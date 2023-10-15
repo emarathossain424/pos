@@ -171,6 +171,7 @@ return [
 
         //custom providers
         App\Providers\FacadeServiceProvider::class,
+        App\Providers\PluginServiceProvider::class,
     ])->toArray(),
 
     /*

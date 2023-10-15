@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Plugin;
+
 class CoreHelperService{
 
     /**
@@ -9,5 +11,12 @@ class CoreHelperService{
      */
     public function isActivePlugin($id){
         return false;
+    }
+
+    /**
+     * Will return all active plugins
+     */
+    public function getActivePlugins(){
+        return Plugin::where('status',1)->get();
     }
 }
