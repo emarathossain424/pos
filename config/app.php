@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\ServiceProvider;
+use App\Providers\PluginRouteServiceProvider;
 
 return [
 
@@ -172,6 +173,7 @@ return [
         //custom providers
         App\Providers\FacadeServiceProvider::class,
         App\Providers\PluginServiceProvider::class,
+        PluginRouteServiceProvider::class,
     ])->toArray(),
 
     /*

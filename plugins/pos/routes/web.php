@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Core\PluginController;
 
 /*
@@ -16,11 +15,6 @@ use App\Http\Controllers\Core\PluginController;
 */
 
 Route::get('/', function () {
-    return view('layouts.master');
-});
-
-Route::prefix('/')->group(function(){
-    Route::resource('plugins', PluginController::class);
-    Route::resource('languages', LanguageController::class);
+    // dd('web.php');
 });
 

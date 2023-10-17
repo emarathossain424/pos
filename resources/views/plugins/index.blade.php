@@ -8,7 +8,7 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
-                        <h5 class="m-0">Featured</h5>
+                        <h5 class="m-0">{{ translate('Plugins') }}</h5>
                         <div class="ml-auto">
                             <button class="btn btn-primary">Create</button>
                             <button class="btn btn-primary">Install</button>

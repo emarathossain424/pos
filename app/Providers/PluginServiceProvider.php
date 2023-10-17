@@ -22,8 +22,6 @@ class PluginServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $plugins = CoreHelpers::getActivePlugins();
-        dd($plugins);
-
         foreach ($plugins as $plugin) {
             //Merge config
             $has_config = file_exists(base_path('plugins/' . $plugin->location . '/config/config.php'));
