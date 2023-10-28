@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\Core\PluginController;
+use App\Http\Controllers\Core\LanguageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,6 +21,12 @@ Route::get('/', function () {
 
 Route::prefix('/')->group(function(){
     Route::resource('plugins', PluginController::class);
-    Route::resource('languages', LanguageController::class);
+
+    //manage Language
+    Route::get('/languages', [LanguageController::class, 'index'])->name('languages.index');
+    Route::get('/languages/create', [LanguageController::class, 'create'])->name('languages.create');
+    Route::post('/languages', [LanguageController::class, 'store'])->name('languages.store');
+
+    Route::post('/languages/update', [LanguageController::class, 'update'])->name('languages.update');
 });
 

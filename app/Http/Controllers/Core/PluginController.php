@@ -12,8 +12,9 @@ class PluginController extends Controller
     /**
      * Will redirect to plugin list
      */
-    public function index(){
+    public function index()
+    {
         $plugins = Plugin::all();
-        return view('plugins.index',compact('plugins'));
+        return view('plugins.index', compact('plugins'));
     }
 }

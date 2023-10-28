@@ -62,13 +62,13 @@
             <a href="{{route('plugins.index')}}" class="nav-link">
               <i class="far fa-object-ungroup"></i>
               <p>
-              {{translate('Plugins')}}
+                {{translate('Plugins')}}
               </p>
             </a>
           </li>
           <li class="nav-item">
             <a href="{{route('languages.index')}}" class="nav-link">
-              <i class="far fa-object-ungroup"></i>
+              <i class="fas fa-language"></i>
               <p>
                 {{translate('Language')}}
               </p>

@@ -11,4 +11,6 @@
   <link rel="stylesheet" href="{{asset('pos/plugins/fontawesome-free/css/all.min.css')}}">
   <!-- Theme style -->
   <link rel="stylesheet" href="{{asset('pos/dist/css/adminlte.min.css')}}">
+  
+  @stack('css')
 </head>

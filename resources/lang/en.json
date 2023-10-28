@@ -7,5 +7,19 @@
     "Language": "Language",
     "Languages": "Languages",
     "Dashboard": "Dashboard",
-    "Create": "Create"
+    "Create": "Create",
+    "Create Language": "Create Language",
+    "Save": "Save",
+    "Close": "Close",
+    "Name": "Name",
+    "Enter Language Name": "Enter Language Name",
+    "Code": "Code",
+    "Enter Language Code": "Enter Language Code",
+    "Error": "Error",
+    "Oops!": "Oops!",
+    "Action": "Action",
+    "Edit": "Edit",
+    "Delete": "Delete",
+    "Update Language": "Update Language",
+    "Update": "Update"
 }
