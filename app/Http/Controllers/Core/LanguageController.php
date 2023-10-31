@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\Core;
 
+use App\Models\Language;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Brian2694\Toastr\Facades\Toastr;
 use App\Http\Requests\StoreLanguageRequest;
-use App\Models\Language;
 
 class LanguageController extends Controller
 {
@@ -43,6 +44,7 @@ class LanguageController extends Controller
         $language->code = $request['code'];
         $language->update();
 
+        Toastr::success('Messages in here', 'Title');
         return back();
     }
 }
