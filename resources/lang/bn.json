@@ -1,7 +1,7 @@
 {
     "welcome to": "Welcome to our website!",
     "home": "Home",
-    "about": "About Us",
+    "about": "About Us32",
     "contact": "Contact Us",
     "Plugins": "Plugins",
     "Language": "Language",
@@ -27,14 +27,5 @@
     "Translate": "Translate",
     "Key": "Key",
     "Value": "Value",
-    "#": "#",
-    "RTL": "RTL",
-    "Is RTL": "Is RTL",
-    "RTL status updated successfully": "RTL status updated successfully",
-    "Success": "Success",
-    "Something went wrong": "Something went wrong",
-    "Media Library": "Media Library",
-    "Unable to change status": "Unable to change status",
-    "Drop files here or click to upload.": "Drop files here or click to upload.",
-    "This is just a demo dropzone. Selected files are not actually uploaded.": "This is just a demo dropzone. Selected files are not actually uploaded."
+    "#": "#"
 }

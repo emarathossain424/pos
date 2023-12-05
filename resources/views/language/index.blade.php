@@ -1,7 +1,7 @@
 @php
 @endphp
 @extends('layouts.master')
-@section('title') Languages @endsection
+@section('title') {{translate('Languages')}} @endsection
 @push('css')
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-responsive/css/responsive.bootstrap4.min.css')}}">
@@ -16,9 +16,9 @@
 @section('content')
 <div class="content">
     <div class="container-fluid">
-        <x-alert column="col-md-6" alert_type="alert-warning" />
+        <x-alert column="col-md-12" alert_type="alert-warning" />
         <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
                         <h5 class="m-0">{{ translate('Languages') }}</h5>
@@ -33,6 +33,7 @@
                                     <th>#</th>
                                     <th>{{translate('Name')}}</th>
                                     <th>{{translate('Code')}}</th>
+                                    <th>{{translate('Is RTL')}}</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -43,13 +44,20 @@
                                     <td>{{$lang->name}}</td>
                                     <td>{{$lang->code}}</td>
                                     <td>
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input change-rtl-status" id="rtlStatus{{$key}}" data-id="{{$lang->id}}" {{$lang->is_rtl==1?'checked':''}}>
+                                            <label class="custom-control-label" for="rtlStatus{{$key}}"></label>
+                                        </div>
+                                    </td>
+                                    <td>
                                         <div class="btn-group" role="group">
                                             <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 {{translate('Action')}}
                                             </button>
                                             <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="{{route('translate',$lang->code)}}">{{translate('Translate')}}</a>
                                                 <a class="dropdown-item update-lang" href="#" data-id="{{$lang->id}}" data-name="{{$lang->name}}" data-code="{{$lang->code}}" data-toggle="modal" data-target="#updateLang">{{translate('Edit')}}</a>
-                                                <a class="dropdown-item" href="#">{{translate('Delete')}}</a>
+                                                <a class="dropdown-item delete-lang" href="#" data-id="{{$lang->id}}" data-toggle="modal" data-target="#deleteLang">{{translate('Delete')}}</a>
                                             </div>
                                         </div>
                                     </td>
@@ -92,6 +100,13 @@
 </x-dynamic-form-modal>
 <!-- /update language-->
 
+<!-- delete language-->
+<x-dynamic-form-modal route="{{route('languages.delete')}}" modal_type="modal-sm" id="deleteLang" title="{{translate('Delete Language')}}" execute_btn_name="{{translate('Delete')}}" execute_btn_class="btn-danger">
+    <input type="hidden" name="id" id="delete-id">
+    <span>{{translate('Are you sure, you want to delete this language?')}}</span>
+</x-dynamic-form-modal>
+<!-- /delete language-->
+
 @endsection
 
 @push('script')
@@ -115,9 +130,29 @@
             $('#update-id').val(id)
         })
 
-        function updateLanguage() {
+        $('.delete-lang').click(function() {
+            const id = $(this).data('id')
+            $('#delete-id').val(id)
+        })
 
-        }
+        $('.change-rtl-status').change(function() {
+            const id = $(this).data('id')
+            var postData = {
+                _token: '{{csrf_token()}}',
+                id: id,
+            };
+            $.post('{{route("update.language.rtl.status")}}', postData, function(response) {
+                if(response.success){
+                    toastr.success(response.message, 'success');
+                    location.reload()
+                }
+                else{
+                    toastr.error(response.message, 'error');
+                }
+            }).fail(function(error){
+                toastr.error('{{translate("Something went wrong")}}', 'error');
+            })
+        })
     });
 </script>
 @endpush

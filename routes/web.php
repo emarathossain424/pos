@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Core\PluginController;
 use App\Http\Controllers\Core\LanguageController;
+use App\Http\Controllers\Core\MediaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,8 +26,15 @@ Route::prefix('/')->group(function(){
     //manage Language
     Route::get('/languages', [LanguageController::class, 'index'])->name('languages.index');
     Route::get('/languages/create', [LanguageController::class, 'create'])->name('languages.create');
-    Route::post('/languages', [LanguageController::class, 'store'])->name('languages.store');
-
+    Route::post('/languages/store', [LanguageController::class, 'store'])->name('languages.store');
     Route::post('/languages/update', [LanguageController::class, 'update'])->name('languages.update');
+    Route::post('/languages/delete', [LanguageController::class, 'delete'])->name('languages.delete');
+    Route::get('/translate/{code}', [LanguageController::class, 'translate'])->name('translate');
+    Route::post('/update-translations', [LanguageController::class, 'updateTranslations'])->name('update.translations');
+    Route::post('/update-language-rtl-status', [LanguageController::class, 'updateLanguageRtlStatus'])->name('update.language.rtl.status');
+    
+    //Media Library
+    Route::get('/media-library', [MediaController::class, 'media'])->name('media.library');
+    Route::post('/media-upload', [MediaController::class, 'uploadMedia'])->name('media.upload');
 });
 

@@ -59,6 +59,14 @@
             </ul>
           </li>
           <li class="nav-item">
+            <a href="{{route('media.library')}}" class="nav-link">
+              <i class="far fa-object-ungroup"></i>
+              <p>
+                {{translate('Media Library')}}
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="{{route('plugins.index')}}" class="nav-link">
               <i class="far fa-object-ungroup"></i>
               <p>
