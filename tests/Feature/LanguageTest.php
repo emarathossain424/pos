@@ -74,15 +74,10 @@ class LanguageTest extends TestCase
         ]);
 
         $response->assertStatus(302);
-
         $language = Language::find(11);
 
         $this->assertNotNull($language);
         $this->assertEquals('Arabic2',$language->name);
         DB::rollBack();
-    }
-
-    public function test_language_delete() {
-        
     }
 }

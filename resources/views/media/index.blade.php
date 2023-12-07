@@ -1,5 +1,3 @@
-@php
-@endphp
 @extends('layouts.master')
 @section('title') {{translate('Media Library')}} @endsection
 @push('css')

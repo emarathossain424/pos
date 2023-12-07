@@ -1,9 +1,10 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Core\MediaController;
 use App\Http\Controllers\Core\PluginController;
 use App\Http\Controllers\Core\LanguageController;
-use App\Http\Controllers\Core\MediaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,3 +39,7 @@ Route::prefix('/')->group(function(){
     Route::post('/media-upload', [MediaController::class, 'uploadMedia'])->name('media.upload');
 });
 
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
