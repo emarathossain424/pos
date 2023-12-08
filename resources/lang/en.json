@@ -36,5 +36,10 @@
     "Media Library": "Media Library",
     "Unable to change status": "Unable to change status",
     "Drop files here or click to upload.": "Drop files here or click to upload.",
-    "This is just a demo dropzone. Selected files are not actually uploaded.": "This is just a demo dropzone. Selected files are not actually uploaded."
+    "This is just a demo dropzone. Selected files are not actually uploaded.": "This is just a demo dropzone. Selected files are not actually uploaded.",
+    "Sign in to start your session": "Sign in to start your session",
+    "Remember Me": "Remember Me",
+    "Sign In": "Sign In",
+    "I forgot my password": "I forgot my password",
+    "Invalid credentials": "Invalid credentials"
 }

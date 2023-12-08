@@ -17,6 +17,8 @@ use App\Http\Controllers\Core\LanguageController;
 |
 */
 
+// Auth::logout();
+
 Route::get('/', function () {
     return view('layouts.master');
 });
