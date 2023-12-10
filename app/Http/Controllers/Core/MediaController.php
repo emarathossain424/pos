@@ -19,48 +19,60 @@ class MediaController extends Controller
      */
     public function media()
     {
-        return view('media.index');
+        $media = Upload::all();
+        return view('media.index',compact('media'));
     }
 
+    /**
+     * upload media files
+     * @param Request $request
+     */
     public function uploadMedia(Request $request)
     {
-        $file = $request->file('file');
-        $fileName = $file->getClientOriginalName();
-        $fileExtension = $file->getClientOriginalExtension();
-        $fileSize = $file->getSize();
-        $mimeType = $file->getMimeType();
+        try {
+            $file = $request->file('file');
 
-        dd($file);
+            // Generate a unique filename using timestamp
+            $timestamp = now()->timestamp;
+            $fileName = $timestamp . '_' . $file->getClientOriginalName();
 
-        // Get current year and month
-        $currentYear = now()->format('Y');
-        $currentMonth = now()->format('m');
+            $fileExtension = $file->getClientOriginalExtension();
+            $fileSize = $file->getSize();
+            $mimeType = $file->getMimeType();
 
-        // Create directories if they don't exist
-        if (!Storage::exists('public/uploads/' . $currentYear)) {
-            Storage::makeDirectory('public/uploads/' . $currentYear);
+            // Get current year and month
+            $currentYear = now()->format('Y');
+            $currentMonth = now()->format('m');
+
+            // Create directories if they don't exist
+            $uploadPath = public_path("uploads/$currentYear/$currentMonth");
+
+            if (!file_exists($uploadPath)) {
+                mkdir($uploadPath, 0755, true);
+            }
+
+            // Save the file
+            $file->move($uploadPath, $fileName);
+
+            $fileLocation = "uploads/$currentYear/$currentMonth/$fileName"; 
+
+            $fileModel = new Upload();
+            $fileModel->name = $fileName;
+            $fileModel->file_location = $fileLocation;
+            $fileModel->file_extension = $fileExtension;
+            $fileModel->file_size = $fileSize;
+            $fileModel->file_type = $mimeType;
+            $fileModel->saveOrFail();
+
+            return response()->json([
+                'success' => true,
+                'path' => asset($fileLocation)
+            ]);
+        } catch (\Exception $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Unable to upload file')
+            ]);
         }
-
-        if (!Storage::exists('public/uploads/' . $currentYear . '/' . $currentMonth)) {
-            Storage::makeDirectory('public/uploads/' . $currentYear . '/' . $currentMonth);
-        }
-
-        // Save the file
-        $path = $file->storeAs('uploads/' . $currentYear . '/' . $currentMonth, $fileName);
-
-        $downloadableUrl = Storage::disk('public')->url($path);
-
-        $file = new Upload();
-        $file->name = $fileName;
-        $file->file_location = $path;
-        $file->file_extension = $fileExtension;
-        $file->file_size = $fileSize;
-        $file->file_type = $mimeType;
-        $file->saveOrFail();
-        
-        return response()->json([
-            'success' => true,
-            'path'=>$path
-        ]);
     }
 }

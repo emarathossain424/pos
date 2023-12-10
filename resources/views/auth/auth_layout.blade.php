@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="{{asset('pos/dist/css/adminlte.min.css')}}">
   @stack('css')
 </head>
-<body class="hold-transition login-page">
+<body class="hold-transition">
 
 @yield('auth_content')
 

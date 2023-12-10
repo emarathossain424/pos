@@ -19,11 +19,11 @@ use App\Http\Controllers\Core\LanguageController;
 
 // Auth::logout();
 
-Route::get('/', function () {
-    return view('layouts.master');
-});
+Route::prefix('/')->middleware('auth')->group(function () {
+    Route::get('/', function () {
+        return view('layouts.master');
+    });
 
-Route::prefix('/')->group(function(){
     Route::resource('plugins', PluginController::class);
 
     //manage Language
@@ -35,7 +35,7 @@ Route::prefix('/')->group(function(){
     Route::get('/translate/{code}', [LanguageController::class, 'translate'])->name('translate');
     Route::post('/update-translations', [LanguageController::class, 'updateTranslations'])->name('update.translations');
     Route::post('/update-language-rtl-status', [LanguageController::class, 'updateLanguageRtlStatus'])->name('update.language.rtl.status');
-    
+
     //Media Library
     Route::get('/media-library', [MediaController::class, 'media'])->name('media.library');
     Route::post('/media-upload', [MediaController::class, 'uploadMedia'])->name('media.upload');
@@ -43,5 +43,3 @@ Route::prefix('/')->group(function(){
 
 
 Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

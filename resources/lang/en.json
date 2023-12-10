@@ -41,5 +41,11 @@
     "Remember Me": "Remember Me",
     "Sign In": "Sign In",
     "I forgot my password": "I forgot my password",
-    "Invalid credentials": "Invalid credentials"
+    "Invalid credentials": "Invalid credentials",
+    "Forgot your password? ": "Forgot your password? ",
+    "Try forgot link": "Try forgot link",
+    "Settings": "Settings",
+    "Logout": "Logout",
+    "Try forgot password link": "Try forgot password link",
+    "Show More": "Show More"
 }

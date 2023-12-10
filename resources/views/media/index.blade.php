@@ -17,6 +17,28 @@
         margin-left: auto;
         margin-right: auto;
     }
+
+    .library .img-container {
+        background-color: #ededee;
+        padding: 8px;
+        border-radius: 8px;
+        border: 1px solid #b7b2b2;
+        height: 110px;
+        /* Set the desired height */
+        width: 100%;
+        /* Set the desired width */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .library img {
+        max-width: 100%;
+        max-height: 100%;
+        border-radius: 4px;
+        /* Optional: Add border-radius for rounded corners on images */
+    }
 </style>
 @endpush
 @section('breadcrumb')
@@ -47,7 +69,18 @@
                         <h5 class="m-0">{{ translate('Media Library') }}</h5>
                     </div>
                     <div class="card-body library">
-
+                        <div class="row">
+                            @foreach($media as $file)
+                            <div class="col-sm-1">
+                                <div class="align-items-center d-flex img-container justify-content-center mb-1">
+                                    <img src="{{asset($file->file_location)}}" alt="Thumbnail">
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                        <div class="row mt-2 justify-content-center">
+                            <button class="btn bg-gradient-gray">{{translate('Show More')}}</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -77,9 +110,21 @@
                 maxFilesize: 3,
                 filesizeBase: 1000,
                 success: function(file, response) {
+                    // Create a new div with the "col-sm-2" class
+                    var colDiv = document.createElement('div');
+                    colDiv.className = 'col-sm-2';
+
+                    // Create an img element and set its src attribute
                     var thumbnailElement = document.createElement('img');
                     thumbnailElement.src = response.path;
-                    document.querySelector('.library').appendChild(thumbnailElement);
+                    thumbnailElement.className = 'img-fluid mb-2';
+                    thumbnailElement.alt = 'Thumbnail';
+
+                    // Append the img element to the new div
+                    colDiv.appendChild(thumbnailElement);
+
+                    // Append the new div to the ".library" div
+                    document.querySelector('.library .row').appendChild(colDiv);
                 },
             });
 
