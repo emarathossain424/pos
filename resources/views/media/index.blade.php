@@ -23,7 +23,7 @@
         padding: 8px;
         border-radius: 8px;
         border: 1px solid #b7b2b2;
-        height: 110px;
+        height: auto;
         /* Set the desired height */
         width: 100%;
         /* Set the desired width */
@@ -68,8 +68,8 @@
                     <div class="card-header d-flex justify-content-between">
                         <h5 class="m-0">{{ translate('Media Library') }}</h5>
                     </div>
-                    <div class="card-body library">
-                        <div class="row">
+                    <div class="card-body">
+                        <div class="row library">
                             @foreach($media as $file)
                             <div class="col-sm-1">
                                 <div class="align-items-center d-flex img-container justify-content-center mb-1">
@@ -79,7 +79,7 @@
                             @endforeach
                         </div>
                         <div class="row mt-2 justify-content-center">
-                            <button class="btn bg-gradient-gray">{{translate('Show More')}}</button>
+                            <button class="btn bg-gradient-gray" id="show-more" {{$media->currentPage()==$media->lastPage()?'disabled':''}}>{{translate('Show More')}}</button>
                         </div>
                     </div>
                 </div>
@@ -99,34 +99,86 @@
         'use strict'
         initDropZone()
 
+        let page = 1
+        let item = 12
+        const lastPage = '{{$media->lastPage()}}'
+
+        $('#show-more').on('click', function() {
+            page = page + 1
+            const route = `{{route("paginate.media.library")}}`
+            const postData = {
+                '_token': '{{csrf_token()}}',
+                'page': page,
+                'item': item
+            }
+            $.post(route, postData, function(response) {
+                    $('.library').append(response);
+                    if (lastPage == page) {
+                        $('#show-more').attr('disabled', true);
+                    }
+                })
+                .fail(function(error) {
+                    console.error('Error:', error.statusText);
+                });
+        })
+
         function initDropZone() {
             Dropzone.autoDiscover = false;
 
             $("#demo-upload").dropzone({
-                url: `{{route('media.upload')}}`,
+                url: `{{ route('media.upload') }}`,
                 parallelUploads: 2,
-                thumbnailHeight: 120,
-                thumbnailWidth: 120,
-                maxFilesize: 3,
-                filesizeBase: 1000,
-                success: function(file, response) {
-                    // Create a new div with the "col-sm-2" class
-                    var colDiv = document.createElement('div');
-                    colDiv.className = 'col-sm-2';
+                maxFilesize: 3, // in MB
+                acceptedFiles: 'image/*,application/pdf,application/zip', // Allow images, PDFs, and ZIP files
 
-                    // Create an img element and set its src attribute
+                init: function() {
+                    this.on('addedfile', function(file) {
+                        // Check if the file type is allowed
+                        var allowedTypes = this.options.acceptedFiles.split(',');
+                        var fileType = file.type;
+                        if (!allowedTypes.includes(fileType)) {
+                            toastr.error('Invalid file type. Allowed types: ' + this.options.acceptedFiles, 'Error');
+                            this.removeFile(file);
+                        }
+
+                        // Check for the maximum number of parallel uploads
+                        if (this.files.length > this.options.parallelUploads) {
+                            toastr.error('Too many files. Maximum allowed: ' + this.options.parallelUploads, 'Error');
+                            this.removeFile(file);
+                        }
+                    });
+
+                    this.on('maxfilesexceeded', function(file) {
+                        toastr.error('Max file size exceeded. Maximum allowed: ' + this.options.maxFilesize + 'MB', 'Error');
+                        this.removeFile(file);
+                    });
+
+                    this.on('error', function(file, response) {
+                        // Handle other errors here
+                        toastr.error('Something went wrong', 'Error');
+                        this.removeFile(file);
+                    });
+                },
+
+                success: function(file, response) {
+                    var colDiv = document.createElement('div');
+                    colDiv.className = 'col-sm-1';
+
                     var thumbnailElement = document.createElement('img');
                     thumbnailElement.src = response.path;
                     thumbnailElement.className = 'img-fluid mb-2';
                     thumbnailElement.alt = 'Thumbnail';
 
-                    // Append the img element to the new div
-                    colDiv.appendChild(thumbnailElement);
+                    var imgContainerDiv = document.createElement('div');
+                    imgContainerDiv.className = 'align-items-center d-flex img-container justify-content-center mb-1';
+                    imgContainerDiv.appendChild(thumbnailElement);
 
-                    // Append the new div to the ".library" div
-                    document.querySelector('.library .row').appendChild(colDiv);
+                    colDiv.appendChild(imgContainerDiv);
+                    document.querySelector('.library').appendChild(colDiv);
                 },
             });
+
+
 
             var minSteps = 6,
                 maxSteps = 60,

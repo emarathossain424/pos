@@ -39,6 +39,7 @@ Route::prefix('/')->middleware('auth')->group(function () {
     //Media Library
     Route::get('/media-library', [MediaController::class, 'media'])->name('media.library');
     Route::post('/media-upload', [MediaController::class, 'uploadMedia'])->name('media.upload');
+    Route::post('/paginate-media-library',[MediaController::class,'paginateMediaLibrary'])->name('paginate.media.library');
 });
 
 

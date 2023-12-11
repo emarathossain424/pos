@@ -19,8 +19,15 @@ class MediaController extends Controller
      */
     public function media()
     {
-        $media = Upload::all();
+        $media = Upload::paginate(12);
         return view('media.index',compact('media'));
+    }
+
+    
+    public function paginateMediaLibrary(Request $request) {
+        $skip = ($request['page']-1)*$request['item'];
+        $media = Upload::skip($skip)->take($request['item'])->get();
+        return view('media.include.files',compact('media'));
     }
 
     /**
