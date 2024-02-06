@@ -18,26 +18,19 @@
         margin-right: auto;
     }
 
-    .library .img-container {
-        background-color: #ededee;
-        padding: 8px;
-        border-radius: 8px;
-        border: 1px solid #b7b2b2;
-        height: auto;
-        /* Set the desired height */
-        width: 100%;
-        /* Set the desired width */
+    .library {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
+        flex-wrap: wrap;
+        /* Allow items to wrap to the next row */
     }
 
-    .library img {
-        max-width: 100%;
+    .library .image-container {
+        background-color: #e2eaf1 !important;
+    }
+
+    .img-fluid {
         max-height: 100%;
-        border-radius: 4px;
-        /* Optional: Add border-radius for rounded corners on images */
+        object-fit: cover;
     }
 </style>
 @endpush
@@ -69,12 +62,29 @@
                         <h5 class="m-0">{{ translate('Media Library') }}</h5>
                     </div>
                     <div class="card-body">
-                        <div class="row library">
+                        <!-- <div class="row library">
                             @foreach($media as $file)
-                            <div class="col-sm-1">
+                            <div>
                                 <div class="align-items-center d-flex img-container justify-content-center mb-1">
                                     <img src="{{asset($file->file_location)}}" alt="Thumbnail">
                                 </div>
+                            </div>
+                            @endforeach
+                        </div> -->
+                        <div class="row library">
+                            @foreach($media as $file)
+                            <div class="col-md-1 d-flex align-items-center m-1 image-container">
+                                @if($file->file_extension == 'zip')
+                                <img src="{{asset('assets/images/zip.png')}}" alt="Thumbnail" class="img-fluid">
+                                @elseif($file->file_extension == 'pdf')
+                                <img src="{{asset('assets/images/pdf.png')}}" alt="Thumbnail" class="img-fluid">
+                                @elseif($file->file_extension == 'mp4')
+                                <img src="{{asset('assets/images/multimedia.png')}}" alt="Thumbnail" class="img-fluid">
+                                @elseif($file->file_extension == 'mp3')
+                                <img src="{{asset('assets/images/mic.png')}}" alt="Thumbnail" class="img-fluid">
+                                @else
+                                <img src="{{asset($file->file_location)}}" alt="Thumbnail" class="img-fluid">
+                                @endif
                             </div>
                             @endforeach
                         </div>
@@ -100,7 +110,7 @@
         initDropZone()
 
         let page = 1
-        let item = 12
+        let item = 22
         const lastPage = '{{$media->lastPage()}}'
 
         $('#show-more').on('click', function() {
@@ -128,14 +138,15 @@
             $("#demo-upload").dropzone({
                 url: `{{ route('media.upload') }}`,
                 parallelUploads: 2,
-                maxFilesize: 3, // in MB
-                acceptedFiles: 'image/*,application/pdf,application/zip', // Allow images, PDFs, and ZIP files
+                maxFilesize: 10, // in MB
+                acceptedFiles: 'image/jpeg,image/png,image/bmp,application/pdf,application/zip,video/mp4,audio/mpeg,application/x-zip-compressed', // Allow images, PDFs, and ZIP files
 
                 init: function() {
                     this.on('addedfile', function(file) {
                         // Check if the file type is allowed
                         var allowedTypes = this.options.acceptedFiles.split(',');
                         var fileType = file.type;
+                        console.log(fileType)
                         if (!allowedTypes.includes(fileType)) {
                             toastr.error('Invalid file type. Allowed types: ' + this.options.acceptedFiles, 'Error');
                             this.removeFile(file);
@@ -155,26 +166,29 @@
 
                     this.on('error', function(file, response) {
                         // Handle other errors here
-                        toastr.error('Something went wrong', 'Error');
+                        toastr.error('Unable to upload file', 'Error');
                         this.removeFile(file);
                     });
                 },
 
                 success: function(file, response) {
+
                     var colDiv = document.createElement('div');
-                    colDiv.className = 'col-sm-1';
+                    colDiv.className = 'col-md-1 d-flex align-items-center m-1 image-container';
 
                     var thumbnailElement = document.createElement('img');
                     thumbnailElement.src = response.path;
-                    thumbnailElement.className = 'img-fluid mb-2';
+                    thumbnailElement.className = 'img-fluid';
                     thumbnailElement.alt = 'Thumbnail';
 
-                    var imgContainerDiv = document.createElement('div');
-                    imgContainerDiv.className = 'align-items-center d-flex img-container justify-content-center mb-1';
-                    imgContainerDiv.appendChild(thumbnailElement);
+                    colDiv.appendChild(thumbnailElement);
 
-                    colDiv.appendChild(imgContainerDiv);
-                    document.querySelector('.library').appendChild(colDiv);
+                    // Get the reference to the first child of .library
+                    var firstChild = document.querySelector('.library').firstChild;
+
+                    // Insert colDiv before the first child
+                    document.querySelector('.library').insertBefore(colDiv, firstChild);
+
                 },
             });
 

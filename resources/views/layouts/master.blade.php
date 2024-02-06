@@ -6,7 +6,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <html lang="en">
 @includeIf('layouts.head')
 
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition sidebar-mini accent-pink">
     <div class="wrapper">
 
         @includeIf('layouts.nav')
