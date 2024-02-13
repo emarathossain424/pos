@@ -15,10 +15,25 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <h6 class="card-title">Special title treatment</h6>
-
-                        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                        <a href="#" class="btn btn-primary">Go somewhere</a>
+                        <div class="row">
+                            @foreach($plugins as $plugin)
+                            <div class="col-md-3">
+                                <div class="card">
+                                    <div class="card-header text-center bg-gradient-pink">
+                                        <h3>{{$plugin->name}}</h3>
+                                        <span class="badge badge-light">{{translate('Free')}}</span>
+                                    </div>
+                                    <div class="card-body">
+                                        <span class="text-gray">{{$plugin->details}}</span>
+                                    </div>
+                                    <div class="card-footer d-flex justify-content-between">
+                                        <span class="text-gray"><strong>By :</strong> {{$plugin->owner}}</span>
+                                        <span class="text-gray"><strong>Version :</strong> {{$plugin->version}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
             </div>

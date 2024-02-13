@@ -32,6 +32,18 @@
         max-height: 100%;
         object-fit: cover;
     }
+
+    .library .image-container:hover {
+        border: 4px solid #e83e8c;
+    }
+
+    .file-details {
+        font-size: 13px;
+    }
+
+    .file-details .title {
+        font-weight: bold;
+    }
 </style>
 @endpush
 @section('breadcrumb')
@@ -43,6 +55,7 @@
 @section('content')
 <div class="content">
     <div class="container-fluid">
+        <!-- Dropzone -->
         <section>
             <div id="dropzone">
                 <form class="dropzone needsclick" id="demo-upload" action="/upload" method="post" enctype="multipart/form-data" name="media_file">
@@ -55,6 +68,9 @@
                 </form>
             </div>
         </section>
+        <!-- /Dropzone -->
+
+        <!-- Media library -->
         <div class="row mt-3">
             <div class="col-lg-12">
                 <div class="card">
@@ -62,39 +78,111 @@
                         <h5 class="m-0">{{ translate('Media Library') }}</h5>
                     </div>
                     <div class="card-body">
-                        <!-- <div class="row library">
-                            @foreach($media as $file)
-                            <div>
-                                <div class="align-items-center d-flex img-container justify-content-center mb-1">
-                                    <img src="{{asset($file->file_location)}}" alt="Thumbnail">
-                                </div>
-                            </div>
-                            @endforeach
-                        </div> -->
                         <div class="row library">
                             @foreach($media as $file)
-                            <div class="col-md-1 d-flex align-items-center m-1 image-container">
+                            @php
+                            $file_details = json_encode([
+                            'file_name' => $file->name,
+                            'file_url' => asset($file->file_location),
+                            'file_type' => $file->file_type,
+                            'file_size' => $file->file_size/1024 . " kb",
+                            'file_uploaded_by' => $file->uploaded_by,
+                            'file_uploaded_at' => $file->created_at,
+                            'file_id' => $file->id,
+                            'file_extension' => $file->file_extension
+                            ]);
+
+                            @endphp
+                            <div class="col-md-1 d-flex align-items-center m-1 image-container" id="file-details-{{$file->id}}" data-details="{{$file_details}}">
                                 @if($file->file_extension == 'zip')
-                                <img src="{{asset('assets/images/zip.png')}}" alt="Thumbnail" class="img-fluid">
+                                <img src="{{asset('assets/images/zip.png')}}" alt="Thumbnail" class="img-fluid" id="file-details-{{$file->id}}" data-details="{{$file_details}}">
                                 @elseif($file->file_extension == 'pdf')
-                                <img src="{{asset('assets/images/pdf.png')}}" alt="Thumbnail" class="img-fluid">
+                                <img src="{{asset('assets/images/pdf.png')}}" alt="Thumbnail" class="img-fluid" id="file-details-{{$file->id}}" data-details="{{$file_details}}">
                                 @elseif($file->file_extension == 'mp4')
-                                <img src="{{asset('assets/images/multimedia.png')}}" alt="Thumbnail" class="img-fluid">
+                                <img src="{{asset('assets/images/multimedia.png')}}" alt="Thumbnail" class="img-fluid" id="file-details-{{$file->id}}" data-details="{{$file_details}}">
                                 @elseif($file->file_extension == 'mp3')
-                                <img src="{{asset('assets/images/mic.png')}}" alt="Thumbnail" class="img-fluid">
+                                <img src="{{asset('assets/images/mic.png')}}" alt="Thumbnail" class="img-fluid" id="file-details-{{$file->id}}" data-details="{{$file_details}}">
                                 @else
-                                <img src="{{asset($file->file_location)}}" alt="Thumbnail" class="img-fluid">
+                                <img src="{{asset($file->file_location)}}" alt="Thumbnail" class="img-fluid" id="file-details-{{$file->id}}" data-details="{{$file_details}}">
                                 @endif
                             </div>
                             @endforeach
                         </div>
-                        <div class="row mt-2 justify-content-center">
-                            <button class="btn bg-gradient-gray" id="show-more" {{$media->currentPage()==$media->lastPage()?'disabled':''}}>{{translate('Show More')}}</button>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row mt-2 justify-content-between">
+                            <p id="pagination-message">{{translate('Showing')}} {{$media->perPage()}} {{translate('of')}} {{$media->total()}} {{translate('itmes')}}</p>
+                            <button class="btn btn-link ml-2" id="show-more" {{$media->currentPage()==$media->lastPage()?'disabled':''}}>
+                                <strong>{{translate('Show More')}}</strong>
+                            </button>
+                            <button class="btn btn-outline-danger rounded-pill" id="bulk-delete">{{translate('Delete Selected Files')}}</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <!-- /Media library -->
+
+        <!-- Single file details -->
+        <div class="modal fade" id="single-file-details-modal">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <img src="/uploads/2023/12/1702140255_8917.jpg" alt="Thumbnail" class="img-fluid" id="orig-image">
+                            </div>
+                            <div class="col-md-6">
+                                <div class="border-left h-100">
+                                    <div class="file-details pl-3 pr-3">
+                                        <span class="title">{{translate('File Name :')}}</span></strong>
+                                        <span id="file-name"></span>
+                                    </div>
+                                    <div class="file-details pl-3 pr-3 pb-1">
+                                        <span class="title">{{translate('File URL :')}}</span></strong>
+                                        <input type="text" id="file-url" class="form-control-file">
+                                    </div>
+                                    <div class="file-details pl-3 pr-3">
+                                        <span class="title">{{translate('File Type :')}}</span></strong>
+                                        <span id="file-type"></span>
+                                    </div>
+                                    <div class="file-details pl-3 pr-3">
+                                        <span class="title">{{translate('File Size :')}}</span></strong>
+                                        <span id="file-size"></span>
+                                    </div>
+                                    <div class="file-details pl-3 pr-3">
+                                        <span class="title">{{translate('Uploaded By :')}}</span></strong>
+                                        <span id="file-uploaded-by"></span>
+                                    </div>
+                                    <div class="file-details pl-3 pr-3">
+                                        <span class="title">{{translate('Uploaded At :')}}</span></strong>
+                                        <span id="file-uploaded-at"></span>
+                                    </div>
+                                    <div class="d-flex">
+                                        <a href="" class="btn text-pink" id="download-file">{{translate('Download')}}</a>
+                                        <button class="btn text-blue" id="copy">{{translate('Copy to clipboard')}}</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <form action="{{route('delete.file.from.media')}}" method="post">
+                            @csrf
+                            <input type="hidden" id="file_id" value="" name="id">
+                            <button type="submit" class="btn btn-danger">{{translate('Delete')}}</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Single file details -->
     </div>
 </div>
 
@@ -113,6 +201,11 @@
         let item = 22
         const lastPage = '{{$media->lastPage()}}'
 
+        let selected_files = []
+
+        $('#bulk-delete').hide()
+
+        //paginate and show more
         $('#show-more').on('click', function() {
             page = page + 1
             const route = `{{route("paginate.media.library")}}`
@@ -123,6 +216,12 @@
             }
             $.post(route, postData, function(response) {
                     $('.library').append(response);
+                    let file_container = $('.library').children('div')
+                    let currently_showing = file_container.length
+                    let pagination_message = "{{translate('Showing')}} " + currently_showing + " {{translate('of')}} {{$media->total()}} {{translate('itmes')}}" 
+
+                    $('#pagination-message').html(pagination_message)
+                    
                     if (lastPage == page) {
                         $('#show-more').attr('disabled', true);
                     }
@@ -132,6 +231,94 @@
                 });
         })
 
+        //Showing single file details
+        $('.library').on('click', '.image-container img', function(event) {
+            let file_details = $(this).data('details')
+            if (event.ctrlKey) {
+                let file_id = file_details.file_id
+                if (selected_files.includes(file_id)) {
+                    $(this).closest('.image-container').removeAttr('style');
+                    let index = selected_files.indexOf(file_id)
+                    selected_files.splice(index, 1)
+                } else {
+                    selected_files.push(file_id)
+                    $(this).closest('.image-container').css('border', '4px solid #e83e8c');
+                }
+
+                if (selected_files.length > 0) {
+                    $('#bulk-delete').show()
+                } else {
+                    $('#bulk-delete').hide()
+                }
+
+                console.log(selected_files)
+            } else {
+                console.log(file_details)
+                $('#file-name').html(file_details.file_name)
+                $('#file-url').val(file_details.file_url)
+                $('#file-type').html(file_details.file_type)
+                $('#file-size').html(file_details.file_size)
+                $('#file-uploaded-by').html(file_details.file_uploaded_by)
+                $('#file-uploaded-at').html(file_details.file_uploaded_at)
+                $('#file_id').val(file_details.file_id)
+
+                $('#download-file').attr('href', file_details.file_url)
+
+                switch (file_details.file_extension) {
+                    case 'zip':
+                        $('#orig-image').attr('src', "{{asset('assets/images/zip.png')}}")
+                        break;
+                    case 'pdf':
+                        $('#orig-image').attr('src', "{{asset('assets/images/pdf.png')}}")
+                        break;
+                    case 'mp4':
+                        $('#orig-image').attr('src', "{{asset('assets/images/multimedia.png')}}")
+                        break;
+                    case 'mp3':
+                        $('#orig-image').attr('src', "{{asset('assets/images/mic.png')}}")
+                        break;
+                    default:
+                        $('#orig-image').attr('src', file_details.file_url)
+                        break;
+                }
+
+
+
+                // Assuming you want to add these attributes to an element with class 'some-element'
+                $('#file-details-' + file_details.file_id).attr('data-toggle', 'modal').attr('data-target', '#single-file-details-modal');
+            }
+        })
+
+        // Copy to clip board
+        $('#copy').on('click', function() {
+            let inputField = $('#file-url');
+            inputField.select();
+            document.execCommand('copy');
+        });
+
+        $('#bulk-delete').on('click', function() {
+            $.ajax({
+                url: "{{route('delete.files.from.media.in.bulk')}}",
+                method: 'POST',
+                data: {
+                    _token:'{{csrf_token()}}',
+                    files:selected_files.join(',')
+                },
+                success: function(response) {
+                    if(response.success){
+                        toastr.success('Selected files deleted successfully', 'Success');
+                        $('#bulk-delete').hide()
+                        location.reload()
+                    }
+                },
+                error: function(xhr, status, error) {
+                    toastr.error('Unable to delete files', 'Error');
+                }
+            });
+
+        })
+
+        //Initializig dropzone
         function initDropZone() {
             Dropzone.autoDiscover = false;
 

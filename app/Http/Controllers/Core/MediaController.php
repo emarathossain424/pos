@@ -20,7 +20,7 @@ class MediaController extends Controller
     public function media()
     {
         $media = Upload::paginate(22);
-        return view('media.index',compact('media'));
+        return view('media.index', compact('media'));
     }
 
     /**
@@ -28,10 +28,11 @@ class MediaController extends Controller
      *
      * @param Request $request
      */
-    public function paginateMediaLibrary(Request $request) {
-        $skip = ($request['page']-1)*$request['item'];
+    public function paginateMediaLibrary(Request $request)
+    {
+        $skip = ($request['page'] - 1) * $request['item'];
         $media = Upload::skip($skip)->take($request['item'])->get();
-        return view('media.include.files',compact('media'));
+        return view('media.include.files', compact('media'));
     }
 
     /**
@@ -65,7 +66,7 @@ class MediaController extends Controller
             // Save the file
             $file->move($uploadPath, $fileName);
 
-            $fileLocation = "uploads/$currentYear/$currentMonth/$fileName"; 
+            $fileLocation = "uploads/$currentYear/$currentMonth/$fileName";
 
             $fileModel = new Upload();
             $fileModel->name = $fileName;
@@ -84,6 +85,41 @@ class MediaController extends Controller
                 'success' => false,
                 'message' => translate('Unable to upload file')
             ]);
+        }
+    }
+
+    /**
+     * Will delete requested file
+     *
+     * @param Request $request
+     */
+    public function deleteFileFromMedia(Request $request)
+    {
+        try {
+            $fileModel = Upload::find($request['id']);
+            $fileModel->delete();
+            Toastr::success('File deleted sucessfully from media', 'Success');
+            return back();
+        } catch (\Exception $ex) {
+            Toastr::error('Unable to delete file from from media', 'Error');
+            return back();
+        }
+    }
+
+    public function deleteFilesFromMediaInBulk(Request $request)
+    {
+        try {
+            $requested_files_to_delete = explode(',', $request['files']);
+            Upload::whereIn('id', $requested_files_to_delete)->delete();
+            return response()->json([
+                'success' => true,
+                'message' => "Files deleted successfully"
+            ]);
+        } catch (\Exception $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Unable to delete files')
+            ],500);
         }
     }
 }

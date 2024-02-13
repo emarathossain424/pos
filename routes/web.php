@@ -40,6 +40,8 @@ Route::prefix('/')->middleware('auth')->group(function () {
     Route::get('/media-library', [MediaController::class, 'media'])->name('media.library');
     Route::post('/media-upload', [MediaController::class, 'uploadMedia'])->name('media.upload');
     Route::post('/paginate-media-library',[MediaController::class,'paginateMediaLibrary'])->name('paginate.media.library');
+    Route::post('/delete-file-from-media',[MediaController::class,'deleteFileFromMedia'])->name('delete.file.from.media');
+    Route::post('/delete-files-from-media-in-bulk',[MediaController::class,'deleteFilesFromMediaInBulk'])->name('delete.files.from.media.in.bulk');
 });
 
 

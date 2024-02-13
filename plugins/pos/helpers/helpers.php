@@ -3,6 +3,6 @@
 if (!function_exists('testFunction')) {
     function testFunction()
     {
-        dd(789);
+        return "Test Function";
     }
 }

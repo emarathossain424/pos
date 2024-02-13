@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\Core;
 
-use App\Facades\CoreHelpers;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Plugin;
 
