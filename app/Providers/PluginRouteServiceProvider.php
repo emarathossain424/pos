@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Facades\CoreHelpers;
+use App\Facades\PluginService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -26,7 +26,7 @@ class PluginRouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->routes(function () {
-            $plugins = CoreHelpers::getActivePlugins();
+            $plugins = PluginService::getActivePlugins();
             foreach ($plugins as $plugin) {
                 $this->rateLimit($plugin);
 
@@ -35,7 +35,7 @@ class PluginRouteServiceProvider extends ServiceProvider
                     ->group(base_path('plugins/'.$plugin->location . '/routes/api.php'));
 
                 Route::middleware('web')
-                    ->prefix('admin')
+                    ->prefix(getAdminPrefix())
                     ->group(base_path('plugins/'.$plugin->location . '/routes/web.php'));
             }
         });

@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Facades\CoreHelpers;
+use App\Facades\PluginService;
 use Composer\Autoload\ClassLoader;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,7 +21,7 @@ class PluginServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $plugins = CoreHelpers::getActivePlugins();
+        $plugins = PluginService::getActivePlugins();
         foreach ($plugins as $plugin) {
             //Merge config
             $has_config = file_exists(base_path('plugins/' . $plugin->location . '/config/config.php'));

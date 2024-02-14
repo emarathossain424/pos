@@ -26,3 +26,16 @@ if (!function_exists('translate')) {
         }
     }
 }
+
+if (!function_exists('getAdminPrefix')) {
+    /**
+     * Will return admin prefix
+     *
+     * @param String $text
+     * @return void
+     */
+    function getAdminPrefix()
+    {
+        return '/admin';
+    }
+}

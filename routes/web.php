@@ -17,13 +17,9 @@ use App\Http\Controllers\Core\LanguageController;
 |
 */
 
-// Auth::logout();
+Route::prefix(getAdminPrefix())->middleware('auth')->group(function () {
 
-Route::prefix('/')->middleware('auth')->group(function () {
-    Route::get('/', function () {
-        return view('layouts.master');
-    });
-
+    //Manage plugins
     Route::resource('plugins', PluginController::class);
 
     //manage Language

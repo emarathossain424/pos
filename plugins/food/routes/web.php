@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Core\PluginController;
+use Plugin\Food\Controllers\CategoryController;
 use Plugin\Food\Controllers\TestController;
 
 /*
@@ -16,3 +17,7 @@ use Plugin\Food\Controllers\TestController;
 */
 
 Route::get('/test-food-plugin', [TestController::class, 'index'])->name('test.controller');
+
+Route::prefix('/food')->middleware('auth')->group(function () {
+    Route::post('/categories', [CategoryController::class, 'categories'])->name('categories');
+});

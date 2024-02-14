@@ -2,19 +2,18 @@
 
 namespace App\Providers;
 
-use App\Services\PluginService;
+use App\View\Composers\AdminPanelComposer;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
-class FacadeServiceProvider extends ServiceProvider
+class ViewComposerServiceProfider extends ServiceProvider
 {
     /**
      * Register services.
      */
     public function register(): void
     {
-        $this->app->singleton('plugin-service',function(){
-            return new PluginService();
-        });
+        //
     }
 
     /**
@@ -22,6 +21,6 @@ class FacadeServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        View::composer('layouts.master',AdminPanelComposer::class);
     }
 }
