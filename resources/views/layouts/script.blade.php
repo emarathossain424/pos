@@ -12,7 +12,8 @@
     $(function() {
         'use strict'
 
-        let selected_files = []
+        let selected_files_for_delete = []
+        let single_selected_file_to_use = ''
 
         $('#bulk-delete').hide()
 
@@ -53,22 +54,22 @@
             let file_details = $(this).data('details')
             if (event.ctrlKey) {
                 let file_id = file_details.file_id
-                if (selected_files.includes(file_id)) {
+                if (selected_files_for_delete.includes(file_id)) {
                     $(this).closest('.image-container').removeAttr('style');
-                    let index = selected_files.indexOf(file_id)
-                    selected_files.splice(index, 1)
+                    let index = selected_files_for_delete.indexOf(file_id)
+                    selected_files_for_delete.splice(index, 1)
                 } else {
-                    selected_files.push(file_id)
+                    selected_files_for_delete.push(file_id)
                     $(this).closest('.image-container').css('border', '4px solid #e83e8c');
                 }
 
-                if (selected_files.length > 0) {
+                if (selected_files_for_delete.length > 0) {
                     $('#bulk-delete').show()
                 } else {
                     $('#bulk-delete').hide()
                 }
 
-                console.log(selected_files)
+                console.log(selected_files_for_delete)
             } else {
                 console.log(file_details)
                 $('#file-name').html(file_details.file_name)
@@ -104,6 +105,11 @@
             }
         })
 
+        $(document).on('click','#media-library .library .image-container img',function(){
+            let file_details = $(this).data('details')
+            single_selected_file_to_use = file_details.file_id 
+        })
+
         // Copy to clip board
         $('#copy').on('click', function() {
             let inputField = $('#file-url');
@@ -118,7 +124,7 @@
                 method: 'POST',
                 data: {
                     _token: '{{csrf_token()}}',
-                    files: selected_files.join(',')
+                    files: selected_files_for_delete.join(',')
                 },
                 success: function(response) {
                     if (response.success) {
@@ -250,5 +256,10 @@
                 }
             }
         };
+    }
+
+    //will record selected file to use 
+    function selectFileToUse(elem) {
+        console.log($(elem).data('details'))
     }
 </script>

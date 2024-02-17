@@ -14,7 +14,7 @@
 }
 
 .library .image-container {
-    background-color: #FDDDE6 !important;
+    background-color: #cccccc !important;
 }
 
 .image-container .img-fluid {
@@ -34,7 +34,15 @@
     font-weight: bold;
 }
 
-#media-library #pagination-message{
-    margin-top: 15px !important;
+#media-library .modal-lg {
+    max-width: 1000px !important;
 }
 
+.form-image-container {
+    height: 100px;
+    width: 100px;
+}
+
+#media-library #pagination-message {
+    margin-top: 15px !important;
+}

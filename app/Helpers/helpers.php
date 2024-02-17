@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Upload;
+use Illuminate\Support\Facades\DB;
+
 if (!function_exists('translate')) {
     /**
      * Will return translated text
@@ -37,5 +40,50 @@ if (!function_exists('getAdminPrefix')) {
     function getAdminPrefix()
     {
         return '/admin';
+    }
+}
+
+
+if (!function_exists('getPlaceholderImagePath')) {
+    /**
+     * Will return placeholder image path
+     *
+     * @param String $text
+     * @return void
+     */
+    function getPlaceholderImagePath()
+    {
+        $placeholder_image_file_id = getGeneralSettingsValue('placeholder_image');
+        $image_path = getFilePath($placeholder_image_file_id);
+        return $image_path;
+    }
+}
+
+if (!function_exists('getFilePath')) {
+    /**
+     * get requested file path
+     *
+     * @param String $text
+     * @return void
+     */
+    function getFilePath($file_id)
+    {
+        $file = Upload::find($file_id);
+        return $file->file_location;
+    }
+}
+
+
+if (!function_exists('getGeneralSettingsValue')) {
+    /**
+     * will return general settings value
+     */
+    function getGeneralSettingsValue($setings_name)
+    {
+        $settings = DB::table('general_settings')
+        ->where('key_name','=',$setings_name)
+        ->first('key_value');
+
+        return $settings->key_value;
     }
 }
