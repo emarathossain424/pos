@@ -66,5 +66,14 @@
     "Free": "Free",
     "Product": "Product",
     "Categories": "Categories",
-    "Foods": "Foods"
+    "Foods": "Foods",
+    "Create Category": "Create Category",
+    "Enter Category Name": "Enter Category Name",
+    "Enter Category Code": "Enter Category Code",
+    "Add Category": "Add Category",
+    "Category Name": "Category Name",
+    "Select Image": "Select Image",
+    "Browse": "Browse",
+    "Browse File": "Browse File",
+    "Use Selection": "Use Selection"
 }

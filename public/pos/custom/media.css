@@ -1,0 +1,40 @@
+.dropzone {
+    background: white;
+    border-radius: 5px;
+    border: 2px dashed rgb(0, 135, 247);
+    border-image: none;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.library {
+    display: flex;
+    flex-wrap: wrap;
+    /* Allow items to wrap to the next row */
+}
+
+.library .image-container {
+    background-color: #FDDDE6 !important;
+}
+
+.image-container .img-fluid {
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.library .image-container:hover {
+    border: 4px solid #e83e8c;
+}
+
+.file-details {
+    font-size: 13px;
+}
+
+.file-details .title {
+    font-weight: bold;
+}
+
+#media-library #pagination-message{
+    margin-top: 15px !important;
+}
+

@@ -38,6 +38,7 @@ Route::prefix(getAdminPrefix())->middleware('auth')->group(function () {
     Route::post('/paginate-media-library',[MediaController::class,'paginateMediaLibrary'])->name('paginate.media.library');
     Route::post('/delete-file-from-media',[MediaController::class,'deleteFileFromMedia'])->name('delete.file.from.media');
     Route::post('/delete-files-from-media-in-bulk',[MediaController::class,'deleteFilesFromMediaInBulk'])->name('delete.files.from.media.in.bulk');
+    Route::post('/get-media-for-library',[MediaController::class,'getMediaForLibrary'])->name('get.media.for.library');
 });
 
 

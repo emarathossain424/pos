@@ -6,7 +6,8 @@
 'route',
 'modal_type'=>'',
 'show_header'=>true,
-'show_footer'=>true
+'show_footer'=>true,
+'modal_header_class'
 ])
 <!-- Modal -->
 <div class="modal fade" id="{{ $id }}" tabindex="-1" role="dialog" aria-labelledby="{{$id}}Label" aria-hidden="true">
@@ -15,7 +16,7 @@
       @csrf
       <div class="modal-content">
         @if ($show_header)
-        <div class="modal-header">
+        <div class="modal-header {{isset($modal_header_class)??$modal_header_class}}">
           <h5 class="modal-title" id="exampleModalLabel">{{$title}}</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>

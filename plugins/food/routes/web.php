@@ -19,5 +19,6 @@ use Plugin\Food\Controllers\TestController;
 Route::get('/test-food-plugin', [TestController::class, 'index'])->name('test.controller');
 
 Route::prefix('/food')->middleware('auth')->group(function () {
-    Route::post('/categories', [CategoryController::class, 'categories'])->name('categories');
+    Route::get('/categories', [CategoryController::class, 'categories'])->name('categories');
+    Route::get('/add-category', [CategoryController::class, 'addCategory'])->name('add.category');
 });

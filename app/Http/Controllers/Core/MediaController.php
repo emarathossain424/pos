@@ -106,6 +106,9 @@ class MediaController extends Controller
         }
     }
 
+    /**
+     * Delete media files in bulk
+     */
     public function deleteFilesFromMediaInBulk(Request $request)
     {
         try {
@@ -119,7 +122,16 @@ class MediaController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => translate('Unable to delete files')
-            ],500);
+            ], 500);
         }
+    }
+
+    /**
+     * Get media library
+     */
+    public function getMediaForLibrary()
+    {
+        $media = Upload::paginate(20);
+        return view('media.library', compact('media'));
     }
 }
