@@ -15,6 +15,9 @@
         let selected_files_for_delete = []
         let single_selected_file_to_use = ''
 
+        let target_input_field_id = ''
+        let target_image_container_id = ''
+
         $('#bulk-delete').hide()
 
         //paginate and show more
@@ -49,7 +52,7 @@
                 });
         })
 
-        //Showing single file details
+        //Showing single file details and hide or show delete button
         $('.library').on('click', '.image-container img', function(event) {
             let file_details = $(this).data('details')
             if (event.ctrlKey) {
@@ -105,18 +108,6 @@
             }
         })
 
-        $(document).on('click','#media-library .library .image-container img',function(){
-            let file_details = $(this).data('details')
-            single_selected_file_to_use = file_details.file_id 
-        })
-
-        // Copy to clip board
-        $('#copy').on('click', function() {
-            let inputField = $('#file-url');
-            inputField.select();
-            document.execCommand('copy');
-        });
-
         //bulk media file delete
         $('#bulk-delete').on('click', function() {
             $.ajax({
@@ -139,11 +130,22 @@
             });
         })
 
+        // Copy to clip board
+        $('#copy').on('click', function() {
+            let inputField = $('#file-url');
+            inputField.select();
+            document.execCommand('copy');
+        });
+
         //browse media file
-        $('#browse-file').click(() => {
+        $('#browse-file').click(function() {
+            target_input_field_id = "#" + $(this).data('inputid')
+            target_image_container_id = "#" + $(this).data('imagecontainerid')
+
             const route = `{{route("get.media.for.library")}}`
             const postData = {
-                '_token': '{{csrf_token()}}'
+                '_token': '{{csrf_token()}}',
+                'selected_file': single_selected_file_to_use
             }
             $.post(route, postData, function(response) {
                 console.log(response);
@@ -152,12 +154,38 @@
                 console.error('Error:', error.statusText);
             });
         })
+
+        //Select file from library inside form 
+        $(document).on('click', '#media-library .library .image-container img', function() {
+            let file_details = $(this).data('details')
+            single_selected_file_to_use = file_details.file_id
+
+            $(target_input_field_id).val(file_details.file_id)
+
+            switch (file_details.file_extension) {
+                case 'zip':
+                    $(target_image_container_id).attr('src', "{{asset('assets/images/zip.png')}}")
+                    break;
+                case 'pdf':
+                    $(target_image_container_id).attr('src', "{{asset('assets/images/pdf.png')}}")
+                    break;
+                case 'mp4':
+                    $(target_image_container_id).attr('src', "{{asset('assets/images/multimedia.png')}}")
+                    break;
+                case 'mp3':
+                    $(target_image_container_id).attr('src', "{{asset('assets/images/mic.png')}}")
+                    break;
+                default:
+                    $(target_image_container_id).attr('src', file_details.file_url)
+                    break;
+            }
+        })
     });
 
     //Initializig dropzone
     function initDropZone() {
         'use strict'
-        
+
         Dropzone.autoDiscover = false;
 
         $("#demo-upload").dropzone({
@@ -256,10 +284,5 @@
                 }
             }
         };
-    }
-
-    //will record selected file to use 
-    function selectFileToUse(elem) {
-        console.log($(elem).data('details'))
     }
 </script>

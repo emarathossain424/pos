@@ -45,11 +45,12 @@ $placeholder = getPlaceholderImagePath();
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="exampleInputFile">File input</label>
-                                    <div class="form-image-container">
-                                        <img src="{{asset($placeholder)}}" class="img-fluid mb-2" alt="black sample">
+                                    <label for="category-image">{{translate('Category Image')}}</label>
+                                    <input type="hidden" name="category_image" id="category-image-input">
+                                    <div class="form-image-container col-2">
+                                        <img src="{{asset($placeholder)}}" class="img-fluid p-2" alt="black sample" id="category-image-view">
                                     </div>
-                                    <button type="button" class="btn text-blue" data-toggle="modal" data-target="#media-library" id="browse-file">{{translate('Browse File')}}</button>
+                                    <button type="button" class="btn text-blue" data-toggle="modal" data-target="#media-library" data-inputid="category-image-input" data-imagecontainerid="category-image-view" id="browse-file">{{translate('Browse File')}}</button>
                                 </div>
                                 <div class="form-check">
                                     <input type="checkbox" class="form-check-input" id="exampleCheck1">
