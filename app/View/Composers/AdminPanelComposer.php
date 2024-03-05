@@ -14,7 +14,8 @@ class AdminPanelComposer
     public function compose(View $view): void
     {
         $data = [
-            'active_plugins_sidebars'=>PluginService::getActivePluginNavigationLocation()
+            'active_plugins_sidebars'=>PluginService::getActivePluginNavigationLocation(),
+            'placeholder' => getPlaceholderImagePath()
         ];
 
         $view->with($data);

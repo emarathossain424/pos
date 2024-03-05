@@ -1,3 +1,6 @@
+@php
+$selectedFileIdsArray = explode(',',$selectedFileIds);
+@endphp
 <div class="row library">
     @foreach($media as $file)
     @php
@@ -13,7 +16,7 @@
     ]);
 
     @endphp
-    <div class="col-md-1 d-flex align-items-center m-1 image-container" id="file-details-{{$file->id}}" data-details="{{$file_details}}">
+    <div class="col-md-1 d-flex align-items-center m-1 image-container {{in_array($file->id,$selectedFileIdsArray)?'active-image':''}}" id="file-details-{{$file->id}}" data-details="{{$file_details}}">
         @if($file->file_extension == 'zip')
         <img src="{{asset('assets/images/zip.png')}}" alt="Thumbnail" class="img-fluid" id="file-details-{{$file->id}}" data-details="{{$file_details}}">
         @elseif($file->file_extension == 'pdf')

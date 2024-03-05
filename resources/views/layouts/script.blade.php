@@ -13,13 +13,17 @@
         'use strict'
 
         let selected_files_for_delete = []
-        let single_selected_file_to_use = ''
+        let selected_file_id_to_use = []
+        let selected_file_details_to_use = []
+
+        let is_for_multi_select = false
 
         let target_input_field_id = ''
         let target_image_container_id = ''
 
         $('#bulk-delete').hide()
 
+        //--Media Library Start--
         //paginate and show more
         $(document).on('click', '#show-more', function() {
             let page = parseInt($(this).data('page')) + 1
@@ -31,7 +35,8 @@
             const postData = {
                 '_token': '{{csrf_token()}}',
                 'page': page,
-                'item': item
+                'item': item,
+                'selected_file': selected_file_id_to_use
             }
             $.post(route, postData, function(response) {
                     $('.library').append(response);
@@ -58,12 +63,12 @@
             if (event.ctrlKey) {
                 let file_id = file_details.file_id
                 if (selected_files_for_delete.includes(file_id)) {
-                    $(this).closest('.image-container').removeAttr('style');
+                    $(this).closest('.image-container').removeClass('active-image');
                     let index = selected_files_for_delete.indexOf(file_id)
                     selected_files_for_delete.splice(index, 1)
                 } else {
                     selected_files_for_delete.push(file_id)
-                    $(this).closest('.image-container').css('border', '4px solid #e83e8c');
+                    $(this).closest('.image-container').addClass('active-image');
                 }
 
                 if (selected_files_for_delete.length > 0) {
@@ -71,10 +76,7 @@
                 } else {
                     $('#bulk-delete').hide()
                 }
-
-                console.log(selected_files_for_delete)
             } else {
-                console.log(file_details)
                 $('#file-name').html(file_details.file_name)
                 $('#file-url').val(file_details.file_url)
                 $('#file-type').html(file_details.file_type)
@@ -103,7 +105,6 @@
                         break;
                 }
 
-                // Assuming you want to add these attributes to an element with class 'some-element'
                 $('#file-details-' + file_details.file_id).attr('data-toggle', 'modal').attr('data-target', '#single-file-details-modal');
             }
         })
@@ -136,50 +137,194 @@
             inputField.select();
             document.execCommand('copy');
         });
+        //--Media Library End--
 
-        //browse media file
-        $('#browse-file').click(function() {
+        //--Media Library In Modal Start--
+        //STEP01: browse media file
+        $('.browse-file').click(function() {
             target_input_field_id = "#" + $(this).data('inputid')
             target_image_container_id = "#" + $(this).data('imagecontainerid')
+            is_for_multi_select = $(this).data('isformultiselect')
+
+            let already_selected_file = $(target_input_field_id).val();
+            if (already_selected_file.length == 0) {
+                $('.use-files').hide()
+            }
 
             const route = `{{route("get.media.for.library")}}`
             const postData = {
                 '_token': '{{csrf_token()}}',
-                'selected_file': single_selected_file_to_use
+                'selected_file': selected_file_id_to_use
             }
             $.post(route, postData, function(response) {
-                console.log(response);
                 $('.modal-body').html(response)
             }).fail(function(error) {
                 console.error('Error:', error.statusText);
             });
         })
 
-        //Select file from library inside form 
+        //STEP02: Select file from library inside form 
         $(document).on('click', '#media-library .library .image-container img', function() {
             let file_details = $(this).data('details')
-            single_selected_file_to_use = file_details.file_id
+            let file_id = file_details.file_id
 
-            $(target_input_field_id).val(file_details.file_id)
+            if (event.ctrlKey && is_for_multi_select == 1) {
+                if (selected_file_id_to_use.includes(file_id)) {
+                    $(this).closest('.image-container').removeClass('active-image');
+                    let index = selected_file_id_to_use.indexOf(file_id)
+                    selected_file_id_to_use.splice(index, 1)
+                    selected_file_details_to_use.splice(index, 1)
+                } else {
+                    selected_file_id_to_use.push(file_id)
+                    selected_file_details_to_use.push(file_details)
+                    $(this).closest('.image-container').addClass('active-image');
+                }
+            } else {
+                $("#media-library .library .image-container").each(function() {
+                    $(this).removeClass('active-image');
+                });
+                $(this).closest('.image-container').addClass('active-image');
+                selected_file_id_to_use = []
+                selected_file_details_to_use = []
 
-            switch (file_details.file_extension) {
-                case 'zip':
-                    $(target_image_container_id).attr('src', "{{asset('assets/images/zip.png')}}")
-                    break;
-                case 'pdf':
-                    $(target_image_container_id).attr('src', "{{asset('assets/images/pdf.png')}}")
-                    break;
-                case 'mp4':
-                    $(target_image_container_id).attr('src', "{{asset('assets/images/multimedia.png')}}")
-                    break;
-                case 'mp3':
-                    $(target_image_container_id).attr('src', "{{asset('assets/images/mic.png')}}")
-                    break;
-                default:
-                    $(target_image_container_id).attr('src', file_details.file_url)
-                    break;
+                selected_file_id_to_use[0] = file_id
+                selected_file_details_to_use[0] = file_details
+            }
+
+            if (selected_file_id_to_use.length > 0) {
+                $('.use-files').show()
+            } else {
+                $('.use-files').hide()
             }
         })
+
+        //STEP03: Use fles
+        $(document).on('click', '.use-files', function() {
+            showSelectedFiles()
+        })
+
+        //STEP04: Delete selected files
+        $(document).on('click', '.delete-selection', function() {
+            let file_to_remove_id = $(this).data('fileid')
+            target_input_field_id = $(this).data('targetinputfield')
+            target_image_container_id = $(this).data('targetimagecontainerid')
+
+            selected_file_details_to_use = JSON.parse($(target_input_field_id).data('filedetails'))
+            selected_file_id_to_use = $(target_input_field_id).val().split(',')
+
+            console.log("before")
+            console.log(selected_file_details_to_use)
+            console.log(selected_file_id_to_use)
+
+            selected_file_details_to_use = selected_file_details_to_use.filter(function(file) {
+                if (file.file_id != file_to_remove_id) {
+                    return true
+                }
+            })
+
+            selected_file_id_to_use = selected_file_id_to_use.filter(function(file_id) {
+                if (file_id != file_to_remove_id) {
+                    return true
+                }
+            })
+
+            console.log("after")
+            console.log(selected_file_details_to_use)
+            console.log(selected_file_id_to_use)
+
+            showSelectedFiles()
+        })
+
+        function showSelectedFiles() {
+            let html = ''
+
+            console.log("Inside")
+            console.log(selected_file_details_to_use)
+            console.log(selected_file_id_to_use)
+
+            if (selected_file_details_to_use.length > 0) {
+                selected_file_details_to_use.forEach(function(file) {
+                    switch (file.file_extension) {
+                        case 'zip':
+                            html = html + `<div class="form-image-container col-2 m-2">
+                                            <div class="image-wrapper">
+                                                <img src="{{asset('assets/images/zip.png')}}" class="img-fluid p-2" alt="Selected Category Image">
+                                                <div class="delete-button">
+                                                    <button type="button" class="btn btn-sm delete-selection" data-fileid="` + file.file_id + `" data-targetinputfield="` + target_input_field_id + `"  data-targetimagecontainerid="` + target_image_container_id + `">
+                                                        <i class="far fa-times-circle"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>`
+                            break;
+                        case 'pdf':
+                            html = html + `<div class="form-image-container col-2 m-2">
+                                            <div class="image-wrapper">
+                                                <img src="{{asset('assets/images/pdf.png')}}" class="img-fluid p-2" alt="Selected Category Image">
+                                                <div class="delete-button">
+                                                    <button type="button" class="btn btn-sm delete-selection" data-fileid="` + file.file_id + `" data-targetinputfield="` + target_input_field_id + `"  data-targetimagecontainerid="` + target_image_container_id + `">
+                                                        <i class="far fa-times-circle"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>`
+                            break;
+                        case 'mp4':
+                            html = html + `<div class="form-image-container col-2 m-2">
+                                            <div class="image-wrapper">
+                                                <img src="{{asset('assets/images/multimedia.png')}}" class="img-fluid p-2" alt="Selected Category Image">
+                                                <div class="delete-button">
+                                                    <button type="button" class="btn btn-sm delete-selection" data-fileid="` + file.file_id + `" data-targetinputfield="` + target_input_field_id + `"  data-targetimagecontainerid="` + target_image_container_id + `">
+                                                        <i class="far fa-times-circle"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>`
+                            break;
+                        case 'mp3':
+                            html = html + `<div class="form-image-container col-2 m-2">
+                                            <div class="image-wrapper">
+                                                <img src="{{asset('assets/images/mic.png')}}" class="img-fluid p-2" alt="Selected Category Image">
+                                                <div class="delete-button">
+                                                    <button type="button" class="btn btn-sm delete-selection" data-fileid="` + file.file_id + `" data-targetinputfield="` + target_input_field_id + `"  data-targetimagecontainerid="` + target_image_container_id + `">
+                                                        <i class="far fa-times-circle"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>`
+                            break;
+                        default:
+                            html = html + `<div class="form-image-container col-2 m-2">
+                                            <div class="image-wrapper">
+                                                <img src="` + file.file_url + `" class="img-fluid p-2" alt="Selected Category Image">
+                                                <div class="delete-button">
+                                                    <button type="button" class="btn btn-sm delete-selection" data-fileid="` + file.file_id + `" data-targetinputfield="` + target_input_field_id + `"  data-targetimagecontainerid="` + target_image_container_id + `">
+                                                        <i class="far fa-times-circle"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>`
+                            break;
+                    }
+
+                    $(target_image_container_id).html(html)
+                    $(target_input_field_id).val(selected_file_id_to_use.join(','))
+                    $(target_input_field_id).data("filedetails", JSON.stringify(selected_file_details_to_use));
+                })
+            } else {
+                let html = `<div class="form-image-container col-2 m-2">
+                                            <div class="image-wrapper">
+                                                <img src="{{asset($placeholder)}}" class="img-fluid" alt="black sample">
+                                            </div>
+                                        </div>`
+                $(target_image_container_id).html(html)
+                $(target_input_field_id).val(selected_file_id_to_use.join(','))
+                $(target_input_field_id).data("filedetails", '');
+            }
+            console.log($(target_input_field_id).data("filedetails"))
+            console.log(target_input_field_id)
+        }
+        //--Media Library In Modal End--
     });
 
     //Initializig dropzone
@@ -199,7 +344,6 @@
                     // Check if the file type is allowed
                     var allowedTypes = this.options.acceptedFiles.split(',');
                     var fileType = file.type;
-                    console.log(fileType)
                     if (!allowedTypes.includes(fileType)) {
                         toastr.error('Invalid file type. Allowed types: ' + this.options.acceptedFiles, 'Error');
                         this.removeFile(file);

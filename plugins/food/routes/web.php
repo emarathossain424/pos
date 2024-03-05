@@ -21,4 +21,5 @@ Route::get('/test-food-plugin', [TestController::class, 'index'])->name('test.co
 Route::prefix('/food')->middleware('auth')->group(function () {
     Route::get('/categories', [CategoryController::class, 'categories'])->name('categories');
     Route::get('/add-category', [CategoryController::class, 'addCategory'])->name('add.category');
+    Route::post('/store-category', [CategoryController::class, 'storeCategory'])->name('store.category');
 });

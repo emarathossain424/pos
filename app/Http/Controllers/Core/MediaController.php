@@ -10,6 +10,7 @@ use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreLanguageRequest;
 use App\Models\Upload;
+use Illuminate\Support\Facades\DB;
 
 class MediaController extends Controller
 {
@@ -32,6 +33,25 @@ class MediaController extends Controller
     {
         $skip = ($request['page'] - 1) * $request['item'];
         $media = Upload::skip($skip)->take($request['item'])->get();
+
+
+        $selectedFileIds = '';
+        if (!empty($request['selected_file'])) {
+            $selectedFileIds = implode(',', $request['selected_file']);
+        }
+
+        if (!empty($selectedFileIds)) {
+            $orderByRaw = "FIELD(id, $selectedFileIds) DESC";
+
+            $media = Upload::orderByRaw($orderByRaw)
+                ->orderBy('created_at', 'desc')
+                ->skip($skip)->take($request['item'])->get();
+        }
+        else{
+            $media = Upload::orderBy('created_at', 'desc')
+                ->skip($skip)->take($request['item'])->get();
+        }
+
         return view('media.include.files', compact('media'));
     }
 
@@ -129,9 +149,25 @@ class MediaController extends Controller
     /**
      * Get media library
      */
-    public function getMediaForLibrary()
+    public function getMediaForLibrary(Request $request)
     {
-        $media = Upload::paginate(20);
-        return view('media.library', compact('media'));
+        $selectedFileIds = '';
+        if (!empty($request['selected_file'])) {
+            $selectedFileIds = implode(',', $request['selected_file']);
+        }
+
+        if (!empty($selectedFileIds)) {
+            $orderByRaw = "FIELD(id, $selectedFileIds) DESC";
+
+            $media = Upload::orderByRaw($orderByRaw)
+                ->orderBy('created_at', 'desc')
+                ->paginate(20);
+        }
+        else{
+            $media = Upload::orderBy('created_at', 'desc')
+                ->paginate(20);
+        }
+
+        return view('media.library', compact('media', 'selectedFileIds'));
     }
 }

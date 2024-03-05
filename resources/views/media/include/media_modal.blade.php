@@ -12,7 +12,7 @@
 
             </div>
             <div class="modal-footer justify-content-center">
-                <button type="button" class="btn bg-pink">{{translate('Use Selected Image')}}</button>
+                <button type="button" class="btn bg-pink use-files" data-dismiss="modal">{{translate('Use Selected Image')}}</button>
             </div>
         </div>
     </div>

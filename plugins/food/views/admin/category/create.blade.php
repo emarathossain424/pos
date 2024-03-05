@@ -1,5 +1,5 @@
 @php
-$all_categories = [];
+$all_categories = getFoodCategories();
 $placeholder = getPlaceholderImagePath();
 @endphp
 @extends('layouts.master')
@@ -8,6 +8,9 @@ $placeholder = getPlaceholderImagePath();
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-responsive/css/responsive.bootstrap4.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-buttons/css/buttons.bootstrap4.min.css')}}">
+<link rel="stylesheet" href="{{asset('pos/plugins/select2/css/select2.min.css')}}">
+<link rel="stylesheet" href="{{asset('pos/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
+
 @endpush
 @section('breadcrumb')
 <ol class="breadcrumb float-sm-right">
@@ -18,53 +21,93 @@ $placeholder = getPlaceholderImagePath();
 @section('content')
 <div class="content">
     <div class="container-fluid">
-        <x-alert column="col-md-12" alert_type="alert-warning" />
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between">
-                        <h5 class="m-0">{{ translate('Add Category') }}</h5>
-                    </div>
-                    <div class="card-body">
-                        <form>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <label for="category-name">{{translate('Category Name')}}</label>
-                                    <input type="text" class="form-control" id="category-name" placeholder="Enter category name">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <h5 class="m-0">{{ translate('Add Category') }}</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{{route('store.category')}}">
+                    @csrf
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="category-name">{{translate('Category Name')}} <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="category-name" name="category_name" placeholder="Enter category name">
+                                @error('category_name')
+                                <div>
+                                    <span class="text-danger">{{ $message }}</span>
                                 </div>
-                                <div class="form-group">
-                                    <label for="exampleInputPassword1">Password</label>
-                                    <select class="form-control select2" style="width: 100%;">
-                                        <option selected="selected">Alabama</option>
-                                        <option>Alaska</option>
-                                        <option>California</option>
-                                        <option>Delaware</option>
-                                        <option>Tennessee</option>
-                                        <option>Texas</option>
-                                        <option>Washington</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="category-image">{{translate('Category Image')}}</label>
-                                    <input type="hidden" name="category_image" id="category-image-input">
-                                    <div class="form-image-container col-2">
-                                        <img src="{{asset($placeholder)}}" class="img-fluid p-2" alt="black sample" id="category-image-view">
-                                    </div>
-                                    <button type="button" class="btn text-blue" data-toggle="modal" data-target="#media-library" data-inputid="category-image-input" data-imagecontainerid="category-image-view" id="browse-file">{{translate('Browse File')}}</button>
-                                </div>
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                                    <label class="form-check-label" for="exampleCheck1">Check me out</label>
-                                </div>
+                                @enderror
                             </div>
-                            <!-- /.card-body -->
 
-                            <div class="card-footer">
-                                <button type="submit" class="btn bg-pink">Submit</button>
+                            <div class="form-group">
+                                <label for="exampleInputPassword1">{{translate('Parent Category')}}</label>
+                                <select class="form-control select2 w-100" name="parent_category" id="parent-category">
+                                    <option value="">{{translate('Select Parent')}}</option>
+                                    @foreach($all_categories as $category)
+                                    <option value="{{$category->id}}">{{$category->name}}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                        </form>
+
+                            <div class="form-group">
+                                <h6><strong>{{translate('Featured Status')}}</strong></h6>
+                                <input type="checkbox" id="is-featured" name="featured_status" checked data-bootstrap-switch>
+                            </div>
+
+                            <div class="form-group">
+                                <h6><strong>{{translate('Status')}}</strong></h6>
+                                <input type="checkbox" id="status" name="status" checked data-bootstrap-switch>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="category-image">{{translate('Category Image')}} <span class="text-danger">*</span></label>
+                                <input type="hidden" name="category_image" id="category-image-input">
+                                <div class="row" id="category-image-view">
+                                    <div class="form-image-container col-2 m-2">
+                                        <div class="image-wrapper">
+                                            <img src="{{asset($placeholder)}}" class="img-fluid" alt="black sample">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn text-blue browse-file" data-toggle="modal" data-target="#media-library" data-inputid="category-image-input" data-imagecontainerid="category-image-view" data-isformultiselect='0'>{{translate('Browse File')}}</button>
+                                @error('category_image')
+                                <div>
+                                    <span class="text-danger">{{ $message }}</span>
+                                </div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="meta-title">{{translate('Meta Title')}}</label>
+                                <input type="text" class="form-control" id="meta-title" placeholder="Enter meta title" name="meta_title">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="meta-description">{{translate('Meta Description')}}</label>
+                                <textarea class="form-control" rows="8" placeholder="Enter Meta Description" name="meta_description"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="meta-image">{{translate('Meta Image')}}</label>
+                                <input type="hidden" name="meta_image" id="meta-image-input">
+                                <div class="row" id="meta-image-view">
+                                    <div class="form-image-container col-2 m-2">
+                                        <div class="image-wrapper">
+                                            <img src="{{asset($placeholder)}}" class="img-fluid" alt="black sample">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn text-blue browse-file" data-toggle="modal" data-target="#media-library" data-inputid="meta-image-input" data-imagecontainerid="meta-image-view" data-isformultiselect='0'>{{translate('Browse File')}}</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                    <hr>
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn bg-pink btn-block w-25 bold">{{translate('Save')}}</button>
+                    </div>
+                </form>
             </div>
         </div>
         @includeIf('media.include.media_modal')
@@ -77,10 +120,19 @@ $placeholder = getPlaceholderImagePath();
 <script src="{{asset('pos/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
 <script src="{{asset('pos/plugins/datatables-responsive/js/dataTables.responsive.min.js')}}"></script>
 <script src="{{asset('pos/plugins/datatables-responsive/js/responsive.bootstrap4.min.js')}}"></script>
+<script src="{{asset('pos/plugins/bootstrap-switch/js/bootstrap-switch.min.js')}}"></script>
+<script src="{{asset('pos/plugins/select2/js/select2.full.min.js')}}"></script>
 
 <script>
     $(function() {
         'use strict'
+        $("input[data-bootstrap-switch]").each(function() {
+            $(this).bootstrapSwitch('state', $(this).prop('checked'));
+        })
+
+        $('#parent-category').select2({
+            theme: 'bootstrap4'
+        })
     });
 </script>
 @endpush
