@@ -140,6 +140,12 @@
         //--Media Library End--
 
         //--Media Library In Modal Start--
+
+        $(document).on('mouseenter', '#media-library .library .image-container img', function() {
+            let file_details = $(this).data('details')
+            $('#current_file').html(file_details.file_name)
+        })
+
         //STEP01: browse media file
         $('.browse-file').click(function() {
             target_input_field_id = "#" + $(this).data('inputid')
@@ -369,14 +375,35 @@
             },
 
             success: function(file, response) {
-
+                console.log(response.details)
                 var colDiv = document.createElement('div');
                 colDiv.className = 'col-md-1 d-flex align-items-center m-1 image-container';
+                colDiv.setAttribute('data-details', JSON.stringify(response.details));
 
                 var thumbnailElement = document.createElement('img');
-                thumbnailElement.src = response.path;
+
+                switch (response.details.file_extension) {
+                    case 'zip':
+                        thumbnailElement.src = "{{asset('assets/images/zip.png')}}";
+                        break;
+                    case 'pdf':
+                        thumbnailElement.src = "{{asset('assets/images/pdf.png')}}";
+                        break;
+                    case 'mp4':
+                        thumbnailElement.src = "{{asset('assets/images/multimedia.png')}}";
+                        break;
+                    case 'mp3':
+                        thumbnailElement.src = "{{asset('assets/images/mic.png')}}";
+                        break;
+                    default:
+                        thumbnailElement.src = response.path;
+                        break;
+                }
+
                 thumbnailElement.className = 'img-fluid';
                 thumbnailElement.alt = 'Thumbnail';
+                thumbnailElement.id = "file-details-" + response.details.file_id
+                thumbnailElement.setAttribute('data-details', JSON.stringify(response.details));
 
                 colDiv.appendChild(thumbnailElement);
 

@@ -28,12 +28,11 @@ class CategoryController extends Controller
     }
     
     /**
-     * will store product category
+     * will store food category
      *
      * @return void
      */
     public function storeCategory(Request $request) {
-        // dd($request->all());
         $request->validate([
             'category_name'=>'required|unique:food_categories,name',
             'category_image'=>'required'
@@ -54,7 +53,6 @@ class CategoryController extends Controller
             Toastr::success('Food category created successfully', 'Success');
             return back();
         } catch (\Exception $ex) {
-            dd($ex);
             Toastr::error('Unable to create food category', 'Error');
             return back();
         }

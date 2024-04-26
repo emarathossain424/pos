@@ -10,6 +10,7 @@ use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreLanguageRequest;
 use App\Models\Upload;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class MediaController extends Controller
@@ -20,7 +21,7 @@ class MediaController extends Controller
      */
     public function media()
     {
-        $media = Upload::paginate(22);
+        $media = Upload::with('user')->orderBy('id','desc')->paginate(22);
         return view('media.index', compact('media'));
     }
 
@@ -32,8 +33,6 @@ class MediaController extends Controller
     public function paginateMediaLibrary(Request $request)
     {
         $skip = ($request['page'] - 1) * $request['item'];
-        $media = Upload::skip($skip)->take($request['item'])->get();
-
 
         $selectedFileIds = '';
         if (!empty($request['selected_file'])) {
@@ -48,7 +47,7 @@ class MediaController extends Controller
                 ->skip($skip)->take($request['item'])->get();
         }
         else{
-            $media = Upload::orderBy('created_at', 'desc')
+            $media = Upload::orderBy('id', 'desc')
                 ->skip($skip)->take($request['item'])->get();
         }
 
@@ -94,11 +93,23 @@ class MediaController extends Controller
             $fileModel->file_extension = $fileExtension;
             $fileModel->file_size = $fileSize;
             $fileModel->file_type = $mimeType;
+            $fileModel->uploaded_by = Auth::user()->id;
             $fileModel->saveOrFail();
+
+            $details = [
+                'file_name'=> $fileModel->name,
+                'file_url'=> asset($fileLocation),
+                'file_type'=> $fileModel->file_type,
+                'file_size'=> $fileModel->file_size,
+                'uploaded_by'=> $fileModel->uploaded_by,
+                'file_extension'=> $fileModel->file_extension,
+                'file_id'=> $fileModel->id
+            ];
 
             return response()->json([
                 'success' => true,
-                'path' => asset($fileLocation)
+                'path' => asset($fileLocation),
+                'details' => $details
             ]);
         } catch (\Exception $ex) {
             return response()->json([

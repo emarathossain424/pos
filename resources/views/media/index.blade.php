@@ -45,7 +45,7 @@
                             'file_url' => asset($file->file_location),
                             'file_type' => $file->file_type,
                             'file_size' => $file->file_size/1024 . " kb",
-                            'file_uploaded_by' => $file->uploaded_by,
+                            'file_uploaded_by' => $file->user->name,
                             'file_uploaded_at' => $file->created_at,
                             'file_id' => $file->id,
                             'file_extension' => $file->file_extension

@@ -113,6 +113,8 @@ $placeholder = getPlaceholderImagePath();
         @includeIf('media.include.media_modal')
     </div>
 </div>
+
+@parent
 @endsection
 
 @push('script')
