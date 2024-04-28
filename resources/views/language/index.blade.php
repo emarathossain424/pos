@@ -73,7 +73,7 @@
 </div>
 
 <!-- create language-->
-<x-dynamic-form-modal route="{{route('languages.index')}}" id="createLang" title="{{translate('Create Language')}}" execute_btn_name="{{translate('Save')}}" execute_btn_class="btn-success">
+<x-dynamic-form-modal route="{{route('languages.store')}}" id="createLang" title="{{translate('Create Language')}}" execute_btn_name="{{translate('Save')}}" execute_btn_class="btn-success">
     <div class="form-group">
         <label for="name">{{translate('Name')}}</label>
         <input type="text" class="form-control" id="name" name="name" placeholder="{{translate('Enter Language Name')}}">

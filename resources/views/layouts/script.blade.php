@@ -141,9 +141,13 @@
 
         //--Media Library In Modal Start--
 
-        $(document).on('mouseenter', '#media-library .library .image-container img', function() {
+        $(document).on('mouseenter', '.library .image-container img', function() {
             let file_details = $(this).data('details')
             $('#current_file').html(file_details.file_name)
+        })
+
+        $(document).on('mouseleave', '.library .image-container img', function() {
+            $('#current_file').html('{{translate("Choose a file")}}')
         })
 
         //STEP01: browse media file
@@ -160,7 +164,7 @@
             const route = `{{route("get.media.for.library")}}`
             const postData = {
                 '_token': '{{csrf_token()}}',
-                'selected_file': selected_file_id_to_use
+                'selected_file': already_selected_file
             }
             $.post(route, postData, function(response) {
                 $('.modal-body').html(response)
@@ -215,12 +219,18 @@
             target_input_field_id = $(this).data('targetinputfield')
             target_image_container_id = $(this).data('targetimagecontainerid')
 
+            console.log(target_input_field_id)
+            console.log(target_image_container_id)
+            console.log($(target_input_field_id).data('filedetails'))
+
             selected_file_details_to_use = JSON.parse($(target_input_field_id).data('filedetails'))
             selected_file_id_to_use = $(target_input_field_id).val().split(',')
 
             console.log("before")
             console.log(selected_file_details_to_use)
             console.log(selected_file_id_to_use)
+            console.log(target_input_field_id)
+            console.log(target_image_container_id)
 
             selected_file_details_to_use = selected_file_details_to_use.filter(function(file) {
                 if (file.file_id != file_to_remove_id) {

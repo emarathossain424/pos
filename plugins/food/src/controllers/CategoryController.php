@@ -14,8 +14,10 @@ class CategoryController extends Controller
      *
      * @return void
      */
-    public function categories(){
-        return view('food::admin.category.index');
+    public function categories()
+    {
+        $categories = FoodCategory::with('parentCategory')->get();
+        return view('food::admin.category.index', compact('categories'));
     }
 
     /**
@@ -23,19 +25,21 @@ class CategoryController extends Controller
      *
      * @return void
      */
-    public function addCategory() {
+    public function addCategory()
+    {
         return view('food::admin.category.create');
     }
-    
+
     /**
      * will store food category
      *
      * @return void
      */
-    public function storeCategory(Request $request) {
+    public function storeCategory(Request $request)
+    {
         $request->validate([
-            'category_name'=>'required|unique:food_categories,name',
-            'category_image'=>'required'
+            'category_name' => 'required|unique:food_categories,name',
+            'category_image' => 'required'
         ]);
 
         try {
@@ -43,8 +47,8 @@ class CategoryController extends Controller
             $category->name = $request['category_name'];
             $category->parent = $request['parent_category'];
             $category->image = $request['category_image'];
-            $category->status = $request['status']=='on'?1:0;
-            $category->featured_status = $request['featured_status']=='on'?1:0;
+            $category->status = $request['status'] == 'on' ? 1 : 0;
+            $category->featured_status = $request['featured_status'] == 'on' ? 1 : 0;
             $category->meta_title = $request['meta_title'];
             $category->meta_description = $request['meta_description'];
             $category->meta_image = $request['meta_image'];
@@ -54,6 +58,58 @@ class CategoryController extends Controller
             return back();
         } catch (\Exception $ex) {
             Toastr::error('Unable to create food category', 'Error');
+            return back();
+        }
+    }
+
+    /**
+     * Will redirect to category editing page
+     */
+    public function editCategory($id)
+    {
+        $e_category = FoodCategory::find($id);
+        return view('food::admin.category.edit', compact('e_category'));
+    }
+
+    /**
+     * Will update requested food category
+     */
+    public function updateCategory(Request $request)
+    {
+        $category_id = $request['id'];
+        $request->validate([
+            'category_name' => 'required|unique:food_categories,name,'.$category_id,
+            'category_image' => 'required'
+        ]);
+
+        try {
+            $category = FoodCategory::find((int)$category_id);
+            $category->name = $request['category_name'];
+            $category->parent = $request['parent_category'];
+            $category->image = $request['category_image'];
+            $category->status = $request['status'] == 'on' ? 1 : 0;
+            $category->featured_status = $request['featured_status'] == 'on' ? 1 : 0;
+            $category->meta_title = $request['meta_title'];
+            $category->meta_description = $request['meta_description'];
+            $category->meta_image = $request['meta_image'];
+            $category->update();
+
+            Toastr::success('Food category updated successfully', 'Success');
+            return back();
+        } catch (\Exception $ex) {
+            Toastr::error('Unable to update food category', 'Error');
+            return back();
+        }
+    }
+
+    public function deleteCategory(Request $request){
+        try {
+            $category = FoodCategory::find((int)$request['id']);
+            $category->delete();
+            Toastr::success('Category deleted successfully', 'Success');
+            return back();
+        } catch (\Throwable $ex) {
+            Toastr::error('Unable to delete category', 'Error');
             return back();
         }
     }

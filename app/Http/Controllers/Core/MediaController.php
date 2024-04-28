@@ -164,7 +164,8 @@ class MediaController extends Controller
     {
         $selectedFileIds = '';
         if (!empty($request['selected_file'])) {
-            $selectedFileIds = implode(',', $request['selected_file']);
+            // $selectedFileIds = implode(',', $request['selected_file']);
+            $selectedFileIds = $request['selected_file'];
         }
 
         if (!empty($selectedFileIds)) {

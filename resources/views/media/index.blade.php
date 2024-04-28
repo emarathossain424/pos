@@ -34,7 +34,10 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
-                        <h5 class="m-0">{{ translate('Media Library') }}</h5>
+                        <h5 class="m-0">
+                            {{ translate('Media Library') }}
+                            (<span class="text-sm" id="current_file">{{translate("Choose a file")}}</span>)
+                        </h5>
                     </div>
                     <div class="card-body">
                         <div class="row library">

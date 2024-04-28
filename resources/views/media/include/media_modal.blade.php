@@ -5,7 +5,7 @@
             <div class="modal-header">
                 <h4 class="modal-title">
                     {{translate('Media Library')}}
-                    (<span class="text-sm" id="current_file"></span>)
+                    (<span class="text-sm" id="current_file">{{translate("Choose a file")}}</span>)
                 </h4>
                 
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">

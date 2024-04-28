@@ -27,13 +27,65 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        <table id="example2" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>{{translate('Iamge')}}</th>
+                                    <th>{{translate('Name')}}</th>
+                                    <th>{{translate('Parent')}}</th>
+                                    <th>{{translate('Action')}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($categories as $key=>$category)
+                                @php
+                                $key = $key+1;
+                                @endphp
+                                <tr>
+                                    <td>{{$key}}.</td>
+                                    <td>
+                                        <img src="/{{ getFilePath($category->image) }}" alt="category-image" class="img-fluid" style="max-width: 50px; max-height: 50px;">
+                                    </td>
+                                    <td>{{ $category->name }}</td>
+                                    @if (!empty($category->parentCategory))
+                                    <td>{{ $category->parentCategory->name }}</td>
+                                    @else
+                                    <td>
+                                        <i class="fa fa-ban"></i>
+                                    </td>
+                                    @endif
+                                    <td>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-default">{{translate('Action')}}</button>
+                                            <button type="button" class="btn btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                                                <span class="sr-only">Toggle Dropdown</span>
+                                            </button>
+                                            <div class="dropdown-menu" role="menu">
+                                                <a class="dropdown-item" href="{{route('edit.category',$category->id)}}">{{translate('Edit')}}</a>
+                                                <a class="dropdown-item delete-category" href="#" data-id="{{$category->id}}" data-toggle="modal" data-target="#deleteCategory">{{translate('Delete')}}</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
 
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- delete category-->
+<x-dynamic-form-modal route="{{route('delete.category')}}" modal_type="modal-sm" id="deleteCategory" title="{{translate('Delete Category')}}" execute_btn_name="{{translate('Delete')}}" execute_btn_class="btn-danger">
+    <input type="hidden" name="id" id="delete-id">
+    <span>{{translate('Are you sure, you want to delete this category?')}}</span>
+</x-dynamic-form-modal>
+<!-- /delete category-->
+
 @endsection
 
 @push('script')
@@ -45,6 +97,11 @@
 <script>
     $(function() {
         'use strict'
+
+        $('.delete-category').click(function() {
+            const id = $(this).data('id')
+            $('#delete-id').val(id)
+        })
     });
 </script>
 @endpush
