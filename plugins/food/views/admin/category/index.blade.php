@@ -27,13 +27,15 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <table id="example2" class="table table-bordered table-hover">
+                        <table id="categoryList" class="table table-bordered table-hover">
                             <thead>
                                 <tr>
                                     <th>#</th>
                                     <th>{{translate('Iamge')}}</th>
                                     <th>{{translate('Name')}}</th>
                                     <th>{{translate('Parent')}}</th>
+                                    <th>{{translate('Featured')}}</th>
+                                    <th>{{translate('Status')}}</th>
                                     <th>{{translate('Action')}}</th>
                                 </tr>
                             </thead>
@@ -56,12 +58,23 @@
                                     </td>
                                     @endif
                                     <td>
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-default">{{translate('Action')}}</button>
-                                            <button type="button" class="btn btn-default dropdown-toggle dropdown-icon" data-toggle="dropdown">
-                                                <span class="sr-only">Toggle Dropdown</span>
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input change-featured-status" id="featuredStatus{{$key}}" data-id="{{$category->id}}" {{$category->featured_status==1?'checked':''}}>
+                                            <label class="custom-control-label" for="featuredStatus{{$key}}"></label>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input change-general-status" id="generalStatus{{$key}}" data-id="{{$category->id}}" {{$category->status==1?'checked':''}}>
+                                            <label class="custom-control-label" for="generalStatus{{$key}}"></label>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                {{translate('Action')}}
                                             </button>
-                                            <div class="dropdown-menu" role="menu">
+                                            <div class="dropdown-menu">
                                                 <a class="dropdown-item" href="{{route('edit.category',$category->id)}}">{{translate('Edit')}}</a>
                                                 <a class="dropdown-item delete-category" href="#" data-id="{{$category->id}}" data-toggle="modal" data-target="#deleteCategory">{{translate('Delete')}}</a>
                                             </div>
@@ -69,7 +82,6 @@
                                     </td>
                                 </tr>
                                 @endforeach
-
                             </tbody>
                         </table>
                     </div>
@@ -98,9 +110,51 @@
     $(function() {
         'use strict'
 
+        $('#categoryList').DataTable()
+
         $('.delete-category').click(function() {
             const id = $(this).data('id')
             $('#delete-id').val(id)
+        })
+
+        $('.change-featured-status').change(function() {
+            const id = $(this).data('id')
+            var postData = {
+                _token: '{{csrf_token()}}',
+                id: id,
+                type:'featured'
+            };
+            $.post('{{route("update.category.status")}}', postData, function(response) {
+                if(response.success){
+                    toastr.success(response.message, 'success');
+                    location.reload()
+                }
+                else{
+                    toastr.error(response.message, 'error');
+                }
+            }).fail(function(error){
+                toastr.error('{{translate("Something went wrong")}}', 'error');
+            })
+        })
+
+        $('.change-general-status').change(function() {
+            const id = $(this).data('id')
+            var postData = {
+                _token: '{{csrf_token()}}',
+                id: id,
+                type:'general'
+            };
+            $.post('{{route("update.category.status")}}', postData, function(response) {
+                if(response.success){
+                    toastr.success(response.message, 'success');
+                    location.reload()
+                }
+                else{
+                    toastr.error(response.message, 'error');
+                }
+            }).fail(function(error){
+                toastr.error('{{translate("Something went wrong")}}', 'error');
+            })
         })
     });
 </script>

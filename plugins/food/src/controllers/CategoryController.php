@@ -78,7 +78,7 @@ class CategoryController extends Controller
     {
         $category_id = $request['id'];
         $request->validate([
-            'category_name' => 'required|unique:food_categories,name,'.$category_id,
+            'category_name' => 'required|unique:food_categories,name,' . $category_id,
             'category_image' => 'required'
         ]);
 
@@ -102,7 +102,47 @@ class CategoryController extends Controller
         }
     }
 
-    public function deleteCategory(Request $request){
+
+    /**
+     * Update category status
+     */
+    public function updateCategoryStatus(Request $request)
+    {
+        try {
+            $category = FoodCategory::find($request['id']);
+            if ($request['type'] == 'featured') {
+                if ($category->featured_status == 1) {
+                    $category->featured_status = 0;
+                } else {
+                    $category->featured_status = 1;
+                }
+            }
+            if ($request['type'] == 'general'){
+                if ($category->status == 1) {
+                    $category->status = 0;
+                } else {
+                    $category->status = 1;
+                }
+            }
+
+            $category->update();
+            return response()->json([
+                'success' => true,
+                'message' => translate('Category status updated successfully')
+            ]);
+        } catch (\Exception $ex) {
+            return response()->json([
+                'success' => false,
+                'message' => translate('Unable to change status')
+            ]);
+        }
+    }
+
+    /**
+     * Delete requested category
+     */
+    public function deleteCategory(Request $request)
+    {
         try {
             $category = FoodCategory::find((int)$request['id']);
             $category->delete();

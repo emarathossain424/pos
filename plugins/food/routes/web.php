@@ -25,4 +25,5 @@ Route::prefix('/food')->middleware('auth')->group(function () {
     Route::get('/edit-category/{id}', [CategoryController::class, 'editCategory'])->name('edit.category');
     Route::post('/update-category', [CategoryController::class, 'updateCategory'])->name('update.category');
     Route::post('/delete-category', [CategoryController::class, 'deleteCategory'])->name('delete.category');
+    Route::post('/update-category-status', [CategoryController::class, 'updateCategoryStatus'])->name('update.category.status');
 });
