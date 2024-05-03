@@ -17,4 +17,18 @@ class FoodCategory extends Model
     public function parentCategory(){
         return $this->belongsTo(FoodCategory::class,'parent');
     }    
+
+    /**
+     * Making relationship with transletion table
+     */
+    public function translations(){
+        return $this->hasMany(TranslateFoodCategory::class,'category_id');
+    }
+
+    /**
+     * get tranletions
+     */
+    public function translateInto($lang_id){
+        return $this->translations()->where('lang_id','=',$lang_id);
+    }
 }

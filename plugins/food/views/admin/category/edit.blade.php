@@ -1,6 +1,9 @@
 @php
 $all_categories = getFoodCategories();
 $placeholder = getPlaceholderImagePath();
+$languages = getAllLanguages();
+$default_lang = getGeneralSettingsValue('default_lang');
+$translatedLang = isset(request()->lang)?request()->lang:$default_lang;
 @endphp
 @extends('layouts.master')
 @section('title') {{translate('Categories')}} @endsection
@@ -10,7 +13,12 @@ $placeholder = getPlaceholderImagePath();
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-buttons/css/buttons.bootstrap4.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/select2/css/select2.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
-
+<style>
+    .disabled-div {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+</style>
 @endpush
 @section('breadcrumb')
 <ol class="breadcrumb float-sm-right">
@@ -31,6 +39,16 @@ $placeholder = getPlaceholderImagePath();
                     <input type="hidden" name="id" value="{{$e_category->id}}">
                     <div class="row">
                         <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="translateInto">{{translate('Translate Into')}}</label>
+                                <select class="form-control select2 w-100" name="translate_into" id="translateInto">
+                                    @foreach($languages as $lang)
+                                    <option value="{{$lang->id}}" {{ $lang->id == $translatedLang ? 'selected' : '' }}>{{$lang->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
                             <div class="form-group">
                                 <label for="category-name">{{translate('Category Name')}} <span class="text-danger">*</span></label>
                                 <input type="text" value="{{$e_category->name}}" class="form-control" id="category-name" name="category_name" placeholder="Enter category name">
@@ -41,8 +59,8 @@ $placeholder = getPlaceholderImagePath();
                                 @enderror
                             </div>
 
-                            <div class="form-group">
-                                <label for="exampleInputPassword1">{{translate('Parent Category')}}</label>
+                            <div class="form-group lang-indipendent-area">
+                                <label for="parent-category">{{translate('Parent Category')}}</label>
                                 <select class="form-control select2 w-100" name="parent_category" id="parent-category">
                                     <option value="">{{translate('Select Parent')}}</option>
                                     @foreach($all_categories as $category)
@@ -51,17 +69,17 @@ $placeholder = getPlaceholderImagePath();
                                 </select>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group lang-indipendent-area">
                                 <h6><strong>{{translate('Featured Status')}}</strong></h6>
                                 <input type="checkbox" id="is-featured" name="featured_status" {{ $e_category->featured_status == 1 ? 'checked' : '' }} data-bootstrap-switch>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group lang-indipendent-area">
                                 <h6><strong>{{translate('Status')}}</strong></h6>
                                 <input type="checkbox" id="status" name="status" {{ $e_category->status == 1 ? 'checked' : '' }} data-bootstrap-switch>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group lang-indipendent-area">
                                 <label for="category-image">{{translate('Category Image')}} <span class="text-danger">*</span></label>
                                 <input type="hidden" name="category_image" id="category-image-input" value="{{$e_category->image}}">
                                 <div class="row" id="category-image-view">
@@ -105,7 +123,7 @@ $placeholder = getPlaceholderImagePath();
                                 </textarea>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group lang-indipendent-area">
                                 <label for="meta-image">{{translate('Meta Image')}}</label>
                                 <input type="hidden" name="meta_image" id="meta-image-input" value="{{$e_category->image}}">
                                 <div class="row" id="meta-image-view">
@@ -157,6 +175,19 @@ $placeholder = getPlaceholderImagePath();
 <script>
     $(function() {
         'use strict'
+
+        const default_lang = '{{$default_lang}}'
+        let selected_lang = '{{$translatedLang}}'
+        
+        console.log(default_lang)
+        console.log(selected_lang)
+
+        if (selected_lang != default_lang) {
+            $('.lang-indipendent-area').addClass('disabled-div')
+        } else {
+            $('.lang-indipendent-area').removeClass('disabled-div')
+        }
+
         $("input[data-bootstrap-switch]").each(function() {
             $(this).bootstrapSwitch('state', $(this).prop('checked'));
         })
@@ -164,6 +195,23 @@ $placeholder = getPlaceholderImagePath();
         $('#parent-category').select2({
             theme: 'bootstrap4'
         })
+
+        $('#translateInto').select2({
+            theme: 'bootstrap4'
+        })
+
+        $('#translateInto').change(function() {
+            let selected_lang = $('#translateInto').val()
+
+            // console.log(window.location)
+
+            var currentBaseUrl = window.location.origin;
+            var pathname = window.location.pathname
+            var newUrl = currentBaseUrl + pathname + '?lang=' + selected_lang;
+            window.location.href = newUrl;
+        });
+
+
 
         let category_image = JSON.stringify([{
             'file_id': '{{$e_category->image}}'

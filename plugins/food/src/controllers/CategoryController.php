@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use Plugin\Food\Models\FoodCategory;
+use Plugin\Food\Models\TranslateFoodCategory;
 
 class CategoryController extends Controller
 {
@@ -68,6 +69,11 @@ class CategoryController extends Controller
     public function editCategory($id)
     {
         $e_category = FoodCategory::find($id);
+
+        $default_lang = getGeneralSettingsValue('default_lang');
+        if(isset(request()->lang) && (request()->lang!=$default_lang)){
+            $e_category = $e_category->translateInto(request()->lang)->first();
+        }
         return view('food::admin.category.edit', compact('e_category'));
     }
 
@@ -76,29 +82,66 @@ class CategoryController extends Controller
      */
     public function updateCategory(Request $request)
     {
-        $category_id = $request['id'];
-        $request->validate([
-            'category_name' => 'required|unique:food_categories,name,' . $category_id,
-            'category_image' => 'required'
-        ]);
-
+        $default_lang = getGeneralSettingsValue('default_lang');
+        $translate_into = $request['translate_into'];
         try {
-            $category = FoodCategory::find((int)$category_id);
-            $category->name = $request['category_name'];
-            $category->parent = $request['parent_category'];
-            $category->image = $request['category_image'];
-            $category->status = $request['status'] == 'on' ? 1 : 0;
-            $category->featured_status = $request['featured_status'] == 'on' ? 1 : 0;
-            $category->meta_title = $request['meta_title'];
-            $category->meta_description = $request['meta_description'];
-            $category->meta_image = $request['meta_image'];
-            $category->update();
+            if ($default_lang == $translate_into) {
+                $category_id = $request['id'];
+                $request->validate([
+                    'category_name' => 'required|unique:food_categories,name,' . $category_id,
+                    'category_image' => 'required'
+                ]);
+
+                $category = FoodCategory::find((int)$category_id);
+                $category->name = $request['category_name'];
+                $category->parent = $request['parent_category'];
+                $category->image = $request['category_image'];
+                $category->status = $request['status'] == 'on' ? 1 : 0;
+                $category->featured_status = $request['featured_status'] == 'on' ? 1 : 0;
+                $category->meta_title = $request['meta_title'];
+                $category->meta_description = $request['meta_description'];
+                $category->meta_image = $request['meta_image'];
+                $category->update();
+            } else {
+                $this->setCategoryTransletion($request);
+            }
 
             Toastr::success('Food category updated successfully', 'Success');
             return back();
         } catch (\Exception $ex) {
             Toastr::error('Unable to update food category', 'Error');
             return back();
+        }
+    }
+
+    /**
+     * Translate category in 
+     */
+    public function setCategoryTransletion($request)
+    {
+        $category_id = $request['id'];
+        $translate_into = $request['translate_into'];
+
+        $has_previous_trans = TranslateFoodCategory::where('category_id', $category_id)
+            ->where('lang_id', $translate_into);
+
+        if ($has_previous_trans->exists()) {
+            $trans_row_id = $has_previous_trans->first()->id;
+            $category_trans = TranslateFoodCategory::find($trans_row_id);
+            $category_trans->category_id = $category_id;
+            $category_trans->lang_id = $translate_into;
+            $category_trans->name = $request['category_name'];
+            $category_trans->meta_title = $request['meta_title'];
+            $category_trans->meta_description = $request['meta_description'];
+            $category_trans->update();
+        } else {
+            $category_trans = new TranslateFoodCategory();
+            $category_trans->category_id = $category_id;
+            $category_trans->lang_id = $translate_into;
+            $category_trans->name = $request['category_name'];
+            $category_trans->meta_title = $request['meta_title'];
+            $category_trans->meta_description = $request['meta_description'];
+            $category_trans->saveOrFail();
         }
     }
 
@@ -117,7 +160,7 @@ class CategoryController extends Controller
                     $category->featured_status = 1;
                 }
             }
-            if ($request['type'] == 'general'){
+            if ($request['type'] == 'general') {
                 if ($category->status == 1) {
                     $category->status = 0;
                 } else {

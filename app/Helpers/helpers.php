@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Language;
 use App\Models\Upload;
 use Illuminate\Support\Facades\DB;
 
@@ -85,5 +86,16 @@ if (!function_exists('getGeneralSettingsValue')) {
         ->first('key_value');
 
         return $settings->key_value;
+    }
+}
+
+if (!function_exists('getAllLanguages')) {
+    /**
+     * will return all languages
+     */
+    function getAllLanguages()
+    {
+        $langs = Language::all(); 
+        return $langs;
     }
 }
