@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Core\PluginController;
 use Plugin\Food\Controllers\CategoryController;
+use Plugin\Food\Controllers\FoodItemController;
 use Plugin\Food\Controllers\TestController;
 
 /*
@@ -26,4 +27,9 @@ Route::prefix('/food')->middleware('auth')->group(function () {
     Route::post('/update-category', [CategoryController::class, 'updateCategory'])->name('update.category');
     Route::post('/delete-category', [CategoryController::class, 'deleteCategory'])->name('delete.category');
     Route::post('/update-category-status', [CategoryController::class, 'updateCategoryStatus'])->name('update.category.status');
+
+    Route::get('/itmes', [FoodItemController::class, 'foodItmes'])->name('food.itmes');
+    Route::get('/add-food-itmes', [FoodItemController::class, 'addFoodItmes'])->name('add.food.itmes');
+    Route::get('/store-food-itmes', [FoodItemController::class, 'storeFoodItmes'])->name('store.food.itmes');
+
 });
