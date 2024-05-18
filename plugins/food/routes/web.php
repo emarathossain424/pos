@@ -30,6 +30,6 @@ Route::prefix('/food')->middleware('auth')->group(function () {
 
     Route::get('/itmes', [FoodItemController::class, 'foodItmes'])->name('food.itmes');
     Route::get('/add-food-itmes', [FoodItemController::class, 'addFoodItmes'])->name('add.food.itmes');
-    Route::get('/store-food-itmes', [FoodItemController::class, 'storeFoodItmes'])->name('store.food.itmes');
+    Route::post('/store-food-itmes', [FoodItemController::class, 'storeFoodItmes'])->name('store.food.itmes');
 
 });

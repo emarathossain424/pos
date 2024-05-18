@@ -121,5 +121,8 @@
     "Is Available": "Is Available",
     "Add Option": "Add Option",
     "+ Add Option": "+ Add Option",
-    "+ Generate Variations": "+ Generate Variations"
+    "+ Generate Variations": "+ Generate Variations",
+    "Variant Food": "Variant Food",
+    "Variant Name": "Variant Name",
+    "Unable to store food item": "Unable to store food item"
 }
