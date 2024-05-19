@@ -42,7 +42,7 @@
                     $('.library').append(response);
                     let file_container = $('.library').children('div')
                     let currently_showing = file_container.length
-                    let pagination_message = "{{translate('Showing')}} " + currently_showing + " {{translate('of')}} " + total + " {{translate('itmes')}}"
+                    let pagination_message = "{{translate('Showing')}} " + currently_showing + " {{translate('of')}} " + total + " {{translate('items')}}"
 
                     $('#pagination-message').html(pagination_message)
                     $(this).data('page', page);

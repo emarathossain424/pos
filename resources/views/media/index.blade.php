@@ -73,7 +73,7 @@
                     </div>
                     <div class="card-footer">
                         <div class="row mt-2 justify-content-between">
-                            <p id="pagination-message">{{translate('Showing')}} {{$media->perPage()}} {{translate('of')}} {{$media->total()}} {{translate('itmes')}}</p>
+                            <p id="pagination-message">{{translate('Showing')}} {{$media->perPage()}} {{translate('of')}} {{$media->total()}} {{translate('items')}}</p>
                             <button class="btn btn-link ml-2" id="show-more" {{$media->currentPage()==$media->lastPage()?'disabled':''}} data-lastPage='{{$media->lastPage()}}' data-total='{{$media->total()}}' data-page='1' data-item='22'>
                                 <strong>{{translate('Show More')}}</strong>
                             </button>

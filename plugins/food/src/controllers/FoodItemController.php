@@ -10,11 +10,11 @@ use Plugin\Food\Models\FoodItem;
 class FoodItemController extends Controller
 {
     /**
-     * Will redirect to food itmes list page
+     * Will redirect to food items list page
      *
      * @return void
      */
-    public function foodItmes()
+    public function foodItems()
     {
         return view('food::admin.foods.index');
     }
@@ -22,26 +22,26 @@ class FoodItemController extends Controller
     /**
      * Will redirect to food item adding page
      */
-    public function addFoodItmes()
+    public function addFoodItems()
     {
         return view('food::admin.foods.create');
     }
 
     /**
-     * Will store food itmes
+     * Will store food items
      */
-    public function storeFoodItmes(Request $request)
+    public function storeFoodItems(Request $request)
     {
-        // $request->validate([
-        //     'name' => 'required',
-        //     'category' => 'required|exists:food_categories,id',
-        //     'details' => 'required',
-        //     'image' => 'required|exists:uploads,id',
-        //     'status' => 'required',
-        //     'price' => 'required',
-        //     'offer_price' => 'required',
-        //     'food_type' => 'required',
-        // ]);
+        $request->validate([
+            'name' => 'required',
+            'category' => 'required|exists:food_categories,id',
+            'details' => 'required',
+            'image' => 'required|exists:uploads,id',
+            'status' => 'required',
+            'price' => 'required',
+            'offer_price' => 'required',
+            'food_type' => 'required',
+        ]);
 
         try {
             $food_item = new FoodItem();
@@ -63,7 +63,7 @@ class FoodItemController extends Controller
             ]);
         } catch (\Exception $ex) {
             return response()->json([
-                'success' => 0,
+                'success' => $ex,
                 'message' => translate('Unable to store food item')
             ],500);
         }

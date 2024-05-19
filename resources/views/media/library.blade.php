@@ -32,7 +32,7 @@ $selectedFileIdsArray = explode(',',$selectedFileIds);
     @endforeach
 </div>
 <div class="row mt-2 justify-content-center">
-    <p id="pagination-message" class="mt-2">{{translate('Showing')}} {{$media->perPage()}} {{translate('of')}} {{$media->total()}} {{translate('itmes')}}</p>
+    <p id="pagination-message" class="mt-2">{{translate('Showing')}} {{$media->perPage()}} {{translate('of')}} {{$media->total()}} {{translate('items')}}</p>
     <button class="btn btn-link ml-2" id="show-more" {{$media->currentPage()==$media->lastPage()?'disabled':''}} data-lastPage='{{$media->lastPage()}}' data-total='{{$media->total()}}' data-page='1' data-item='20'>
         <strong>{{translate('Show More')}}</strong>
     </button>

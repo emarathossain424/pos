@@ -21,12 +21,12 @@
         </li>
         <li class="nav-item">
             @php
-                $active_menu_list = ['food.itmes'];
+                $active_menu_list = ['food.items'];
                 $is_active = in_array(Route::currentRouteName(), $active_menu_list);
             @endphp
-            <a href="{{route('food.itmes')}}" class="nav-link {{$is_active? 'active':'' }}">
+            <a href="{{route('food.items')}}" class="nav-link {{$is_active? 'active':'' }}">
                 <i class="far fa-circle nav-icon"></i>
-                <p>{{translate('Food Itmes')}}</p>
+                <p>{{translate('Food items')}}</p>
             </a>
         </li>
     </ul>

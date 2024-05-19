@@ -1,7 +1,7 @@
 @php
 @endphp
 @extends('layouts.master')
-@section('title') {{translate('Food Itmes')}} @endsection
+@section('title') {{translate('Food items')}} @endsection
 @push('css')
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-responsive/css/responsive.bootstrap4.min.css')}}">
@@ -10,7 +10,7 @@
 @section('breadcrumb')
 <ol class="breadcrumb float-sm-right">
     <li class="breadcrumb-item"><a href="#">{{translate('Dashboard')}}</a></li>
-    <li class="breadcrumb-item active">{{translate('Food Itmes')}}</li>
+    <li class="breadcrumb-item active">{{translate('Food items')}}</li>
 </ol>
 @endsection
 @section('content')
@@ -21,11 +21,11 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between">
-                        <h5 class="m-0">{{ translate('Food Itmes') }}</h5>
+                        <h5 class="m-0">{{ translate('Food items') }}</h5>
                         <div class="ml-auto">
-                            <a class="btn btn-primary" href="{{route('add.food.itmes')}}">
+                            <a class="btn btn-primary" href="{{route('add.food.items')}}">
                                 <i class="fa fa-plus"></i>
-                                {{translate('Add Itme')}}
+                                {{translate('Add item')}}
                             </a>
                         </div>
                     </div>

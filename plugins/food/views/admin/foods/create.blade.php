@@ -12,7 +12,7 @@ $placeholder = getPlaceholderImagePath();
 @endpush
 @section('breadcrumb')
 <ol class="breadcrumb float-sm-right">
-    <li class="breadcrumb-item"><a href="{{route('food.itmes')}}">{{translate('Food Itmes')}}</a></li>
+    <li class="breadcrumb-item"><a href="{{route('food.items')}}">{{translate('Food items')}}</a></li>
     <li class="breadcrumb-item active">{{translate('Add Food Item')}}</li>
 </ol>
 @endsection
@@ -312,7 +312,7 @@ $placeholder = getPlaceholderImagePath();
             let food_type = $('#food-type').val()
 
             $.ajax({
-                url: "{{ route('store.food.itmes') }}",
+                url: "{{ route('store.food.items') }}",
                 method: 'POST',
                 data: {
                     _token: '{{ csrf_token() }}',
@@ -331,12 +331,13 @@ $placeholder = getPlaceholderImagePath();
                 success: function(response) {
                     if(response.success == 1){
                         toastr.success(response.message, 'Success');
-                        window.location.href = "{{route('food.itmes')}}";                        
+                        window.location.href = "{{route('food.items')}}";                        
                     }
                 },
                 error: function(xhr) {
                     let response = xhr.responseJSON
                     if (xhr.status === 422) {
+                        toastr.error('{{translate("Please give valid informetions")}}', 'Error');
                         let errors = xhr.responseJSON.errors;
                         for (let key in errors) {
                             if (errors.hasOwnProperty(key)) {

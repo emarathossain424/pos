@@ -28,8 +28,9 @@ Route::prefix('/food')->middleware('auth')->group(function () {
     Route::post('/delete-category', [CategoryController::class, 'deleteCategory'])->name('delete.category');
     Route::post('/update-category-status', [CategoryController::class, 'updateCategoryStatus'])->name('update.category.status');
 
-    Route::get('/itmes', [FoodItemController::class, 'foodItmes'])->name('food.itmes');
-    Route::get('/add-food-itmes', [FoodItemController::class, 'addFoodItmes'])->name('add.food.itmes');
-    Route::post('/store-food-itmes', [FoodItemController::class, 'storeFoodItmes'])->name('store.food.itmes');
+    Route::get('/items', [FoodItemController::class, 'foodItems'])->name('food.items');
+    Route::get('/add-food-items', [FoodItemController::class, 'addFoodItems'])->name('add.food.items');
+    Route::post('/store-food-items', [FoodItemController::class, 'storeFoodItems'])->name('store.food.items');
+    Route::get('/items/{id}', [FoodItemController::class, 'editFoodItems'])->name('edit.food.items');
 
 });
