@@ -124,5 +124,6 @@
     "+ Generate Variations": "+ Generate Variations",
     "Variant Food": "Variant Food",
     "Variant Name": "Variant Name",
-    "Unable to store food item": "Unable to store food item"
+    "Unable to store food item": "Unable to store food item",
+    "Food item stored successfully": "Food item stored successfully"
 }

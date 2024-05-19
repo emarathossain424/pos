@@ -54,7 +54,7 @@ class FoodItemController extends Controller
             $food_item->offer_price = $request['offer_price'];
             $food_item->meta_title = $request['meta_title'];
             $food_item->meta_image = $request['meta_image'];
-            $food_item->food_variations = json_encode($request['food_variation']);
+            $food_item->food_variation = json_encode($request['food_variation']);
             $food_item->saveOrFail();
 
             return response()->json([

@@ -329,7 +329,10 @@ $placeholder = getPlaceholderImagePath();
                     food_variation: variant_option_array
                 },
                 success: function(response) {
-                    toastr.error(response.message, 'Error');
+                    if(response.success == 1){
+                        toastr.success(response.message, 'Success');
+                        window.location.href = "{{route('food.itmes')}}";                        
+                    }
                 },
                 error: function(xhr) {
                     let response = xhr.responseJSON
