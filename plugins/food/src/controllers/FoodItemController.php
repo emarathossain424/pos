@@ -65,7 +65,32 @@ class FoodItemController extends Controller
             return response()->json([
                 'success' => $ex,
                 'message' => translate('Unable to store food item')
-            ],500);
+            ], 500);
         }
+    }
+
+    public function editFoodItems($id)
+    {
+        $food_item = FoodItem::find($id);
+        $food_item->food_variation = json_decode($food_item->food_variation,true);
+        $food_item->variant_options = $this->prepareVariation($food_item->food_variation);
+        
+        return view('food::admin.foods.edit',compact('food_item'));
+    }
+
+    public function prepareVariation($variation_combo) {
+        $result = [];
+        foreach($variation_combo as $variantion){
+            foreach($variantion as $key=>$value){
+                if(!in_array($key,['availablity','price','special_price'])){
+                    if(!array_key_exists($key,$result)){
+                        $result[$key]=[];
+                    }
+                    array_push($result[$key],$value);     
+                }
+            }
+        }
+
+        return $result;
     }
 }

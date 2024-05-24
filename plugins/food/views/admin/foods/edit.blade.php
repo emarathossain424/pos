@@ -4,7 +4,7 @@ $placeholder = getPlaceholderImagePath();
 
 @endphp
 @extends('layouts.master')
-@section('title') {{translate('Add Food Item')}} @endsection
+@section('title') {{translate('Update Food Item')}} @endsection
 @push('css')
 <link rel="stylesheet" href="{{asset('pos/plugins/select2/css/select2.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
@@ -13,7 +13,7 @@ $placeholder = getPlaceholderImagePath();
 @section('breadcrumb')
 <ol class="breadcrumb float-sm-right">
     <li class="breadcrumb-item"><a href="{{route('food.items')}}">{{translate('Food items')}}</a></li>
-    <li class="breadcrumb-item active">{{translate('Add Food Item')}}</li>
+    <li class="breadcrumb-item active">{{translate('Update Food Item')}}</li>
 </ol>
 @endsection
 @section('content')
@@ -21,14 +21,14 @@ $placeholder = getPlaceholderImagePath();
     <div class="container-fluid">
         <div class="card">
             <div class="card-header d-flex justify-content-between">
-                <h5 class="m-0">{{ translate('Add Food Item') }}</h5>
+                <h5 class="m-0">{{ translate('Update Food Item') }}</h5>
             </div>
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="food-name">{{translate('Food Name')}} <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="food-name" name="food_name" placeholder="Enter food name">
+                            <input type="text" class="form-control" id="food-name" name="food_name" placeholder="Enter food name" value="{{$food_item->name}}">
                             <div>
                                 <span class="text-danger" id="name"></span>
                             </div>
@@ -39,7 +39,7 @@ $placeholder = getPlaceholderImagePath();
                             <select class="form-control select2 w-100" name="category" id="category">
                                 <option value="">{{translate('Select Category')}}</option>
                                 @foreach($all_categories as $category)
-                                <option value="{{$category->id}}">{{$category->name}}</option>
+                                <option value="{{$category->id}}" {{$food_item->category==$category->id?'selected':''}}>{{$category->name}}</option>
                                 @endforeach
                             </select>
                             <div>
@@ -49,7 +49,7 @@ $placeholder = getPlaceholderImagePath();
 
                         <div class="form-group">
                             <label for="food-details">{{translate('Food Details')}} <span class="text-danger">*</span></label>
-                            <textarea class="form-control" rows="5" placeholder="Enter Food Details" name="food_details" id="food-details"></textarea>
+                            <textarea class="form-control" rows="5" placeholder="Enter Food Details" name="food_details" id="food-details">{{$food_item->details}}</textarea>
                             <div>
                                 <span class="text-danger" id="details"></span>
                             </div>
@@ -59,11 +59,24 @@ $placeholder = getPlaceholderImagePath();
                             <label for="meta-image">{{translate('Image')}} <span class="text-danger">*</span></label>
                             <input type="hidden" name="food_image" id="food-image-input">
                             <div class="row" id="food-image-view">
+                                @if(!empty($food_item->image))
+                                <div class="form-image-container col-2 m-2">
+                                    <div class="image-wrapper">
+                                        <img src="{{asset(getFilePath($food_item->image))}}" class="img-fluid p-2" alt="Selected image">
+                                        <div class="delete-button">
+                                            <button type="button" class="btn btn-sm delete-selection" data-fileid="{{$food_item->image}}" data-targetinputfield="#food-image-input" data-targetimagecontainerid="#food-image-view">
+                                                <i class="far fa-times-circle"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                @else
                                 <div class="form-image-container col-2 m-2">
                                     <div class="image-wrapper">
                                         <img src="{{asset($placeholder)}}" class="img-fluid" alt="black sample">
                                     </div>
                                 </div>
+                                @endif
                             </div>
                             <button type="button" class="btn text-blue browse-file" data-toggle="modal" data-target="#media-library" data-inputid="food-image-input" data-imagecontainerid="food-image-view" data-isformultiselect='0'>{{translate('Browse File')}}</button>
                             <div>
@@ -75,8 +88,8 @@ $placeholder = getPlaceholderImagePath();
                             <label for="food-type">{{translate('Food Type')}} <span class="text-danger">*</span></label>
                             <select class="form-control select2 w-100" name="food_type" id="food-type">
                                 <option value="">{{translate('Select Food Type')}}</option>
-                                <option value="variant">{{translate('Variant Food')}}</option>
-                                <option value="single">{{translate('Single Food')}}</option>
+                                <option value="variant" {{$food_item->food_type=='variant'?'selected':''}}>{{translate('Variant Food')}}</option>
+                                <option value="single" {{$food_item->food_type=='single'?'selected':''}}>{{translate('Single Food')}}</option>
                             </select>
                             <div>
                                 <span class="text-danger" id="food_type"></span>
@@ -86,7 +99,7 @@ $placeholder = getPlaceholderImagePath();
                     <div class="col-md-6">
                         <div class="form-group">
                             <h6><strong>{{translate('Status')}}</strong></h6>
-                            <input type="checkbox" id="status" name="status" checked data-bootstrap-switch>
+                            <input type="checkbox" id="status" name="status" {{$food_item->status==1?'checked':''}} data-bootstrap-switch>
                             <div>
                                 <span class="text-danger" id="status"></span>
                             </div>
@@ -94,7 +107,7 @@ $placeholder = getPlaceholderImagePath();
 
                         <div class="form-group">
                             <label for="price">{{translate('Price')}} <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" id="price" name="price" placeholder="Enter price">
+                            <input type="number" class="form-control" id="price" name="price" placeholder="Enter price" value="{{$food_item->price}}">
                             <div>
                                 <span class="text-danger" id="price"></span>
                             </div>
@@ -102,7 +115,7 @@ $placeholder = getPlaceholderImagePath();
 
                         <div class="form-group">
                             <label for="offer-price">{{translate('Offer Price')}} <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" id="offer-price" name="offer_price" placeholder="Enter offer price">
+                            <input type="number" class="form-control" id="offer-price" name="offer_price" placeholder="Enter offer price" value="{{$food_item->offer_price}}">
                             <div>
                                 <span class="text-danger" id="offer_price"></span>
                             </div>
@@ -110,23 +123,36 @@ $placeholder = getPlaceholderImagePath();
 
                         <div class="form-group">
                             <label for="meta-title">{{translate('Meta Title')}}</label>
-                            <input type="text" class="form-control" id="meta-title" placeholder="Enter meta title" name="meta_title">
+                            <input type="text" class="form-control" id="meta-title" placeholder="Enter meta title" name="meta_title" value="{{$food_item->meta_title}}">
                         </div>
 
                         <div class="form-group">
                             <label for="meta-description">{{translate('Meta Description')}}</label>
-                            <textarea class="form-control" rows="3" placeholder="Enter Meta Description" name="meta-description" id="meta_description"></textarea>
+                            <textarea class="form-control" rows="3" placeholder="Enter Meta Description" name="meta-description" id="meta_description">{{$food_item->meta_description}}</textarea>
                         </div>
 
                         <div class="form-group">
                             <label for="meta-image">{{translate('Meta Image')}}</label>
                             <input type="hidden" name="meta_image" id="meta-image-input">
                             <div class="row" id="meta-image-view">
+                                @if(!empty($food_item->meta_image))
+                                <div class="form-image-container col-2 m-2">
+                                    <div class="image-wrapper">
+                                        <img src="{{asset(getFilePath($food_item->meta_image))}}" class="img-fluid p-2" alt="Selected meta image">
+                                        <div class="delete-button">
+                                            <button type="button" class="btn btn-sm delete-selection" data-fileid="{{$food_item->meta_image}}" data-targetinputfield="#meta-image-input" data-targetimagecontainerid="#meta-image-view">
+                                                <i class="far fa-times-circle"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                @else
                                 <div class="form-image-container col-2 m-2">
                                     <div class="image-wrapper">
                                         <img src="{{asset($placeholder)}}" class="img-fluid" alt="black sample">
                                     </div>
                                 </div>
+                                @endif
                             </div>
                             <button type="button" class="btn text-blue browse-file" data-toggle="modal" data-target="#media-library" data-inputid="meta-image-input" data-imagecontainerid="meta-image-view" data-isformultiselect='0'>{{translate('Browse File')}}</button>
                         </div>
@@ -330,9 +356,9 @@ $placeholder = getPlaceholderImagePath();
                     food_type: food_type,
                 },
                 success: function(response) {
-                    if(response.success == 1){
+                    if (response.success == 1) {
                         toastr.success(response.message, 'Success');
-                        window.location.href = "{{route('food.items')}}";                        
+                        window.location.href = "{{route('food.items')}}";
                     }
                 },
                 error: function(xhr) {
@@ -342,7 +368,7 @@ $placeholder = getPlaceholderImagePath();
                         let errors = xhr.responseJSON.errors;
                         for (let key in errors) {
                             if (errors.hasOwnProperty(key)) {
-                                $('#'+key).html(errors[key][0])
+                                $('#' + key).html(errors[key][0])
                             }
                         }
                     } else {

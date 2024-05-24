@@ -128,5 +128,7 @@
     "Food item stored successfully": "Food item stored successfully",
     "Food items": "Food items",
     "items": "items",
-    "Add item": "Add item"
+    "Add item": "Add item",
+    "Please give valid informetions": "Please give valid informetions",
+    "Update Food Item": "Update Food Item"
 }
