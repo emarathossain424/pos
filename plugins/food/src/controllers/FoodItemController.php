@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use Plugin\Food\Models\FoodItem;
+use Plugin\Food\Models\FoodVariant;
 
 class FoodItemController extends Controller
 {
@@ -24,6 +25,10 @@ class FoodItemController extends Controller
      */
     public function addFoodItems()
     {
+        $variants = FoodVariant::with('options')->get();
+
+        dd($variants->toArray());
+
         return view('food::admin.foods.create');
     }
 
@@ -72,21 +77,27 @@ class FoodItemController extends Controller
     public function editFoodItems($id)
     {
         $food_item = FoodItem::find($id);
-        $food_item->food_variation = json_decode($food_item->food_variation,true);
+        $food_item->food_variation = json_decode($food_item->food_variation, true);
         $food_item->variant_options = $this->prepareVariation($food_item->food_variation);
-        
-        return view('food::admin.foods.edit',compact('food_item'));
+
+
+        // dd($food_item->food_variation);
+
+        return view('food::admin.foods.edit', compact('food_item'));
     }
 
-    public function prepareVariation($variation_combo) {
+    public function prepareVariation($variation_combo)
+    {
         $result = [];
-        foreach($variation_combo as $variantion){
-            foreach($variantion as $key=>$value){
-                if(!in_array($key,['availablity','price','special_price'])){
-                    if(!array_key_exists($key,$result)){
-                        $result[$key]=[];
+        foreach ($variation_combo as $variantion) {
+            foreach ($variantion as $key => $value) {
+                if (!in_array($key, ['availablity', 'price', 'special_price'])) {
+                    if (!array_key_exists($key, $result)) {
+                        $result[$key] = [];
                     }
-                    array_push($result[$key],$value);     
+                    if (!in_array($value, $result[$key])) {
+                        array_push($result[$key], $value);
+                    }
                 }
             }
         }

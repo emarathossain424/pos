@@ -164,20 +164,25 @@ $placeholder = getPlaceholderImagePath();
                         <button type="button" class="btn bg-primary bold ml-2" id="add-variant">{{translate('+ Add Option')}}</button>
                     </div>
                     <div class="variants">
+                        @foreach ($food_item->variant_options as $varient=>$options)
+                        @php
+                        $all_options = implode(',',$options);
+                        @endphp
                         <div class="row single-variant">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="variant-name">{{translate('Variant Name')}} <span class="text-danger"></span></label>
-                                    <input type="text" class="form-control" id="variant-name" name="variant_name" placeholder="Ex. Size">
+                                    <label for="variant-name">{{translate('Variant Name')}}</label>
+                                    <input type="text" class="form-control" id="variant-name" name="variant_name" placeholder="Ex. Size" value="{{$varient}}">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="options">{{translate('Options')}} <span class="text-danger"></span></label>
-                                    <input type="text" class="form-control" id="options" name="options" placeholder="Ex. Small,Medium,Large">
+                                    <label for="options">{{translate('Options')}}</label>
+                                    <input type="text" class="form-control" id="options" name="options" placeholder="Ex. Small,Medium,Large" value="{{$all_options}}">
                                 </div>
                             </div>
                         </div>
+                        @endforeach
                     </div>
 
                     <div class="row d-flex justify-content-center">
@@ -221,9 +226,13 @@ $placeholder = getPlaceholderImagePath();
 <script src="{{asset('pos/plugins/select2/js/select2.full.min.js')}}"></script>
 <script src="{{asset('pos/plugins/summernote/summernote-bs4.min.js')}}"></script>
 <script>
-    let variant_option_array = [];
+    let variant_option_array = JSON.parse(`{!! json_encode($food_item->food_variation) !!}`);
+
     $(function() {
         'use strict'
+        $(document).ready(function() {
+            $('#generate-variant').trigger('click');
+        })
         $("input[data-bootstrap-switch]").each(function() {
             $(this).bootstrapSwitch('state', $(this).prop('checked'));
         })
@@ -278,10 +287,14 @@ $placeholder = getPlaceholderImagePath();
                 }
             });
 
+            // console.log("variant_option_array[0].price")
+            // console.log(variant_option_array[0].price)
+
             //generating variant combinetion
             if (Object.keys(options_array).length != 0) {
                 variant_option_array = cartesianProduct(options_array)
             }
+            // console.log(variant_option_array[0].price)
 
             //Generating html for variant combinetion table header 
             table_header_html = table_header_html + `<th>{{translate('Price')}}</th>
@@ -297,19 +310,24 @@ $placeholder = getPlaceholderImagePath();
                     table_content_html = table_content_html + `<td>` + variant_option_array[i][key] + `</td>`
                 }
 
+                let availablity = 'checked'
+                if (variant_option_array[i].availablity != 'on') {
+                    availablity = ''
+                }
+
                 table_content_html = table_content_html + `<td>
                                     <div class="form-group">
-                                        <input type="number" class="form-control" name="price" id="price-` + i + `" onchange="setPrice(` + i + `)">
+                                        <input type="number" class="form-control" name="price" id="price-` + i + `" onchange="setPrice(` + i + `)" value="` + variant_option_array[i].price + `">
                                     </div>
                                 </td>
                                 <td>
                                     <div class="form-group">
-                                        <input type="number" class="form-control" name="special_price" id="special-price-` + i + `" onchange="setSpecialPrice(` + i + `)">
+                                        <input type="number" class="form-control" name="special_price" id="special-price-` + i + `" onchange="setSpecialPrice(` + i + `)"  value="` + variant_option_array[i].special_price + `">
                                     </div>
                                 </td>
                                 <td>
                                 <div class="form-group">
-                                    <input type="checkbox" class="form-control" name="is_available" id="availablity-` + i + `" onchange="setAvailablity(` + i + `)"  checked data-bootstrap-switch>
+                                    <input type="checkbox" class="form-control" name="is_available" id="availablity-` + i + `" onchange="setAvailablity(` + i + `)"  ` + availablity + ` data-bootstrap-switch>
                                 </div>
                             </td>
                             </tr>`
@@ -382,23 +400,35 @@ $placeholder = getPlaceholderImagePath();
          * Will generate variant combinetion
          */
         function cartesianProduct(variants) {
+            console.log(variants)
             const keys = Object.keys(variants);
             const values = Object.values(variants);
+            const result = variant_option_array;
 
-            return values.reduce((accumulator, currentValue, index) => {
-                const variantName = keys[index];
+            for (let i = 0; i < values.length; i++) {
+                const variantName = keys[i];
+                const currentValue = values[i];
+                const tempResult = [];
 
-                return accumulator.flatMap((accItem) => {
-                    return currentValue.map((option) => {
+                for (let j = 0; j < result.length; j++) {
+                    const accItem = result[j];
+
+                    for (let k = 0; k < currentValue.length; k++) {
+                        console.log(accItem)
+                        const option = currentValue[k];
                         const newItem = {
                             ...accItem
                         };
                         newItem[variantName] = option;
-                        return newItem;
-                    });
-                });
-            }, [{}]);
+                        tempResult.push(newItem);
+                    }
+                }
+                result.splice(0, result.length, ...tempResult);
+            }
+
+            return result;
         }
+
 
         /**
          * Will create slug 
