@@ -5,7 +5,9 @@ namespace Plugin\Food\Controllers;
 use App\Http\Controllers\Controller;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Plugin\Food\Models\FoodItem;
+use Plugin\Food\Models\FoodItemsVariantCombos;
 use Plugin\Food\Models\FoodVariant;
 
 class FoodItemController extends Controller
@@ -26,10 +28,7 @@ class FoodItemController extends Controller
     public function addFoodItems()
     {
         $variants = FoodVariant::with('options')->get();
-
-        dd($variants->toArray());
-
-        return view('food::admin.foods.create');
+        return view('food::admin.foods.create', compact('variants'));
     }
 
     /**
@@ -49,6 +48,7 @@ class FoodItemController extends Controller
         ]);
 
         try {
+            DB::beginTransaction();
             $food_item = new FoodItem();
             $food_item->name = $request['name'];
             $food_item->category = $request['category'];
@@ -59,19 +59,45 @@ class FoodItemController extends Controller
             $food_item->offer_price = $request['offer_price'];
             $food_item->meta_title = $request['meta_title'];
             $food_item->meta_image = $request['meta_image'];
-            $food_item->food_variation = json_encode($request['food_variation']);
             $food_item->saveOrFail();
 
+            if($request['food_type'] == 'variant'){
+                $this->storeFoodItemVariantOptions($request['variant_combo'], $food_item->id);
+            }
+
+            DB::commit();
             return response()->json([
                 'success' => 1,
                 'message' => translate('Food item stored successfully')
             ]);
         } catch (\Exception $ex) {
+            DB::rollBack();
             return response()->json([
                 'success' => $ex,
                 'message' => translate('Unable to store food item')
             ], 500);
         }
+    }
+
+    /**
+     * Stores the food item variant options in the database.
+     *
+     * @param array $variation_combo The array of variation combinations.
+     * @param int $food_item_id The ID of the food item.
+     * @return void
+     */
+    public function storeFoodItemVariantOptions($variation_combo, $food_item_id)
+    {
+        $data = [];
+        foreach ($variation_combo as $combo) {
+            $combination = json_encode($combo);
+            $data[] = [
+                'item_id' => $food_item_id,
+                'combo' => $combination
+            ];
+        }
+
+        FoodItemsVariantCombos::insert($data);
     }
 
     public function editFoodItems($id)

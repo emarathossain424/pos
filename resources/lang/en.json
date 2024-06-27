@@ -130,5 +130,7 @@
     "items": "items",
     "Add item": "Add item",
     "Please give valid informetions": "Please give valid informetions",
-    "Update Food Item": "Update Food Item"
+    "Update Food Item": "Update Food Item",
+    "Select Variant": "Select Variant",
+    "Unable to store item details": "Unable to store item details"
 }

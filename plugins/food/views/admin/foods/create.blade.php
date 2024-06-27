@@ -9,6 +9,11 @@ $placeholder = getPlaceholderImagePath();
 <link rel="stylesheet" href="{{asset('pos/plugins/select2/css/select2.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/summernote/summernote-bs4.min.css')}}">
+<style>
+    select {
+        width: 100% !important;
+    }
+</style>
 @endpush
 @section('breadcrumb')
 <ol class="breadcrumb float-sm-right">
@@ -74,9 +79,8 @@ $placeholder = getPlaceholderImagePath();
                         <div class="form-group">
                             <label for="food-type">{{translate('Food Type')}} <span class="text-danger">*</span></label>
                             <select class="form-control select2 w-100" name="food_type" id="food-type">
-                                <option value="">{{translate('Select Food Type')}}</option>
                                 <option value="variant">{{translate('Variant Food')}}</option>
-                                <option value="single">{{translate('Single Food')}}</option>
+                                <option value="single" selected>{{translate('Single Food')}}</option>
                             </select>
                             <div>
                                 <span class="text-danger" id="food_type"></span>
@@ -133,53 +137,30 @@ $placeholder = getPlaceholderImagePath();
                     </div>
                 </div>
                 <hr>
-                <div class="variant-options">
-                    <div class="row d-flex justify-content-end">
-                        <button type="button" class="btn bg-primary bold ml-2" id="add-variant">{{translate('+ Add Option')}}</button>
-                    </div>
-                    <div class="variants">
-                        <div class="row single-variant">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="variant-name">{{translate('Variant Name')}} <span class="text-danger"></span></label>
-                                    <input type="text" class="form-control" id="variant-name" name="variant_name" placeholder="Ex. Size">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="options">{{translate('Options')}} <span class="text-danger"></span></label>
-                                    <input type="text" class="form-control" id="options" name="options" placeholder="Ex. Small,Medium,Large">
-                                </div>
+                <div class="variant-selections d-none">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form-group">
+                                <label for="variant-id">{{translate('Select Variant')}} <span class="text-danger"></span></label>
+                                <select class="form-control select2" name="variant_id[]" id="variant-id" multiple>
+                                    @foreach ($variants as $variant)
+                                    <option value="{{$variant->id}}">{{$variant->name}}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                     </div>
+                    <div class="row" id="options">
 
-                    <div class="row d-flex justify-content-center">
-                        <button type="button" class="btn bg-primary bold ml-2" id="generate-variant">
-                            <i class="fas fa-sync-alt"></i>
-                            {{translate('Generate Variations')}}
-                        </button>
                     </div>
-
-                    <hr />
-
                     <div class="row">
-                        <div class="col-md-12">
-                            <table class="table table-bordered">
-                                <thead class="bg-pink">
-                                    <tr id="variant-table-header">
-                                        <th>{{translate('Price')}}</th>
-                                        <th>{{translate('Special Price')}}</th>
-                                        <th>{{translate('Is Available')}}</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="variant-table-content"></tbody>
-                            </table>
+                        <div class="col-md-12" id="variant-table-container">
+
                         </div>
                     </div>
                 </div>
                 <div class="d-flex justify-content-center">
-                    <button class="btn bg-pink btn-block w-25 bold" id="store-button">{{translate('Save')}}</button>
+                    <button class="btn bg-pink btn-block w-25 bold" id="store-button" type="button" onclick="storeFoodItems()">{{translate('Save')}}</button>
                 </div>
             </div>
         </div>
@@ -195,220 +176,308 @@ $placeholder = getPlaceholderImagePath();
 <script src="{{asset('pos/plugins/select2/js/select2.full.min.js')}}"></script>
 <script src="{{asset('pos/plugins/summernote/summernote-bs4.min.js')}}"></script>
 <script>
+    // Array to store the options of each variant combination
     let variant_option_array = [];
+    // Array to store the options of each variant (sent from server)
+    let variantData = JSON.parse('{!! json_encode($variants->toArray()) !!}');
+    // Array to store the selected options
+    let selected_variant_with_options = [];
     $(function() {
         'use strict'
+        //Implement bootstrap switch is status field
         $("input[data-bootstrap-switch]").each(function() {
             $(this).bootstrapSwitch('state', $(this).prop('checked'));
         })
 
+        // Initialize Select2 for category
         $('#category').select2({
-            theme: 'bootstrap4'
+            theme: 'bootstrap4',
+            width: '100%'
         })
+        // Initialize Select2 for food type
         $('#food-type').select2({
-            theme: 'bootstrap4'
+            theme: 'bootstrap4',
+            width: '100%'
+        })
+        // Initialize Select2 for variant list
+        $('#variant-id').select2({
+            theme: 'bootstrap4',
+            width: '100%'
         })
 
+        //Showing variant selection option based on food type
         $('#food-type').change(() => {
             const food_type = $('#food-type').val()
             if (food_type == 'variant') {
-                $('.variant-options').removeClass('d-none')
+                $('.variant-selections').removeClass('d-none')
             } else {
-                $('.variant-options').addClass('d-none')
+                $('.variant-selections').addClass('d-none')
             }
         })
 
-        $('#add-variant').click(() => {
-            const html = `<div class="row single-variant">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="variant-name">{{translate('Variant Name')}}</label>
-                                    <input type="text" class="form-control" id="variant-name" name="variant_name" placeholder="Ex. Size">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="options">{{translate('Options')}}</label>
-                                    <input type="text" class="form-control" id="options" name="options" placeholder="Ex. Small,Medium,Large">
-                                </div>
-                            </div>
-                         </div>`
-            $('.variants').append(html)
-        })
+        $('#variant-id').change(() => {
+            const variant_id = $('#variant-id').val()
+            if (variant_id.length > 0) {
+                // Find and store the variant ids that do not exist in variant_id
+                let removedVariantIds = selected_variant_with_options
+                    .filter(v => !variant_id.includes(v.variant.id))
+                    .map(v => v.variant.id);
 
-        $('#generate-variant').click(() => {
-            let table_header_html = ``;
-            let table_content_html = ``;
-            let options_array = {};
-
-            //Extracting options of each variant and store them in array
-            $('.single-variant').each(function() {
-                let variantName = $(this).find('[name="variant_name"]').val();
-                if (variantName != '') {
-                    table_header_html = table_header_html + `<th>` + variantName + `</th>`
-
-                    let options = $(this).find('[name="options"]').val();
-                    options_array[createSlug(variantName)] = options.split(',')
-                }
-            });
-
-            //generating variant combinetion
-            if (Object.keys(options_array).length != 0) {
-                variant_option_array = cartesianProduct(options_array)
-            }
-
-            //Generating html for variant combinetion table header 
-            table_header_html = table_header_html + `<th>{{translate('Price')}}</th>
-                    <th>{{translate('Special Price')}}</th>
-                    <th>{{translate('Is Available')}}</th>`
-
-            $('#variant-table-header').html(table_header_html)
-
-            //Generating html for variant combinetion table row
-            for (let i = 0; i < variant_option_array.length; i++) {
-                table_content_html = table_content_html + `<tr>`
-                for (let key in variant_option_array[i]) {
-                    table_content_html = table_content_html + `<td>` + variant_option_array[i][key] + `</td>`
-                }
-
-                table_content_html = table_content_html + `<td>
-                                    <div class="form-group">
-                                        <input type="number" class="form-control" name="price" id="price-` + i + `" onchange="setPrice(` + i + `)">
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="form-group">
-                                        <input type="number" class="form-control" name="special_price" id="special-price-` + i + `" onchange="setSpecialPrice(` + i + `)">
-                                    </div>
-                                </td>
-                                <td>
-                                <div class="form-group">
-                                    <input type="checkbox" class="form-control" name="is_available" id="availablity-` + i + `" onchange="setAvailablity(` + i + `)"  checked data-bootstrap-switch>
-                                </div>
-                            </td>
-                            </tr>`
-            }
-            $('#variant-table-content').html(table_content_html)
-
-            $("input[data-bootstrap-switch]").each(function() {
-                $(this).bootstrapSwitch('state', $(this).prop('checked'));
-            })
-        })
-
-        /**
-         * Requesting food item to store in database
-         */
-        $('#store-button').click(() => {
-            let food_name = $('#food-name').val()
-            let category = $('#category').val()
-            let details = $('#food-details').val()
-            let food_image = $('#food-image-input').val()
-            let status = $('#status').val()
-            let price = $('#price').val()
-            let offer_price = $('#offer-price').val()
-            let meta_title = $('#meta-title').val()
-            let meta_description = $('#meta-description').val()
-            let meta_image = $('#meta-image-input').val()
-            let food_type = $('#food-type').val()
-
-            $.ajax({
-                url: "{{ route('store.food.items') }}",
-                method: 'POST',
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    name: food_name,
-                    category: category,
-                    details: details,
-                    image: food_image,
-                    status: status,
-                    price: price,
-                    offer_price: offer_price,
-                    meta_title: meta_title,
-                    meta_description: meta_description,
-                    meta_image: meta_image,
-                    food_variation: variant_option_array,
-                    food_type: food_type,
-                },
-                success: function(response) {
-                    if(response.success == 1){
-                        toastr.success(response.message, 'Success');
-                        window.location.href = "{{route('food.items')}}";                        
-                    }
-                },
-                error: function(xhr) {
-                    let response = xhr.responseJSON
-                    if (xhr.status === 422) {
-                        toastr.error('{{translate("Please give valid informetions")}}', 'Error');
-                        let errors = xhr.responseJSON.errors;
-                        for (let key in errors) {
-                            if (errors.hasOwnProperty(key)) {
-                                $('#'+key).html(errors[key][0])
-                            }
-                        }
-                    } else {
-                        toastr.error(response.message, 'Error');
-                    }
-                }
-            });
-        })
-
-        /**
-         * Will generate variant combinetion
-         */
-        function cartesianProduct(variants) {
-            const keys = Object.keys(variants);
-            const values = Object.values(variants);
-
-            return values.reduce((accumulator, currentValue, index) => {
-                const variantName = keys[index];
-
-                return accumulator.flatMap((accItem) => {
-                    return currentValue.map((option) => {
-                        const newItem = {
-                            ...accItem
-                        };
-                        newItem[variantName] = option;
-                        return newItem;
-                    });
+                // Remove the corresponding elements from the DOM
+                removedVariantIds.forEach(id => {
+                    $(`#variant-div-${id}`).remove();
                 });
-            }, [{}]);
-        }
 
-        /**
-         * Will create slug 
-         */
-        function createSlug(str) {
-            return str
-                .toLowerCase()
-                .replace(/[^\w\s-]/g, '') // Remove special characters
-                .replace(/\s+/g, '-') // Replace spaces with dashes
-                .replace(/--+/g, '-') // Replace consecutive dashes with a single dash
-                .trim(); // Trim leading/trailing spaces and dashes
-        }
+                // Keeping only the variants that exist in variant_id
+                selected_variant_with_options = selected_variant_with_options.filter(v => variant_id.includes(v.variant.id));
+
+
+                variant_id.forEach(id => {
+                    let index = selected_variant_with_options.findIndex(v => v.variant.id == id)
+                    if (index == -1) {
+                        selected_variant_with_options.push({
+                            variant: {
+                                name: variantData.find(v => v.id == id).name,
+                                id: id
+                            },
+                            options: []
+                        })
+                        createSelectBox(id)
+                    }
+                })
+            }
+
+            generateCombinations(selected_variant_with_options);
+            generateTableFromVariantCombinations()
+        })
     });
 
+    // Create select box for each variant
+    function createSelectBox(variantId) {
+        // Find the variant object with the given ID
+        const variant = variantData.find(variant => variant.id == variantId);
+
+        // Start building the raw HTML string for the form-group, label, and select element
+        let selectHTML = `<div class="col-md-12" id="variant-div-${variant.id}"><div class="form-group">
+        <label for="variant-${variant.id}">${variant.name} <span class="text-danger"></span></label>
+        <select class="form-control select2 variant-options" name="variant_id[]"  id="variant-${variant.id}" multiple>`;
+
+        // Loop through the options of the variant and create option elements
+        variant.options.forEach(option => {
+            selectHTML += `<option data-name="${option.option_name}" value="${option.id}">${option.option_name}</option>`;
+        });
+
+        // Close the select and div elements
+        selectHTML += `</select></div></div>`;
+
+        // Append the constructed HTML to the desired parent element
+        $('#options').append(selectHTML);
+
+        $(`#variant-${variant.id}`).select2({
+            theme: 'bootstrap4',
+            width: '100%'
+        });
+
+        // Add onchange event listener to the select box
+        $(`#variant-${variant.id}`).on('change', function() {
+            // Retrieve selected option elements
+            const selectedOptions = $(this).find('option:selected');
+
+            // Construct the options array
+            const options = selectedOptions.map(function() {
+                return {
+                    id: $(this).val(),
+                    name: $(this).data('name')
+                };
+            }).get(); // Use .get() to convert jQuery object to a plain array
+
+            // Find the existing variant in the array
+            const variantIndex = selected_variant_with_options.findIndex(v => v.variant.id == variant.id);
+
+            if (variantIndex > -1) {
+                // Update the existing variant's options
+                selected_variant_with_options[variantIndex].options = options;
+            } else {
+                // Add new variant with options
+                selected_variant_with_options.push({
+                    variant: {
+                        name: variant.name,
+                        id: variant.id
+                    },
+                    options: options
+                });
+            }
+
+            generateCombinations(selected_variant_with_options);
+            generateTableFromVariantCombinations()
+        });
+    }
+
+    /** 
+     * Generate variant combinations
+     */
+    function generateCombinations(variants) {
+        const combinations = [];
+
+        const generateComboKey = (combo) => {
+            return combo.map(item => `${item.variant.id}:${item.options.id}`).join('|');
+        };
+        const existingCombos = new Set(variant_option_array.map(combo => generateComboKey(combo.combo)));
+
+        const getCombinations = (options, index = 0, currentCombo = []) => {
+            if (index === options.length) {
+                let newCombo = {
+                    combo: currentCombo.map((item) => ({
+                        variant: item.variant,
+                        options: item.option
+                    })),
+                    price: 0,
+                    special_price: 0,
+                    availability: 0
+                };
+
+                const comboKey = generateComboKey(newCombo.combo);
+
+                combinations.push(newCombo);
+                existingCombos.add(comboKey);
+
+                return combinations;
+            }
+
+            for (const option of options[index].options) {
+                getCombinations(options, index + 1, [...currentCombo, {
+                    variant: options[index].variant,
+                    option
+                }]);
+            }
+        };
+
+        getCombinations(variants);
+
+        const comboKeysInArray2 = new Set(combinations.map(item => generateComboKey(item.combo)));
+        variant_option_array = variant_option_array.filter(item => comboKeysInArray2.has(generateComboKey(item.combo)));
+
+        const existingComboKeys = new Set(variant_option_array.map(item => generateComboKey(item.combo)));
+        const newCombinations = combinations.filter(item => !existingComboKeys.has(generateComboKey(item.combo)));
+        variant_option_array = [...variant_option_array, ...newCombinations];
+
+    }
+
     /**
-     * will set price for each variant combinetion
+     * Generate table from variant combinations
+     */
+    function generateTableFromVariantCombinations() {
+        'use strict';
+        let data = variant_option_array;
+
+        // Extract unique variant names
+        const variantNames = new Set();
+        data.forEach(item => {
+            item.combo.forEach(variantCombo => {
+                variantNames.add(variantCombo.variant.name);
+            });
+        });
+
+        // Start building the table HTML
+        let tableHTML = '<table border="1" class="table table-bordered" id="variantTable"><thead><tr>';
+
+        // Add headers for each unique variant
+        variantNames.forEach(name => {
+            tableHTML += `<th>${name}</th>`;
+        });
+
+        // Add headers for price and availability
+        tableHTML += '<th>{{translate("Price")}}</th><th>{{translate("Special Price")}}</th><th>{{translate("Is Available")}}</th></tr></thead><tbody>';
+
+        // Add rows for each data item
+        data.forEach((item, index) => {
+            tableHTML += '<tr>';
+
+            // Add cells for each variant option
+            variantNames.forEach(name => {
+                const variantCombo = item.combo.find(v => v.variant.name === name);
+                tableHTML += `<td>${variantCombo ? variantCombo.options.name : ''}</td>`;
+            });
+
+            // Add cells for price and availability
+            tableHTML += `<td><input type="number" class="form-control" id="price-${index}" value="${item.price}" onchange="setPrice(${index})"></td>`;
+            tableHTML += `<td><input type="number" class="form-control" id="special-price-${index}" value="${item.special_price}" onchange="setSpecialPrice(${index})"></td>`;
+            tableHTML += `<td><input type="checkbox" class="form-control" id="availability-${index}" ${item.availability==1 ? 'checked' : ''} onchange="setAvailability(${index})"></td>`;
+            tableHTML += '</tr>';
+        });
+
+        tableHTML += '</tbody></table>';
+        $('#variant-table-container').html(tableHTML);
+    }
+
+
+    /**
+     * will set price for each variant combination
      */
     function setPrice(index) {
+        'use strict';
         let price = $('#price-' + index).val()
         variant_option_array[index].price = price
     }
 
     /**
-     * will set availablity status for each variant combinetion
+     * will set special price for each variant combination
      */
-    function setAvailablity(index) {
-        let availablity = $('#availablity-' + index).val()
-        variant_option_array[index].availablity = availablity
+    function setSpecialPrice(index) {
+        'use strict';
+        let special_price = $('#special-price-' + index).val()
+        variant_option_array[index].special_price = special_price
     }
 
     /**
-     * will set special price for each variant combinetion
+     * will set availability for each variant combination
      */
-    function setSpecialPrice(index) {
-        let special_price = $('#special-price-' + index).val()
-        variant_option_array[index].special_price = special_price
+    function setAvailability(index) {
+        'use strict';
+        availability = variant_option_array[index].availability
+        if (availability == 1) {
+            variant_option_array[index].availability = 0
+        } else {
+            variant_option_array[index].availability = 1
+        }
+    }
+
+    /**
+     * Sending food item data store request
+     */
+    function storeFoodItems() {
+        'use strict';
+        let data = {
+            'name': $('#food-name').val(),
+            'details': $('#food-details').val(),
+            'category': $('#category').val(),
+            'image': $('#food-image-input').val(),
+            'status': $('#status').val(),
+            'price': $('#price').val(),
+            'offer_price': $('#offer-price').val(),
+            'food_type': $('#food-type').val(),
+            'meta_title': $('#meta-title').val(),
+            'meta_description': $('#meta_description').val(),
+            'meta_image': $('#meta-image-input').val(),
+            'variant_combo': variant_option_array,
+            '_token': '{{ csrf_token() }}'
+        }
+
+        $.ajax({
+            url: '{{ route("store.food.items") }}', // Your endpoint URL
+            type: 'POST',
+            data: data,
+            success: function(response) {
+                toastr.success("{{translate('Food item stored successfully')}}", 'success');
+                setTimeout(function() {
+                    window.location.href = "{{route('food.items')}}";
+                }, 3000);
+            },
+            error: function(xhr) {
+                console.log(xhr.responseJSON);
+                toastr.error("{{translate('Unable to store item details')}}", 'error');
+            }
+        });
     }
 </script>
 @endpush
