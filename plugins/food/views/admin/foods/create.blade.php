@@ -35,7 +35,7 @@ $placeholder = getPlaceholderImagePath();
                             <label for="food-name">{{translate('Food Name')}} <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="food-name" name="food_name" placeholder="Enter food name">
                             <div>
-                                <span class="text-danger" id="name"></span>
+                                <span class="text-danger" id="name_error"></span>
                             </div>
                         </div>
 
@@ -48,7 +48,7 @@ $placeholder = getPlaceholderImagePath();
                                 @endforeach
                             </select>
                             <div>
-                                <span class="text-danger" id="category"></span>
+                                <span class="text-danger" id="category_error"></span>
                             </div>
                         </div>
 
@@ -56,7 +56,7 @@ $placeholder = getPlaceholderImagePath();
                             <label for="food-details">{{translate('Food Details')}} <span class="text-danger">*</span></label>
                             <textarea class="form-control" rows="5" placeholder="Enter Food Details" name="food_details" id="food-details"></textarea>
                             <div>
-                                <span class="text-danger" id="details"></span>
+                                <span class="text-danger" id="details_error"></span>
                             </div>
                         </div>
 
@@ -72,7 +72,7 @@ $placeholder = getPlaceholderImagePath();
                             </div>
                             <button type="button" class="btn text-blue browse-file" data-toggle="modal" data-target="#media-library" data-inputid="food-image-input" data-imagecontainerid="food-image-view" data-isformultiselect='0'>{{translate('Browse File')}}</button>
                             <div>
-                                <span class="text-danger" id="image"></span>
+                                <span class="text-danger" id="image_error"></span>
                             </div>
                         </div>
 
@@ -83,7 +83,7 @@ $placeholder = getPlaceholderImagePath();
                                 <option value="single" selected>{{translate('Single Food')}}</option>
                             </select>
                             <div>
-                                <span class="text-danger" id="food_type"></span>
+                                <span class="text-danger" id="food_type_error"></span>
                             </div>
                         </div>
                     </div>
@@ -100,7 +100,7 @@ $placeholder = getPlaceholderImagePath();
                             <label for="price">{{translate('Price')}} <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="price" name="price" placeholder="Enter price">
                             <div>
-                                <span class="text-danger" id="price"></span>
+                                <span class="text-danger" id="price_error"></span>
                             </div>
                         </div>
 
@@ -108,7 +108,7 @@ $placeholder = getPlaceholderImagePath();
                             <label for="offer-price">{{translate('Offer Price')}} <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="offer-price" name="offer_price" placeholder="Enter offer price">
                             <div>
-                                <span class="text-danger" id="offer_price"></span>
+                                <span class="text-danger" id="offer_price_error"></span>
                             </div>
                         </div>
 
@@ -471,11 +471,27 @@ $placeholder = getPlaceholderImagePath();
                 toastr.success("{{translate('Food item stored successfully')}}", 'success');
                 setTimeout(function() {
                     window.location.href = "{{route('food.items')}}";
-                }, 3000);
+                }, 2000);
             },
             error: function(xhr) {
-                console.log(xhr.responseJSON);
-                toastr.error("{{translate('Unable to store item details')}}", 'error');
+                // Check if the response has errors
+                if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    toastr.error("{{translate('Please fill up mandatory fields')}}", 'error');
+
+                    var errors = xhr.responseJSON.errors;
+
+                    // Loop through the errors and display each one using Toastr
+                    for (var field in errors) {
+                        if (errors.hasOwnProperty(field)) {
+                            $('#' + field+'_error').html('');
+                            errors[field].forEach(function(message) {
+                                $('#' + field+'_error').append(message);
+                            });
+                        }
+                    }
+                } else {
+                    toastr.error("{{translate('There was an error')}}", 'error');
+                }
             }
         });
     }
