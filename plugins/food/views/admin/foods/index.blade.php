@@ -30,6 +30,60 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        <table id="itemList" class="table table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>{{translate('Image')}}</th>
+                                    <th>{{translate('Name')}}</th>
+                                    <th>{{translate('Category')}}</th>
+                                    <th>{{translate('Food Type')}}</th>
+                                    <th>{{translate('Status')}}</th>
+                                    <th>{{translate('Price')}}</th>
+                                    <th>{{translate('Offer Price')}}</th>
+                                    <th>{{translate('Action')}}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @php
+                                $key = 0;
+                                @endphp
+                                @foreach ($food_items as $item)
+                                @php
+                                $key = $key+1;
+                                @endphp
+                                <tr>
+                                    <td>{{$key}}.</td>
+                                    <td>
+                                        <img src="/{{ getFilePath($item->image) }}" alt="item-image" class="img-fluid" style="max-width: 50px; max-height: 50px;">
+                                    </td>
+                                    <td>{{ $item->name }}</td>
+                                    <td>{{ $item->foodCategory->name }}</td>
+                                    
+                                    <td>{{ $item->food_type }}</td>
+                                    <td>
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input change-featured-status" id="status{{$key}}" data-id="{{$item->id}}" {{$item->status==1?'checked':''}}>
+                                            <label class="custom-control-label" for="status{{$key}}"></label>
+                                        </div>
+                                    </td>
+                                    <td>{{ $item->price }}</td>
+                                    <td>{{ $item->offer_price }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                {{translate('Action')}}
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item" href="{{route('edit.food.item',$item->id)}}">{{translate('Edit')}}</a>
+                                                <a class="dropdown-item delete-category" href="#" data-id="{{$item->id}}" data-toggle="modal" data-target="#deleteCategory">{{translate('Delete')}}</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -46,5 +100,10 @@
 <script src="{{asset('pos/plugins/datatables-responsive/js/responsive.bootstrap4.min.js')}}"></script>
 
 <script>
+    $(function() {
+        'use strict'
+        $("#itemList").DataTable()
+    });
+    
 </script>
 @endpush

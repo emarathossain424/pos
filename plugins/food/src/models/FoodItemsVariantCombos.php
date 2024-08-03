@@ -11,4 +11,8 @@ class FoodItemsVariantCombos extends Model
 
     protected $table = 'food_items_variant_combos';
 
+    public function getVariantComboByItemId($variant_id) {
+        return $this->where('item_id', $variant_id)->get();
+    }
+
 }

@@ -308,6 +308,7 @@ $placeholder = getPlaceholderImagePath();
                 });
             }
 
+            console.log(selected_variant_with_options)
             generateCombinations(selected_variant_with_options);
             generateTableFromVariantCombinations()
         });
@@ -434,7 +435,7 @@ $placeholder = getPlaceholderImagePath();
      */
     function setAvailability(index) {
         'use strict';
-        availability = variant_option_array[index].availability
+        let availability = variant_option_array[index].availability
         if (availability == 1) {
             variant_option_array[index].availability = 0
         } else {
