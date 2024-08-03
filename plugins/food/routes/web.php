@@ -33,5 +33,6 @@ Route::prefix('/food')->middleware('auth')->group(function () {
     Route::post('/store-food-items', [FoodItemController::class, 'storeFoodItems'])->name('store.food.items');
     Route::get('/items/{id}', [FoodItemController::class, 'editFoodItems'])->name('edit.food.item');
     Route::post('/update-food-items', [FoodItemController::class, 'updateFoodItems'])->name('update.food.items');
+    Route::post('/delete-food-item', [FoodItemController::class, 'deleteFoodItem'])->name('delete.food.item');
 
 });

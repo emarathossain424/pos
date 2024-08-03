@@ -22,9 +22,9 @@ class FoodItemController extends Controller
      */
     public function foodItems()
     {
-        $food_items = FoodItem::with('foodItemVariant','foodCategory')
+        $food_items = FoodItem::with('foodItemVariant', 'foodCategory')
             ->get();
-        return view('food::admin.foods.index',compact('food_items'));
+        return view('food::admin.foods.index', compact('food_items'));
     }
 
     /**
@@ -78,9 +78,8 @@ class FoodItemController extends Controller
             ]);
         } catch (\Exception $ex) {
             DB::rollBack();
-            dd($ex);
             return response()->json([
-                'success' => $ex,
+                'success' => 0,
                 'message' => translate('Unable to store food item')
             ], 500);
         }
@@ -143,9 +142,8 @@ class FoodItemController extends Controller
             $food_item->saveOrFail();
 
             if ($request['food_type'] == 'variant') {
-                $this->storeFoodItemVariantOptions($request['variant_combo'], $food_item->id,true);
-            }
-            else{
+                $this->storeFoodItemVariantOptions($request['variant_combo'], $food_item->id, true);
+            } else {
                 FoodItemVariant::where('item_id', $food_item->id)->delete();
             }
 
@@ -156,9 +154,8 @@ class FoodItemController extends Controller
             ]);
         } catch (\Exception $ex) {
             DB::rollBack();
-            dd($ex);
             return response()->json([
-                'success' => $ex,
+                'success' => 0,
                 'message' => translate('Unable to store food item')
             ], 500);
         }
@@ -185,7 +182,7 @@ class FoodItemController extends Controller
         if ($is_for_update) {
             FoodItemVariant::where('item_id', $food_item_id)->delete();
         }
-        
+
         foreach ($variations as $variation) {
             $combinations = $variation['combo'];
 
@@ -287,5 +284,26 @@ class FoodItemController extends Controller
         }
         // If no match is found, return false.
         return false;
+    }
+
+    /**
+     * Deletes a food item.
+     *
+     * @param Request $request The HTTP request object containing the food item ID.
+     * @throws \Exception If an error occurs while deleting the food item.
+     * @return \Illuminate\Http\JsonResponse The JSON response indicating the success or failure of the deletion.
+     */
+    public function deleteFoodItem(Request $request)
+    {
+        try {
+            $food_item = FoodItem::find((int)$request['id']);
+            $food_item->delete();
+
+            Toastr::success('Food item deleted successfully', 'Success');
+            return back();
+        } catch (\Throwable $ex) {
+            Toastr::error('Unable to delete food item', 'Error');
+            return back();
+        }
     }
 }

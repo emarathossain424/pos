@@ -30,6 +30,9 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        <div class="row d-flex">
+                            
+                        </div>
                         <table id="itemList" class="table table-bordered table-hover">
                             <thead>
                                 <tr>
@@ -76,7 +79,7 @@
                                             </button>
                                             <div class="dropdown-menu">
                                                 <a class="dropdown-item" href="{{route('edit.food.item',$item->id)}}">{{translate('Edit')}}</a>
-                                                <a class="dropdown-item delete-category" href="#" data-id="{{$item->id}}" data-toggle="modal" data-target="#deleteCategory">{{translate('Delete')}}</a>
+                                                <a class="dropdown-item delete-item" href="#" data-id="{{$item->id}}" data-toggle="modal" data-target="#deleteItem">{{translate('Delete')}}</a>
                                             </div>
                                         </div>
                                     </td>
@@ -91,6 +94,13 @@
     </div>
 </div>
 
+<!-- delete item-->
+<x-dynamic-form-modal route="{{route('delete.food.item')}}" modal_type="modal-sm" id="deleteItem" title="{{translate('Delete Food Item')}}" execute_btn_name="{{translate('Delete')}}" execute_btn_class="btn-danger">
+    <input type="hidden" name="id" id="delete-id">
+    <span>{{translate('Are you sure, you want to delete this item?')}}</span>
+</x-dynamic-form-modal>
+<!-- /delete item-->
+
 @endsection
 
 @push('script')
@@ -103,6 +113,11 @@
     $(function() {
         'use strict'
         $("#itemList").DataTable()
+
+        $('.delete-item').click(function() {
+            const id = $(this).data('id')
+            $('#delete-id').val(id)
+        })
     });
     
 </script>
