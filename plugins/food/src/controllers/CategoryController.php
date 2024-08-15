@@ -103,7 +103,7 @@ class CategoryController extends Controller
                 $category->meta_image = $request['meta_image'];
                 $category->update();
             } else {
-                $this->setCategoryTransletion($request);
+                $this->setCategoryTranslation($request);
             }
 
             Toastr::success('Food category updated successfully', 'Success');
@@ -117,7 +117,7 @@ class CategoryController extends Controller
     /**
      * Translate category in 
      */
-    public function setCategoryTransletion($request)
+    public function setCategoryTranslation($request)
     {
         $category_id = $request['id'];
         $translate_into = $request['translate_into'];

@@ -19,14 +19,14 @@ class FoodCategory extends Model
     }    
 
     /**
-     * Making relationship with transletion table
+     * Making relationship with translation table
      */
     public function translations(){
         return $this->hasMany(TranslateFoodCategory::class,'category_id');
     }
 
     /**
-     * get tranletions
+     * get translations
      */
     public function translateInto($lang_id){
         return $this->translations()->where('lang_id','=',$lang_id);

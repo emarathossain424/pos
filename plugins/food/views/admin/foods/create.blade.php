@@ -8,7 +8,6 @@ $placeholder = getPlaceholderImagePath();
 @push('css')
 <link rel="stylesheet" href="{{asset('pos/plugins/select2/css/select2.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
-<link rel="stylesheet" href="{{asset('pos/plugins/summernote/summernote-bs4.min.css')}}">
 <style>
     select {
         width: 100% !important;
@@ -174,7 +173,7 @@ $placeholder = getPlaceholderImagePath();
 @push('script')
 <script src="{{asset('pos/plugins/bootstrap-switch/js/bootstrap-switch.min.js')}}"></script>
 <script src="{{asset('pos/plugins/select2/js/select2.full.min.js')}}"></script>
-<script src="{{asset('pos/plugins/summernote/summernote-bs4.min.js')}}"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.0/classic/ckeditor.js"></script>
 <script>
     // Array to store the options of each variant combination
     let variant_option_array = [];
@@ -182,6 +181,10 @@ $placeholder = getPlaceholderImagePath();
     let variantData = JSON.parse('{!! json_encode($variants->toArray()) !!}');
     // Array to store the selected options
     let selected_variant_with_options = [];
+
+    let food_details_instance = null
+    let meta_description_instance = null
+
     $(function() {
         'use strict'
         //Implement bootstrap switch is status field
@@ -250,6 +253,24 @@ $placeholder = getPlaceholderImagePath();
             generateCombinations(selected_variant_with_options);
             generateTableFromVariantCombinations()
         })
+
+        ClassicEditor
+            .create(document.querySelector('#food-details'))
+            .then(editor => {
+                food_details_instance = editor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+        ClassicEditor
+            .create(document.querySelector('#meta_description'))
+            .then(editor => {
+                meta_description_instance = editor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
     });
 
     // Create select box for each variant
@@ -450,7 +471,7 @@ $placeholder = getPlaceholderImagePath();
         'use strict';
         let data = {
             'name': $('#food-name').val(),
-            'details': $('#food-details').val(),
+            'details': food_details_instance.getData(),
             'category': $('#category').val(),
             'image': $('#food-image-input').val(),
             'status': $('#status').val(),
@@ -458,7 +479,7 @@ $placeholder = getPlaceholderImagePath();
             'offer_price': $('#offer-price').val(),
             'food_type': $('#food-type').val(),
             'meta_title': $('#meta-title').val(),
-            'meta_description': $('#meta_description').val(),
+            'meta_description': meta_description_instance.getData(),
             'meta_image': $('#meta-image-input').val(),
             'variant_combo': variant_option_array,
             '_token': '{{ csrf_token() }}'
@@ -484,9 +505,9 @@ $placeholder = getPlaceholderImagePath();
                     // Loop through the errors and display each one using Toastr
                     for (var field in errors) {
                         if (errors.hasOwnProperty(field)) {
-                            $('#' + field+'_error').html('');
+                            $('#' + field + '_error').html('');
                             errors[field].forEach(function(message) {
-                                $('#' + field+'_error').append(message);
+                                $('#' + field + '_error').append(message);
                             });
                         }
                     }

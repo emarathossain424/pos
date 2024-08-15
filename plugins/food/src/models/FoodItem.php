@@ -30,4 +30,20 @@ class FoodItem extends Model
     {
         return $this->hasOne(FoodCategory::class, 'id', 'category');
     }
+
+    /**
+     * Making relationship with translation table
+     */
+    public function translations()
+    {
+        return $this->hasMany(TranslateFoodItem::class, 'item_id');
+    }
+
+    /**
+     * Get translations
+     */
+    public function translateInto($lang_id)
+    {
+        return $this->translations()->where('lang_id', '=', $lang_id);
+    }
 }

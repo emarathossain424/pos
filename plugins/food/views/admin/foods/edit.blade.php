@@ -1,17 +1,23 @@
 @php
 $all_categories = getFoodCategories();
 $placeholder = getPlaceholderImagePath();
-
+$languages = getAllLanguages();
+$default_lang = getGeneralSettingsValue('default_lang');
+$translatedLang = isset(request()->lang)?request()->lang:$default_lang;
 @endphp
 @extends('layouts.master')
 @section('title') {{translate('Update Food Item')}} @endsection
 @push('css')
 <link rel="stylesheet" href="{{asset('pos/plugins/select2/css/select2.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
-<link rel="stylesheet" href="{{asset('pos/plugins/summernote/summernote-bs4.min.css')}}">
 <style>
     select {
         width: 100% !important;
+    }
+
+    .disabled-div {
+        opacity: 0.5;
+        pointer-events: none;
     }
 </style>
 @endpush
@@ -32,6 +38,15 @@ $placeholder = getPlaceholderImagePath();
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
+                            <label for="translateInto">{{translate('Translate Into')}}</label>
+                            <select class="form-control select2 w-100" name="translate_into" id="translateInto">
+                                @foreach($languages as $lang)
+                                <option value="{{$lang->id}}" {{ $lang->id == $translatedLang ? 'selected' : '' }}>{{$lang->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="form-group">
                             <label for="food-name">{{translate('Food Name')}} <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="food-name" name="food_name" placeholder="Enter food name" value="{{$food_item['name']}}">
                             <div>
@@ -39,7 +54,7 @@ $placeholder = getPlaceholderImagePath();
                             </div>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group lang-indipendent-area">
                             <label for="category">{{translate('Category')}} <span class="text-danger">*</span></label>
                             <select class="form-control select2 w-100" name="category" id="category">
                                 <option value="">{{translate('Select Category')}}</option>
@@ -54,13 +69,13 @@ $placeholder = getPlaceholderImagePath();
 
                         <div class="form-group">
                             <label for="food-details">{{translate('Food Details')}} <span class="text-danger">*</span></label>
-                            <textarea class="form-control" rows="5" placeholder="Enter Food Details" name="food_details" id="food-details"> {{$food_item['details']}} </textarea>
+                            <textarea name="food_details" id="food-details"> {{$food_item['details']}} </textarea>
                             <div>
                                 <span class="text-danger" id="details_error"></span>
                             </div>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group lang-indipendent-area">
                             <label for="meta-image">{{translate('Image')}} <span class="text-danger">*</span></label>
                             <input type="hidden" name="food_image" id="food-image-input" value="{{$food_item['image']}}">
                             <div class="row" id="food-image-view">
@@ -89,7 +104,7 @@ $placeholder = getPlaceholderImagePath();
                             </div>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group lang-indipendent-area">
                             <label for="food-type">{{translate('Food Type')}} <span class="text-danger">*</span></label>
                             <select class="form-control select2 w-100" name="food_type" id="food-type">
                                 <option value="variant" {{$food_item['food_type'] == 'variant'? 'selected':''}}>{{translate('Variant Food')}}</option>
@@ -101,7 +116,7 @@ $placeholder = getPlaceholderImagePath();
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-group">
+                        <div class="form-group lang-indipendent-area">
                             <h6><strong>{{translate('Status')}}</strong></h6>
                             <input type="checkbox" id="status" name="status" {{$food_item['status']=='1'? 'checked':''}} data-bootstrap-switch>
                             <div>
@@ -109,7 +124,7 @@ $placeholder = getPlaceholderImagePath();
                             </div>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group lang-indipendent-area">
                             <label for="price">{{translate('Price')}} <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="price" name="price" placeholder="Enter price" value="{{$food_item['price']}}">
                             <div>
@@ -117,7 +132,7 @@ $placeholder = getPlaceholderImagePath();
                             </div>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group lang-indipendent-area">
                             <label for="offer-price">{{translate('Offer Price')}} <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="offer-price" name="offer_price" placeholder="Enter offer price" value="{{$food_item['offer_price']}}">
                             <div>
@@ -132,10 +147,10 @@ $placeholder = getPlaceholderImagePath();
 
                         <div class="form-group">
                             <label for="meta-description">{{translate('Meta Description')}}</label>
-                            <textarea class="form-control" rows="3" placeholder="Enter Meta Description" name="meta-description" id="meta_description"> {{$food_item['meta_description']}} </textarea>
+                            <textarea class="form-control" rows="3" placeholder="Enter Meta Description" name="meta_description" id="meta_description"> {{$food_item['meta_description']}} </textarea>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group lang-indipendent-area">
                             <label for="meta-image">{{translate('Meta Image')}}</label>
                             <input type="hidden" name="meta_image" id="meta-image-input" value="{{$food_item['meta_image']}}">
                             <div class="row" id="meta-image-view">
@@ -163,7 +178,7 @@ $placeholder = getPlaceholderImagePath();
                     </div>
                 </div>
                 <hr>
-                <div class="variant-selections d-none">
+                <div class="variant-selections lang-indipendent-area d-none">
                     <div class="row">
                         <div class="col-12">
                             <div class="form-group">
@@ -200,7 +215,8 @@ $placeholder = getPlaceholderImagePath();
 @push('script')
 <script src="{{asset('pos/plugins/bootstrap-switch/js/bootstrap-switch.min.js')}}"></script>
 <script src="{{asset('pos/plugins/select2/js/select2.full.min.js')}}"></script>
-<script src="{{asset('pos/plugins/summernote/summernote-bs4.min.js')}}"></script>
+<script src="https://cdn.ckeditor.com/ckeditor5/39.0.0/classic/ckeditor.js"></script>
+
 <script>
     // Array to store the options of each variant combination
     let variant_option_array = JSON.parse('{!! json_encode($variant_option_array) !!}');
@@ -213,10 +229,35 @@ $placeholder = getPlaceholderImagePath();
 
     let is_structure_created = false
 
+    let food_details_instance = null
+    let meta_description_instance = null
+
     separateSelectedVariantWithOptions()
 
     $(function() {
         'use strict'
+
+        const default_lang = '{{$default_lang}}'
+        let selected_lang = '{{$translatedLang}}'
+
+        $('#translateInto').select2({
+            theme: 'bootstrap4'
+        })
+
+        $('#translateInto').change(function() {
+            let selected_lang = $('#translateInto').val()
+            var currentBaseUrl = window.location.origin;
+            var pathname = window.location.pathname
+            var newUrl = currentBaseUrl + pathname + '?lang=' + selected_lang;
+            window.location.href = newUrl;
+        });
+
+        if (selected_lang != default_lang) {
+            $('.lang-indipendent-area').addClass('disabled-div')
+        } else {
+            $('.lang-indipendent-area').removeClass('disabled-div')
+        }
+
         //Implement bootstrap switch is status field
         $("input[data-bootstrap-switch]").each(function() {
             $(this).bootstrapSwitch('state', $(this).prop('checked'));
@@ -314,6 +355,23 @@ $placeholder = getPlaceholderImagePath();
         }])
         $('#meta-image-input').data('filedetails', meta_image)
 
+        ClassicEditor
+            .create(document.querySelector('#food-details'))
+            .then(editor => {
+                food_details_instance = editor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
+
+        ClassicEditor
+            .create(document.querySelector('#meta_description'))
+            .then(editor => {
+                meta_description_instance = editor;
+            })
+            .catch(error => {
+                console.error(error);
+            });
     });
 
     // Create select box for each variant
@@ -549,7 +607,8 @@ $placeholder = getPlaceholderImagePath();
         let data = {
             'id': "{{$food_item['id']}}",
             'name': $('#food-name').val(),
-            'details': $('#food-details').val(),
+            'translate_into': $('#translateInto').val(),
+            'details': food_details_instance.getData(),
             'category': $('#category').val(),
             'image': $('#food-image-input').val(),
             'status': $('#status').val(),
@@ -557,7 +616,7 @@ $placeholder = getPlaceholderImagePath();
             'offer_price': $('#offer-price').val(),
             'food_type': $('#food-type').val(),
             'meta_title': $('#meta-title').val(),
-            'meta_description': $('#meta_description').val(),
+            'meta_description': meta_description_instance.getData(),
             'meta_image': $('#meta-image-input').val(),
             'variant_combo': variant_option_array,
             '_token': '{{ csrf_token() }}'

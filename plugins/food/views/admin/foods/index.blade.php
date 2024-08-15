@@ -1,4 +1,5 @@
 @php
+$all_categories = getFoodCategories();
 @endphp
 @extends('layouts.master')
 @section('title') {{translate('Food items')}} @endsection
@@ -6,6 +7,13 @@
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-responsive/css/responsive.bootstrap4.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-buttons/css/buttons.bootstrap4.min.css')}}">
+
+<link rel="stylesheet" href="{{asset('pos/plugins/select2/css/select2.min.css')}}">
+<link rel="stylesheet" href="{{asset('pos/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
+
+<link rel="stylesheet" href="{{asset('pos/plugins/summernote/summernote-bs4.min.css')}}">
+<link rel="stylesheet" href="{{asset('pos/plugins/summernote/summernote-bs4.min.css')}}">
+
 @endpush
 @section('breadcrumb')
 <ol class="breadcrumb float-sm-right">
@@ -30,9 +38,42 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="row d-flex">
-                            
-                        </div>
+                        <form action="{{route('food.items')}}" method="get">
+                            <div class="row d-flex justify-content-center">
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <select class="form-control select2 w-100" name="category" id="category">
+                                            <option value="">{{translate('Select Category')}}</option>
+                                            @foreach($all_categories as $category)
+                                            <option value="{{$category->id}}" {{ request()->get('category') == $category->id ? 'selected' : '' }}>{{$category->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <select class="form-control select2 w-100" name="food_type" id="food_type">
+                                            <option value="">{{translate('Select Food Type')}}</option>
+                                            <option value="variant" {{ request()->get('food_type') == 'variant' ? 'selected' : '' }}>{{translate('variant')}}</option>
+                                            <option value="single" {{ request()->get('food_type') == 'single' ? 'selected' : '' }}>{{translate('single')}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <select class="form-control select2 w-100" name="item_status" id="item_status">
+                                            <option value="">{{translate('Select Status')}}</option>
+                                            <option value="1" {{ request()->get('item_status') == '1' ? 'selected' : '' }}>{{translate('Available')}}</option>
+                                            <option value="0" {{ request()->get('item_status') == '0' ? 'selected' : '' }}>{{translate('Not Available')}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-primary sm">{{translate('Filter')}}</button>
+                                    <a class="btn btn-danger sm" href="{{route('food.items')}}">{{translate('Clear')}}</a>
+                                </div>
+                            </div>
+                        </form>
                         <table id="itemList" class="table table-bordered table-hover">
                             <thead>
                                 <tr>
@@ -62,11 +103,11 @@
                                     </td>
                                     <td>{{ $item->name }}</td>
                                     <td>{{ $item->foodCategory->name }}</td>
-                                    
+
                                     <td>{{ $item->food_type }}</td>
                                     <td>
                                         <div class="custom-control custom-switch">
-                                            <input type="checkbox" class="custom-control-input change-featured-status" id="status{{$key}}" data-id="{{$item->id}}" {{$item->status==1?'checked':''}}>
+                                            <input type="checkbox" class="custom-control-input change-general-status" id="status{{$key}}" data-id="{{$item->id}}" {{$item->status==1?'checked':''}}>
                                             <label class="custom-control-label" for="status{{$key}}"></label>
                                         </div>
                                     </td>
@@ -108,7 +149,7 @@
 <script src="{{asset('pos/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js')}}"></script>
 <script src="{{asset('pos/plugins/datatables-responsive/js/dataTables.responsive.min.js')}}"></script>
 <script src="{{asset('pos/plugins/datatables-responsive/js/responsive.bootstrap4.min.js')}}"></script>
-
+<script src="{{asset('pos/plugins/select2/js/select2.full.min.js')}}"></script>
 <script>
     $(function() {
         'use strict'
@@ -118,7 +159,40 @@
             const id = $(this).data('id')
             $('#delete-id').val(id)
         })
+
+        $('#category').select2({
+            theme: 'bootstrap4',
+            width: '100%'
+        })
+
+        $('#food_type').select2({
+            theme: 'bootstrap4',
+            width: '100%'
+        })
+
+        $('#item_status').select2({
+            theme: 'bootstrap4',
+            width: '100%'
+        })
+
+        $('.change-general-status').change(function() {
+            const id = $(this).data('id')
+            var postData = {
+                _token: '{{csrf_token()}}',
+                id: id
+            };
+            $.post('{{route("update.item.status")}}', postData, function(response) {
+                if(response.success){
+                    toastr.success(response.message, 'success');
+                    location.reload()
+                }
+                else{
+                    toastr.error(response.message, 'error');
+                }
+            }).fail(function(error){
+                toastr.error('{{translate("Something went wrong")}}', 'error');
+            })
+        })
     });
-    
 </script>
 @endpush

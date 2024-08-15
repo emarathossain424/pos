@@ -34,5 +34,5 @@ Route::prefix('/food')->middleware('auth')->group(function () {
     Route::get('/items/{id}', [FoodItemController::class, 'editFoodItems'])->name('edit.food.item');
     Route::post('/update-food-items', [FoodItemController::class, 'updateFoodItems'])->name('update.food.items');
     Route::post('/delete-food-item', [FoodItemController::class, 'deleteFoodItem'])->name('delete.food.item');
-
+    Route::post('/update-item-status',[FoodItemController::class,'updateItemStatus'])->name('update.item.status');
 });
