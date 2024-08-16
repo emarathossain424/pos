@@ -47,7 +47,16 @@
                                     @if (!empty($variant->options))
                                     <td>
                                         @foreach ($variant->options as $option)
-                                        <span class="badge bg-secondary">{{ $option->option_name }}</span>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-outline-dark">{{ $option->option_name }}</button>
+                                            <button type="button" class="btn btn-sm btn-outline-dark dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                                <span class="sr-only">Toggle Dropdown</span>
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <a class="dropdown-item update-option" href="#" data-id="{{$option->id}}" data-name="{{$option->option_name}}" data-toggle="modal" data-target="#updateOption">{{translate('Edit')}}</a>
+                                                <a class="dropdown-item delete-option" href="#" data-id="{{$option->id}}" data-toggle="modal" data-target="#deleteOption">{{translate('Delete')}}</a>
+                                            </div>
+                                        </div>
                                         @endforeach
                                     </td>
                                     @else
@@ -61,6 +70,7 @@
                                                 {{translate('Action')}}
                                             </button>
                                             <div class="dropdown-menu">
+                                                <a class="dropdown-item add-option" href="#" data-id="{{$variant->id}}" data-toggle="modal" data-target="#addOption">{{translate('Add Option')}}</a>
                                                 <a class="dropdown-item update-variant" href="#" data-id="{{$variant->id}}" data-name="{{$variant->name}}" data-toggle="modal" data-target="#updateVariant">{{translate('Edit')}}</a>
                                                 <a class="dropdown-item delete-variant" href="#" data-id="{{$variant->id}}" data-toggle="modal" data-target="#deleteVariant">{{translate('Delete')}}</a>
                                             </div>
@@ -93,6 +103,7 @@
 </x-dynamic-form-modal>
 <!-- /create variant-->
 
+<!-- update variant-->
 <x-dynamic-form-modal route="{{route('update.variant')}}" modal_type="modal-md" id="updateVariant" title="{{translate('Edit Variant')}}" execute_btn_name="{{translate('Update')}}" execute_btn_class="btn-success">
     <input type="hidden" name="id" id="edit-id">
     <div class="form-group">
@@ -100,7 +111,34 @@
         <input type="text" class="form-control" id="edit-variant-name" placeholder="Enter variant name" name="variant_name">
     </div>
 </x-dynamic-form-modal>
-<!-- /create variant-->
+<!-- /update variant-->
+
+<!-- delete option-->
+<x-dynamic-form-modal route="{{route('delete.option')}}" modal_type="modal-sm" id="deleteOption" title="{{translate('Delete Option')}}" execute_btn_name="{{translate('Delete')}}" execute_btn_class="btn-danger">
+    <input type="hidden" name="id" id="delete-option-id">
+    <span>{{translate('Are you sure, you want to delete this option?')}}</span>
+</x-dynamic-form-modal>
+<!-- /delete option-->
+
+<!-- update option-->
+<x-dynamic-form-modal route="{{route('update.option')}}" modal_type="modal-md" id="updateOption" title="{{translate('Edit Option')}}" execute_btn_name="{{translate('Update')}}" execute_btn_class="btn-success">
+    <input type="hidden" name="id" id="edit-option-id">
+    <div class="form-group">
+        <label for="option-name">{{translate('Option Name')}}</label>
+        <input type="text" class="form-control" id="edit-option-name" placeholder="Enter option name" name="option_name">
+    </div>
+</x-dynamic-form-modal>
+<!-- /update variant-->
+
+<!-- add option-->
+<x-dynamic-form-modal route="{{route('add.option')}}" modal_type="modal-md" id="addOption" title="{{translate('Add Option')}}" execute_btn_name="{{translate('Save')}}" execute_btn_class="btn-success">
+    <input type="hidden" name="variant_id" id="variant-id">
+    <div class="form-group">
+        <label for="option-name">{{translate('Option Name')}}</label>
+        <input type="text" class="form-control" id="variant-name" placeholder="Enter option name" name="option_name">
+    </div>
+</x-dynamic-form-modal>
+<!-- /add option-->
 
 @endsection
 
@@ -122,10 +160,27 @@
             $('#edit-id').val(id)
             $('#edit-variant-name').val(name)
         })
-        
+
         $('.delete-variant').click(function() {
             const id = $(this).data('id')
             $('#delete-id').val(id)
+        })
+
+        $('.add-option').click(function() {
+            const id = $(this).data('id')
+            $('#variant-id').val(id)
+        })
+
+        $('.update-option').click(function() {
+            const id = $(this).data('id')
+            const name = $(this).data('name')
+            $('#edit-option-id').val(id)
+            $('#edit-option-name').val(name)
+        })
+
+        $('.delete-option').click(function() {
+            const id = $(this).data('id')
+            $('#delete-option-id').val(id)
         })
     });
 </script>

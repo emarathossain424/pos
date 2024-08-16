@@ -153,5 +153,9 @@
     "Food variant stored successfully": "Food variant stored successfully",
     "Edit Variant": "Edit Variant",
     "Delete Variant": "Delete Variant",
-    "Are you sure, you want to delete this variant?": "Are you sure, you want to delete this variant?"
+    "Are you sure, you want to delete this variant?": "Are you sure, you want to delete this variant?",
+    "Delete Option": "Delete Option",
+    "Are you sure, you want to delete this option?": "Are you sure, you want to delete this option?",
+    "Edit Option": "Edit Option",
+    "Option Name": "Option Name"
 }
