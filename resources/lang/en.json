@@ -146,5 +146,8 @@
     "Filter": "Filter",
     "Clear": "Clear",
     "Food item updated successfully": "Food item updated successfully",
-    "Food item status updated successfully": "Food item status updated successfully"
+    "Food item status updated successfully": "Food item status updated successfully",
+    "Variations": "Variations",
+    "Variant List": "Variant List",
+    "Create Variant": "Create Variant"
 }

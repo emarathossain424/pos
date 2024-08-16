@@ -5,6 +5,7 @@ use App\Http\Controllers\Core\PluginController;
 use Plugin\Food\Controllers\CategoryController;
 use Plugin\Food\Controllers\FoodItemController;
 use Plugin\Food\Controllers\TestController;
+use Plugin\Food\Controllers\VariationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,4 +36,7 @@ Route::prefix('/food')->middleware('auth')->group(function () {
     Route::post('/update-food-items', [FoodItemController::class, 'updateFoodItems'])->name('update.food.items');
     Route::post('/delete-food-item', [FoodItemController::class, 'deleteFoodItem'])->name('delete.food.item');
     Route::post('/update-item-status',[FoodItemController::class,'updateItemStatus'])->name('update.item.status');
+    
+    Route::get('/all-variations',[VariationController::class,'variations'])->name('variations');
+    Route::get('/create-variant',[VariationController::class,'variations'])->name('create.variant');
 });
