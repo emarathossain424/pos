@@ -149,5 +149,9 @@
     "Food item status updated successfully": "Food item status updated successfully",
     "Variations": "Variations",
     "Variant List": "Variant List",
-    "Create Variant": "Create Variant"
+    "Create Variant": "Create Variant",
+    "Food variant stored successfully": "Food variant stored successfully",
+    "Edit Variant": "Edit Variant",
+    "Delete Variant": "Delete Variant",
+    "Are you sure, you want to delete this variant?": "Are you sure, you want to delete this variant?"
 }

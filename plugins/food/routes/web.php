@@ -38,5 +38,7 @@ Route::prefix('/food')->middleware('auth')->group(function () {
     Route::post('/update-item-status',[FoodItemController::class,'updateItemStatus'])->name('update.item.status');
     
     Route::get('/all-variations',[VariationController::class,'variations'])->name('variations');
-    Route::get('/create-variant',[VariationController::class,'variations'])->name('create.variant');
+    Route::post('/create-variant',[VariationController::class,'createVariant'])->name('create.variant');
+    Route::post('/update-variant',[VariationController::class,'updateVariant'])->name('update.variant');
+    Route::post('/delete-variant',[VariationController::class,'deleteVariant'])->name('delete.variant');
 });

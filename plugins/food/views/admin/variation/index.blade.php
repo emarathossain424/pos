@@ -61,8 +61,8 @@
                                                 {{translate('Action')}}
                                             </button>
                                             <div class="dropdown-menu">
-                                                <a class="dropdown-item" href="{{route('edit.category',$variant->id)}}">{{translate('Edit')}}</a>
-                                                <a class="dropdown-item delete-category" href="#" data-id="{{$variant->id}}" data-toggle="modal" data-target="#deleteCategory">{{translate('Delete')}}</a>
+                                                <a class="dropdown-item update-variant" href="#" data-id="{{$variant->id}}" data-name="{{$variant->name}}" data-toggle="modal" data-target="#updateVariant">{{translate('Edit')}}</a>
+                                                <a class="dropdown-item delete-variant" href="#" data-id="{{$variant->id}}" data-toggle="modal" data-target="#deleteVariant">{{translate('Delete')}}</a>
                                             </div>
                                         </div>
                                     </td>
@@ -77,16 +77,28 @@
     </div>
 </div>
 
-<!-- delete category-->
-<x-dynamic-form-modal route="{{route('delete.category')}}" modal_type="modal-sm" id="deleteCategory" title="{{translate('Delete Category')}}" execute_btn_name="{{translate('Delete')}}" execute_btn_class="btn-danger">
+<!-- delete variant-->
+<x-dynamic-form-modal route="{{route('delete.variant')}}" modal_type="modal-sm" id="deleteVariant" title="{{translate('Delete Variant')}}" execute_btn_name="{{translate('Delete')}}" execute_btn_class="btn-danger">
     <input type="hidden" name="id" id="delete-id">
-    <span>{{translate('Are you sure, you want to delete this category?')}}</span>
+    <span>{{translate('Are you sure, you want to delete this variant?')}}</span>
 </x-dynamic-form-modal>
-<!-- /delete category-->
+<!-- /delete variant-->
 
 <!-- create variant-->
 <x-dynamic-form-modal route="{{route('create.variant')}}" modal_type="modal-md" id="createVariant" title="{{translate('Create Variant')}}" execute_btn_name="{{translate('Save')}}" execute_btn_class="btn-success">
-    
+    <div class="form-group">
+        <label for="variant-name">{{translate('Variant Name')}}</label>
+        <input type="text" class="form-control" id="variant-name" placeholder="Enter variant name" name="variant_name">
+    </div>
+</x-dynamic-form-modal>
+<!-- /create variant-->
+
+<x-dynamic-form-modal route="{{route('update.variant')}}" modal_type="modal-md" id="updateVariant" title="{{translate('Edit Variant')}}" execute_btn_name="{{translate('Update')}}" execute_btn_class="btn-success">
+    <input type="hidden" name="id" id="edit-id">
+    <div class="form-group">
+        <label for="variant-name">{{translate('Variant Name')}}</label>
+        <input type="text" class="form-control" id="edit-variant-name" placeholder="Enter variant name" name="variant_name">
+    </div>
 </x-dynamic-form-modal>
 <!-- /create variant-->
 
@@ -103,6 +115,18 @@
         'use strict'
 
         $('#variantList').DataTable()
+
+        $('.update-variant').click(function() {
+            const id = $(this).data('id')
+            const name = $(this).data('name')
+            $('#edit-id').val(id)
+            $('#edit-variant-name').val(name)
+        })
+        
+        $('.delete-variant').click(function() {
+            const id = $(this).data('id')
+            $('#delete-id').val(id)
+        })
     });
 </script>
 @endpush
