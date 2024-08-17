@@ -1,4 +1,7 @@
 @php
+$languages = getAllLanguages();
+$default_lang = getGeneralSettingsValue('default_lang');
+$translatedLang = isset(request()->lang)?request()->lang:$default_lang;
 @endphp
 @extends('layouts.master')
 @section('title') {{translate('Variations')}} @endsection
@@ -107,6 +110,14 @@
 <x-dynamic-form-modal route="{{route('update.variant')}}" modal_type="modal-md" id="updateVariant" title="{{translate('Edit Variant')}}" execute_btn_name="{{translate('Update')}}" execute_btn_class="btn-success">
     <input type="hidden" name="id" id="edit-id">
     <div class="form-group">
+        <label for="translateInto">{{translate('Translate Into')}}</label>
+        <select class="form-control select2 w-100" name="translate_into" id="variantTranslation">
+            @foreach($languages as $lang)
+            <option value="{{$lang->id}}" {{ $lang->id == $translatedLang ? 'selected' : '' }}>{{$lang->name}}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="form-group">
         <label for="variant-name">{{translate('Variant Name')}}</label>
         <input type="text" class="form-control" id="edit-variant-name" placeholder="Enter variant name" name="variant_name">
     </div>
@@ -123,6 +134,14 @@
 <!-- update option-->
 <x-dynamic-form-modal route="{{route('update.option')}}" modal_type="modal-md" id="updateOption" title="{{translate('Edit Option')}}" execute_btn_name="{{translate('Update')}}" execute_btn_class="btn-success">
     <input type="hidden" name="id" id="edit-option-id">
+    <div class="form-group">
+        <label for="translateInto">{{translate('Translate Into')}}</label>
+        <select class="form-control select2 w-100" name="translate_into" id="optionTranslation">
+            @foreach($languages as $lang)
+            <option value="{{$lang->id}}" {{ $lang->id == $translatedLang ? 'selected' : '' }}>{{$lang->name}}</option>
+            @endforeach
+        </select>
+    </div>
     <div class="form-group">
         <label for="option-name">{{translate('Option Name')}}</label>
         <input type="text" class="form-control" id="edit-option-name" placeholder="Enter option name" name="option_name">
@@ -181,6 +200,44 @@
         $('.delete-option').click(function() {
             const id = $(this).data('id')
             $('#delete-option-id').val(id)
+        })
+
+        $('#variantTranslation').change(() => {
+            const lang_id = $('#variantTranslation').val()
+            const id = $('#edit-id').val()
+            $.ajax({
+                url: "{{ route('get.variant.translation') }}",
+                type: 'GET',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    id: id,
+                    lang_id: lang_id,
+                },
+                success: function(response) {
+                    if (response.success == 1) {
+                        $('#edit-variant-name').val(response.data.name)
+                    }
+                }
+            })
+        })
+
+        $('#optionTranslation').change(() => {
+            const lang_id = $('#optionTranslation').val()
+            const id = $('#edit-option-id').val()
+            $.ajax({
+                url: "{{ route('get.option.translation') }}",
+                type: 'GET',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    id: id,
+                    lang_id: lang_id,
+                },
+                success: function(response) {
+                    if (response.success == 1) {
+                        $('#edit-option-name').val(response.data.name)
+                    }
+                }
+            })
         })
     });
 </script>

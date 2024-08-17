@@ -45,4 +45,7 @@ Route::prefix('/food')->middleware('auth')->group(function () {
     Route::post('/update-option',[VariationController::class,'updateOption'])->name('update.option');
     Route::post('/delete-option',[VariationController::class,'deleteOption'])->name('delete.option');
     Route::post('/add-option',[VariationController::class,'addOption'])->name('add.option');
+
+    Route::get('/get-variant-translation',[VariationController::class,'getVariantTranslation'])->name('get.variant.translation');
+    Route::get('/get-option-translation',[VariationController::class,'getOptionTranslation'])->name('get.option.translation');
 });

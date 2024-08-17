@@ -157,5 +157,7 @@
     "Delete Option": "Delete Option",
     "Are you sure, you want to delete this option?": "Are you sure, you want to delete this option?",
     "Edit Option": "Edit Option",
-    "Option Name": "Option Name"
+    "Option Name": "Option Name",
+    "Translated variant name": "Translated variant name",
+    "Translated option name": "Translated option name"
 }
