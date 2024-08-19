@@ -59,7 +59,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
                                 @enderror
                             </div>
 
-                            <div class="form-group lang-indipendent-area">
+                            <div class="form-group lang-independent-area">
                                 <label for="parent-category">{{translate('Parent Category')}}</label>
                                 <select class="form-control select2 w-100" name="parent_category" id="parent-category">
                                     <option value="">{{translate('Select Parent')}}</option>
@@ -69,17 +69,17 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
                                 </select>
                             </div>
 
-                            <div class="form-group lang-indipendent-area">
+                            <div class="form-group lang-independent-area">
                                 <h6><strong>{{translate('Featured Status')}}</strong></h6>
                                 <input type="checkbox" id="is-featured" name="featured_status" {{ $e_category->featured_status == 1 ? 'checked' : '' }} data-bootstrap-switch>
                             </div>
 
-                            <div class="form-group lang-indipendent-area">
+                            <div class="form-group lang-independent-area">
                                 <h6><strong>{{translate('Status')}}</strong></h6>
                                 <input type="checkbox" id="status" name="status" {{ $e_category->status == 1 ? 'checked' : '' }} data-bootstrap-switch>
                             </div>
 
-                            <div class="form-group lang-indipendent-area">
+                            <div class="form-group lang-independent-area">
                                 <label for="category-image">{{translate('Category Image')}} <span class="text-danger">*</span></label>
                                 <input type="hidden" name="category_image" id="category-image-input" value="{{$e_category->image}}">
                                 <div class="row" id="category-image-view">
@@ -123,7 +123,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
                                 </textarea>
                             </div>
 
-                            <div class="form-group lang-indipendent-area">
+                            <div class="form-group lang-independent-area">
                                 <label for="meta-image">{{translate('Meta Image')}}</label>
                                 <input type="hidden" name="meta_image" id="meta-image-input" value="{{$e_category->image}}">
                                 <div class="row" id="meta-image-view">
@@ -183,9 +183,9 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         console.log(selected_lang)
 
         if (selected_lang != default_lang) {
-            $('.lang-indipendent-area').addClass('disabled-div')
+            $('.lang-independent-area').addClass('disabled-div')
         } else {
-            $('.lang-indipendent-area').removeClass('disabled-div')
+            $('.lang-independent-area').removeClass('disabled-div')
         }
 
         $("input[data-bootstrap-switch]").each(function() {

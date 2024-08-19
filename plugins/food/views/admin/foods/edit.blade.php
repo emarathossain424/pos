@@ -54,7 +54,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
                             </div>
                         </div>
 
-                        <div class="form-group lang-indipendent-area">
+                        <div class="form-group lang-independent-area">
                             <label for="category">{{translate('Category')}} <span class="text-danger">*</span></label>
                             <select class="form-control select2 w-100" name="category" id="category">
                                 <option value="">{{translate('Select Category')}}</option>
@@ -75,7 +75,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
                             </div>
                         </div>
 
-                        <div class="form-group lang-indipendent-area">
+                        <div class="form-group lang-independent-area">
                             <label for="meta-image">{{translate('Image')}} <span class="text-danger">*</span></label>
                             <input type="hidden" name="food_image" id="food-image-input" value="{{$food_item['image']}}">
                             <div class="row" id="food-image-view">
@@ -104,7 +104,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
                             </div>
                         </div>
 
-                        <div class="form-group lang-indipendent-area">
+                        <div class="form-group lang-independent-area">
                             <label for="food-type">{{translate('Food Type')}} <span class="text-danger">*</span></label>
                             <select class="form-control select2 w-100" name="food_type" id="food-type">
                                 <option value="variant" {{$food_item['food_type'] == 'variant'? 'selected':''}}>{{translate('Variant Food')}}</option>
@@ -116,7 +116,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
                         </div>
                     </div>
                     <div class="col-md-6">
-                        <div class="form-group lang-indipendent-area">
+                        <div class="form-group lang-independent-area">
                             <h6><strong>{{translate('Status')}}</strong></h6>
                             <input type="checkbox" id="status" name="status" {{$food_item['status']=='1'? 'checked':''}} data-bootstrap-switch>
                             <div>
@@ -124,7 +124,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
                             </div>
                         </div>
 
-                        <div class="form-group lang-indipendent-area">
+                        <div class="form-group lang-independent-area">
                             <label for="price">{{translate('Price')}} <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="price" name="price" placeholder="Enter price" value="{{$food_item['price']}}">
                             <div>
@@ -132,7 +132,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
                             </div>
                         </div>
 
-                        <div class="form-group lang-indipendent-area">
+                        <div class="form-group lang-independent-area">
                             <label for="offer-price">{{translate('Offer Price')}} <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="offer-price" name="offer_price" placeholder="Enter offer price" value="{{$food_item['offer_price']}}">
                             <div>
@@ -150,7 +150,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
                             <textarea class="form-control" rows="3" placeholder="Enter Meta Description" name="meta_description" id="meta_description"> {{$food_item['meta_description']}} </textarea>
                         </div>
 
-                        <div class="form-group lang-indipendent-area">
+                        <div class="form-group lang-independent-area">
                             <label for="meta-image">{{translate('Meta Image')}}</label>
                             <input type="hidden" name="meta_image" id="meta-image-input" value="{{$food_item['meta_image']}}">
                             <div class="row" id="meta-image-view">
@@ -178,7 +178,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
                     </div>
                 </div>
                 <hr>
-                <div class="variant-selections lang-indipendent-area d-none">
+                <div class="variant-selections lang-independent-area d-none">
                     <div class="row">
                         <div class="col-12">
                             <div class="form-group">
@@ -253,9 +253,9 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         });
 
         if (selected_lang != default_lang) {
-            $('.lang-indipendent-area').addClass('disabled-div')
+            $('.lang-independent-area').addClass('disabled-div')
         } else {
-            $('.lang-indipendent-area').removeClass('disabled-div')
+            $('.lang-independent-area').removeClass('disabled-div')
         }
 
         //Implement bootstrap switch is status field

@@ -21,12 +21,22 @@
         </li>
         <li class="nav-item">
             @php
-                $active_menu_list = ['variations','add.variation','edit.variation'];
+                $active_menu_list = ['variations'];
                 $is_active = in_array(Route::currentRouteName(), $active_menu_list);
             @endphp
             <a href="{{route('variations')}}" class="nav-link {{$is_active? 'active':'' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>{{translate('Variations')}}</p>
+            </a>
+        </li>
+        <li class="nav-item">
+            @php
+                $active_menu_list = ['properties'];
+                $is_active = in_array(Route::currentRouteName(), $active_menu_list);
+            @endphp
+            <a href="{{route('properties')}}" class="nav-link {{$is_active? 'active':'' }}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>{{translate('Properties')}}</p>
             </a>
         </li>
         <li class="nav-item">

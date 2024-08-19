@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Core\PluginController;
 use Plugin\Food\Controllers\CategoryController;
 use Plugin\Food\Controllers\FoodItemController;
+use Plugin\Food\Controllers\PropertyController;
 use Plugin\Food\Controllers\TestController;
 use Plugin\Food\Controllers\VariationController;
 
@@ -48,4 +49,17 @@ Route::prefix('/food')->middleware('auth')->group(function () {
 
     Route::get('/get-variant-translation',[VariationController::class,'getVariantTranslation'])->name('get.variant.translation');
     Route::get('/get-option-translation',[VariationController::class,'getOptionTranslation'])->name('get.option.translation');
+
+    Route::get('/all-properties',[PropertyController::class,'properties'])->name('properties');
+    Route::post('/create-property',[PropertyController::class,'createProperty'])->name('create.property');
+    Route::post('/update-property',[PropertyController::class,'updateProperty'])->name('update.property');
+    Route::post('/delete-property',[PropertyController::class,'deleteProperty'])->name('delete.property');
+
+    Route::post('/update-item',[PropertyController::class,'updateItem'])->name('update.item');
+    Route::post('/delete-item',[PropertyController::class,'deleteItem'])->name('delete.item');
+    Route::post('/add-item',[PropertyController::class,'addItem'])->name('add.item');
+
+    Route::get('/get-property-translation',[PropertyController::class,'getPropertyTranslation'])->name('get.property.translation');
+    Route::get('/get-item-translation',[PropertyController::class,'getItemTranslation'])->name('get.item.translation');
+
 });
