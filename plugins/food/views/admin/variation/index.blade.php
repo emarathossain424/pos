@@ -174,6 +174,8 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         $('#variantList').DataTable()
 
         $('.update-variant').click(function() {
+            getVariantTranslation()
+
             const id = $(this).data('id')
             const name = $(this).data('name')
             $('#edit-id').val(id)
@@ -191,6 +193,8 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         })
 
         $('.update-option').click(function() {
+            getOptionTranslation()
+            
             const id = $(this).data('id')
             const name = $(this).data('name')
             $('#edit-option-id').val(id)
@@ -203,6 +207,14 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         })
 
         $('#variantTranslation').change(() => {
+            getVariantTranslation()
+        })
+
+        $('#optionTranslation').change(() => {
+            getOptionTranslation()
+        })
+
+        function getVariantTranslation() {
             const lang_id = $('#variantTranslation').val()
             const id = $('#edit-id').val()
             $.ajax({
@@ -219,9 +231,9 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
                     }
                 }
             })
-        })
+        }
 
-        $('#optionTranslation').change(() => {
+        function getOptionTranslation() {
             const lang_id = $('#optionTranslation').val()
             const id = $('#edit-option-id').val()
             $.ajax({
@@ -238,7 +250,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
                     }
                 }
             })
-        })
+        }
     });
 </script>
 @endpush
