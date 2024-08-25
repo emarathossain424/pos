@@ -115,7 +115,7 @@ class CategoryController extends Controller
     }
 
     /**
-     * Translate category in 
+     * Translate category in
      */
     public function setCategoryTranslation($request)
     {
