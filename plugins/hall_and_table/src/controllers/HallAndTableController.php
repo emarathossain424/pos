@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use Plugin\HallAndTable\Models\Hall;
+use Plugin\HallAndTable\Models\Table;
 
 class HallAndTableController extends Controller {
 
@@ -93,6 +94,39 @@ class HallAndTableController extends Controller {
             return back();
         } catch ( \Exception $ex ) {
             Toastr::success( 'Unable to delete hall', 'Error' );
+            return back();
+        }
+    }
+
+    public function allTables( $hall_id ) {
+        $tables = [];
+        return view( 'hall_and_table::admin.table.index', compact( 'hall_id', 'tables' ) );
+    }
+
+    public function createTable( Request $request ) {
+        $request->validate( [
+            'hall_id'      => 'required|exists:halls,id',
+            'table_number' => 'required|unique:tables,table_number',
+            'table_shape'  => 'required',
+            'table_type'   => 'required',
+            'table_status' => 'required',
+            'chair_limit'  => 'required|numeric',
+        ] );
+
+        try {
+            $table               = new Table();
+            $table->hall_id      = $request['hall_id'];
+            $table->table_number = $request['table_number'];
+            $table->shape        = $request['table_shape'];
+            $table->type         = $request['table_type'];
+            $table->status       = $request['table_status'];
+            $table->chair_limit  = $request['chair_limit'];
+            $table->saveOrFail();
+
+            Toastr::success( 'Table created successfully', 'Success' );
+            return back();
+        } catch ( \Exception $ex ) {
+            Toastr::error( 'Unable to create table', 'Error' );
             return back();
         }
     }

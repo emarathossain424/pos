@@ -192,5 +192,15 @@
     "Manage Tables": "Manage Tables",
     "Update Hall": "Update Hall",
     "Delete Hall": "Delete Hall",
-    "Are you sure, you want to delete this hall?": "Are you sure, you want to delete this hall?"
+    "Are you sure, you want to delete this hall?": "Are you sure, you want to delete this hall?",
+    "Tables": "Tables",
+    "Table No.": "Table No.",
+    "Shape": "Shape",
+    "Type": "Type",
+    "Chair Limit": "Chair Limit",
+    "Create Table": "Create Table",
+    "Table Shape": "Table Shape",
+    "Table Type": "Table Type",
+    "Table Status": "Table Status",
+    "Table Number": "Table Number"
 }
