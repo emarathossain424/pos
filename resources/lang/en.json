@@ -181,5 +181,14 @@
     "No translation found": "No translation found",
     "Translated item name": "Translated item name",
     "Translated property group name": "Translated property group name",
-    "Hall & Tables": "Hall & Tables"
+    "Hall & Tables": "Hall & Tables",
+    "Halls": "Halls",
+    "Capacity": "Capacity",
+    "Description": "Description",
+    "Create Hall": "Create Hall",
+    "Hall Name": "Hall Name",
+    "Hall Status": "Hall Status",
+    "Table Capacity": "Table Capacity",
+    "Manage Tables": "Manage Tables",
+    "Update Hall": "Update Hall"
 }
