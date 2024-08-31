@@ -58,7 +58,7 @@
                                             </button>
                                             <div class="dropdown-menu">
                                                 <a class="dropdown-item edit-hall" href="#" data-toggle="modal" data-target="#editHall" data-id="{{$hall->id}}" data-name="{{$hall->name}}" data-capacity="{{$hall->table_capacity}}" data-status="{{$hall->status}}">{{translate('Edit')}}</a>
-                                                <a class="dropdown-item delete-hall" href="#" data-toggle="modal" data-target="#deleteHall" data-id="{{$hall->id}}" data-toggle="modal" data-target="#deleteCategory">{{translate('Delete')}}</a>
+                                                <a class="dropdown-item delete-hall" href="#" data-toggle="modal" data-target="#deleteHall" data-id="{{$hall->id}}">{{translate('Delete')}}</a>
                                             </div>
                                         </div>
                                     </td>
@@ -114,6 +114,13 @@
 </x-dynamic-form-modal>
 <!-- /edit hall-->
 
+<!-- delete hall-->
+<x-dynamic-form-modal route="{{route('delete.hall')}}" modal_type="modal-sm" id="deleteHall" title="{{translate('Delete Hall')}}" execute_btn_name="{{translate('Delete')}}" execute_btn_class="btn-danger">
+    <input type="hidden" name="id" id="delete-id">
+    <span>{{translate('Are you sure, you want to delete this hall?')}}</span>
+</x-dynamic-form-modal>
+<!-- /delete hall-->
+
 @endsection
 
 @push('script')
@@ -138,6 +145,11 @@
             $('#editable-hall-name').val(name)
             $('#editable-table-capacity').val(capacity)
             $('#editable-hall-status').val(status)
+        })
+
+        $('.delete-hall').click(function() {
+            const id = $(this).data('id')
+            $('#delete-id').val(id)
         })
     });
 </script>

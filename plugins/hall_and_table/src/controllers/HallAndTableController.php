@@ -76,4 +76,24 @@ class HallAndTableController extends Controller {
             return back();
         }
     }
+
+    /**
+     * Deletes a hall based on the provided request data.
+     *
+     * @param Request $request The incoming request containing the hall data.
+     * @throws \Exception If an error occurs while deleting the hall.
+     * @return \Illuminate\Http\RedirectResponse Redirects back to the previous page.
+     */
+    public function deleteHall( Request $request ) {
+        try {
+            $hall = Hall::find( $request['id'] );
+            $hall->delete();
+
+            Toastr::success( 'Hall deleted successfully', 'Success' );
+            return back();
+        } catch ( \Exception $ex ) {
+            Toastr::success( 'Unable to delete hall', 'Error' );
+            return back();
+        }
+    }
 }

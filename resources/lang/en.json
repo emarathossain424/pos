@@ -190,5 +190,7 @@
     "Hall Status": "Hall Status",
     "Table Capacity": "Table Capacity",
     "Manage Tables": "Manage Tables",
-    "Update Hall": "Update Hall"
+    "Update Hall": "Update Hall",
+    "Delete Hall": "Delete Hall",
+    "Are you sure, you want to delete this hall?": "Are you sure, you want to delete this hall?"
 }
