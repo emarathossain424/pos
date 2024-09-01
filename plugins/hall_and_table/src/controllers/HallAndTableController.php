@@ -99,7 +99,7 @@ class HallAndTableController extends Controller {
     }
 
     public function allTables( $hall_id ) {
-        $tables = [];
+        $tables = Table::where( 'hall_id', $hall_id )->get();
         return view( 'hall_and_table::admin.table.index', compact( 'hall_id', 'tables' ) );
     }
 
@@ -127,6 +127,46 @@ class HallAndTableController extends Controller {
             return back();
         } catch ( \Exception $ex ) {
             Toastr::error( 'Unable to create table', 'Error' );
+            return back();
+        }
+    }
+
+    public function updateTable( Request $request ) {
+        $request->validate( [
+            'id'           => 'required|exists:tables,id',
+            'table_number' => 'required|unique:tables,table_number,' . $request['id'],
+            'table_shape'  => 'required',
+            'table_type'   => 'required',
+            'table_status' => 'required',
+            'chair_limit'  => 'required|numeric',
+        ] );
+
+        try {
+            $table               = Table::find( $request['id'] );
+            $table->table_number = $request['table_number'];
+            $table->shape        = $request['table_shape'];
+            $table->type         = $request['table_type'];
+            $table->status       = $request['table_status'];
+            $table->chair_limit  = $request['chair_limit'];
+            $table->update();
+
+            Toastr::success( 'Table updated successfully', 'Success' );
+            return back();
+        } catch ( \Exception $ex ) {
+            Toastr::error( 'Unable to update table', 'Error' );
+            return back();
+        }
+    }
+
+    public function deleteTable( Request $request ) {
+        try {
+            $table = Table::find( $request['id'] );
+            $table->delete();
+
+            Toastr::success( 'Table deleted successfully', 'Success' );
+            return back();
+        } catch ( \Exception $ex ) {
+            Toastr::error( 'Unable to delete table', 'Error' );
             return back();
         }
     }

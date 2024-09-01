@@ -1,34 +1,34 @@
 <?php
 
-if ( !function_exists( 'getTableShapes' ) ) {
+if ( !function_exists( 'getAllTableShapes' ) ) {
     /**
      * Get all table shapes.
      *
      * @return array
      */
-    function getTableShapes() {
+    function getAllTableShapes() {
         return config( 'hall_and_table.table_shapes' );
     }
 }
 
-if ( !function_exists( 'getTableStatus' ) ) {
+if ( !function_exists( 'getAllTableStatus' ) ) {
     /**
      * Get all table status.
      *
      * @return array
      */
-    function getTableStatus() {
+    function getAllTableStatus() {
         return config( 'hall_and_table.table_status' );
     }
 }
 
-if ( !function_exists( 'getTableTypes' ) ) {
+if ( !function_exists( 'getAllTableTypes' ) ) {
     /**
      * Get all table types.
      *
      * @return array
      */
-    function getTableTypes() {
+    function getAllTableTypes() {
         return config( 'hall_and_table.table_types' );
     }
 }

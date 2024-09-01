@@ -1,7 +1,8 @@
 @php
-$table_types = getTableTypes();
-$table_status = getTableStatus();
-$table_shapes = getTableShapes();
+$table_types = getAllTableTypes();
+$table_status = getAllTableStatus();
+$table_shapes = getAllTableShapes();
+
 
 @endphp
 @extends('layouts.master')
@@ -34,34 +35,29 @@ $table_shapes = getTableShapes();
                         <table id="tableList" class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>#</th>
                                     <th>{{translate('Table No.')}}</th>
                                     <th>{{translate('Shape')}}</th>
                                     <th>{{translate('Type')}}</th>
-                                    <th>{{translate('Chair Limit')}}</th>
                                     <th>{{translate('Status')}}</th>
+                                    <th>{{translate('Chair Limit')}}</th>
                                     <th>{{translate('Action')}}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($tables as $key=>$table)
-                                @php
-                                $key = $key+1;
-                                @endphp
                                 <tr>
-                                    <td>{{$key}}.</td>
-                                    <td>{{ $table->table_number }}</td>
-                                    <td>{{ $table->shape }}</td>
-                                    <td>{{ $table->type }}</td>
+                                    <td>{{ $table->table_number }}.</td>
+                                    <td>{{ $table_shapes[$table->shape] }}</td>
+                                    <td>{{ $table_types[$table->type] }}</td>
+                                    <td>{{ $table_status[$table->status] }}</td>
                                     <td>{{ $table->chair_limit }}</td>
-                                    <td>{{ $table->status }}</td>
                                     <td>
                                         <div class="btn-group" role="group">
                                             <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 {{translate('Action')}}
                                             </button>
                                             <div class="dropdown-menu">
-                                                <a class="dropdown-item edit-table" href="#" data-toggle="modal" data-target="#editTable" data-table_number="{{$table->table_number}}" data-shape="{{$table->shape}}" data-type="{{$table->type}}" data-chair_limit="{{$table->chair_limit}}" data-status="{{$table->status}}">{{translate('Edit')}}</a>
+                                                <a class="dropdown-item edit-table" href="#" data-toggle="modal" data-target="#editTable" data-id="{{$table->id}}" data-table_number="{{$table->table_number}}" data-shape="{{$table->shape}}" data-type="{{$table->type}}" data-chair_limit="{{$table->chair_limit}}" data-status="{{$table->status}}">{{translate('Edit')}}</a>
                                                 <a class="dropdown-item delete-table" href="#" data-toggle="modal" data-target="#deleteTable" data-id="{{$table->id}}">{{translate('Delete')}}</a>
                                             </div>
                                         </div>
@@ -103,8 +99,8 @@ $table_shapes = getTableShapes();
     <div class="form-group">
         <label for="table-status">{{translate('Table Status')}}</label>
         <select class="form-control select2 w-100" name="table_status" id="table-status">
-            @foreach ($table_status as $key => $table_status)
-            <option value="{{ $key }}">{{ $table_status }}</option>
+            @foreach ($table_status as $key => $status)
+            <option value="{{ $key }}">{{ $status }}</option>
             @endforeach
         </select>
     </div>
@@ -115,31 +111,48 @@ $table_shapes = getTableShapes();
 </x-dynamic-form-modal>
 <!-- /create table-->
 
-<!-- edit hall-->
-<x-dynamic-form-modal route="{{route('update.hall')}}" modal_type="modal-md" id="editHall" title="{{translate('Update Hall')}}" execute_btn_name="{{translate('Update')}}" execute_btn_class="btn-success">
-    <input type="hidden" name="id" id="editable-hall-id" value="">
+<!-- edit table-->
+<x-dynamic-form-modal route="{{route('update.table')}}" modal_type="modal-md" id="editTable" title="{{translate('Update Table')}}" execute_btn_name="{{translate('Update')}}" execute_btn_class="btn-success">
+    <input type="hidden" name="id" value="" id="editable-table-id">
     <div class="form-group">
-        <label for="editable-hall-name">{{translate('Hall Name')}}</label>
-        <input type="text" class="form-control" id="editable-hall-name" placeholder="Enter hall name" name="hall_name">
+        <label for="editable-table-number">{{translate('Table Number')}}</label>
+        <input type="number" class="form-control" id="editable-table-number" placeholder="Enter Table Number" name="table_number">
     </div>
     <div class="form-group">
-        <label for="editable-table-capacity">{{translate('Table Capacity')}}</label>
-        <input type="number" class="form-control" id="editable-table-capacity" placeholder="Enter Table Capacity" name="table_capacity">
-    </div>
-    <div class="form-group">
-        <label for="editable-hall-status">{{translate('Hall Status')}}</label>
-        <select class="form-control select2 w-100" name="hall_status" id="editable-hall-status">
-            <option value="1">{{translate('Active')}}</option>
-            <option value="0">{{translate('In active')}}</option>
+        <label for="editable-table-shape">{{translate('Table Shape')}}</label>
+        <select class="form-control select2 w-100" name="table_shape" id="editable-table-shape">
+            @foreach ($table_shapes as $key => $table_shape)
+            <option value="{{ $key }}">{{ $table_shape }}</option>
+            @endforeach
         </select>
     </div>
+    <div class="form-group">
+        <label for="editable-table-type">{{translate('Table Type')}}</label>
+        <select class="form-control select2 w-100" name="table_type" id="editable-table-type">
+            @foreach ($table_types as $key => $table_type)
+            <option value="{{ $key }}">{{ $table_type }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="editable-table-status">{{translate('Table Status')}}</label>
+        <select class="form-control select2 w-100" name="table_status" id="editable-table-status">
+            @foreach ($table_status as $key => $status)
+            <option value="{{ $key }}">{{ $status }}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="editable-chair-limit">{{translate('Chair Limit')}}</label>
+        <input type="number" class="form-control" id="editable-chair-limit" placeholder="Enter Chair Limit" name="chair_limit">
+    </div>
 </x-dynamic-form-modal>
-<!-- /edit hall-->
+<!-- /edit table-->
 
 <!-- delete hall-->
-<x-dynamic-form-modal route="{{route('delete.hall')}}" modal_type="modal-sm" id="deleteHall" title="{{translate('Delete Hall')}}" execute_btn_name="{{translate('Delete')}}" execute_btn_class="btn-danger">
+<x-dynamic-form-modal route="{{route('delete.table')}}" modal_type="modal-sm" id="deleteTable" title="{{translate('Delete Table')}}" execute_btn_name="{{translate('Delete')}}" execute_btn_class="btn-danger">
     <input type="hidden" name="id" id="delete-id">
-    <span>{{translate('Are you sure, you want to delete this hall?')}}</span>
+    <span>{{translate('Are you sure, you want to delete this table?')}}</span>
 </x-dynamic-form-modal>
 <!-- /delete hall-->
 
@@ -155,24 +168,30 @@ $table_shapes = getTableShapes();
     $(function() {
         'use strict'
 
-        $('#hallList').DataTable()
+        $('#tableList').DataTable()
 
-        // $('.edit-hall').click(function() {
-        //     const id = $(this).data('id')
-        //     const name = $(this).data('name')
-        //     const capacity = $(this).data('capacity')
-        //     const status = $(this).data('status')
+        $('.edit-table').click(function() {
+            const id = $(this).data('id')
+            const table_number = $(this).data('table_number')
+            const table_shape = $(this).data('shape')
+            const table_type = $(this).data('type')
+            const table_status = $(this).data('status')
+            const chair_limit = $(this).data('chair_limit')
 
-        //     $('#editable-hall-id').val(id)
-        //     $('#editable-hall-name').val(name)
-        //     $('#editable-table-capacity').val(capacity)
-        //     $('#editable-hall-status').val(status)
-        // })
+            $('#editable-table-number').val(table_number)
+            $('#editable-table-shape').val(table_shape)
+            $('#editable-table-type').val(table_type)
+            $('#editable-table-status').val(table_status)
+            $('#editable-chair-limit').val(chair_limit)
+            $('#editable-table-id').val(id)
 
-        // $('.delete-hall').click(function() {
-        //     const id = $(this).data('id')
-        //     $('#delete-id').val(id)
-        // })
+
+        })
+
+        $('.delete-table').click(function() {
+            const id = $(this).data('id')
+            $('#delete-id').val(id)
+        })
     });
 </script>
 @endpush
