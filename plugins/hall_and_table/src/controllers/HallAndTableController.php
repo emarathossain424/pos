@@ -98,11 +98,24 @@ class HallAndTableController extends Controller {
         }
     }
 
+    /**
+     * Shows all tables for a given hall
+     *
+     * @param int $hall_id The id of the hall to show tables for
+     * @return \Illuminate\Http\Response
+     */
     public function allTables( $hall_id ) {
         $tables = Table::where( 'hall_id', $hall_id )->get();
         return view( 'hall_and_table::admin.table.index', compact( 'hall_id', 'tables' ) );
     }
 
+    /**
+     * Creates a new table based on the provided request data.
+     *
+     * @param Request $request The incoming request containing the table data.
+     * @throws \Exception If an error occurs while storing the table.
+     * @return \Illuminate\Http\RedirectResponse Redirects back to the previous page.
+     */
     public function createTable( Request $request ) {
         $request->validate( [
             'hall_id'      => 'required|exists:halls,id',
@@ -131,6 +144,13 @@ class HallAndTableController extends Controller {
         }
     }
 
+    /**
+     * Updates an existing table based on the provided request data.
+     *
+     * @param Request $request The incoming request containing the table data.
+     * @throws \Exception If an error occurs while updating the table.
+     * @return \Illuminate\Http\RedirectResponse Redirects back to the previous page.
+     */
     public function updateTable( Request $request ) {
         $request->validate( [
             'id'           => 'required|exists:tables,id',
@@ -158,6 +178,13 @@ class HallAndTableController extends Controller {
         }
     }
 
+    /**
+     * Deletes a table based on the provided request data.
+     *
+     * @param Request $request The incoming request containing the table ID.
+     * @throws \Exception If an error occurs during the deletion process.
+     * @return \Illuminate\Http\RedirectResponse Redirects back to the previous page.
+     */
     public function deleteTable( Request $request ) {
         try {
             $table = Table::find( $request['id'] );
