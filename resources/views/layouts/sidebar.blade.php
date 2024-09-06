@@ -84,7 +84,7 @@
                       $active_menu_list = ['categories','add.category','edit.category'];
                       $is_active = in_array(Route::currentRouteName(), $active_menu_list);
                   @endphp
-                  <a href="{{route('categories')}}" class="nav-link {{$is_active? 'active':'' }}">
+                  <a href="{{route('manage.branch')}}" class="nav-link {{$is_active? 'active':'' }}">
                       <i class="far fa-circle nav-icon"></i>
                       <p>{{translate('Manage Branch')}}</p>
                   </a>

@@ -206,5 +206,15 @@
     "Update Table": "Update Table",
     "Delete Table": "Delete Table",
     "Are you sure, you want to delete this table?": "Are you sure, you want to delete this table?",
-    "Manage Branch": "Manage Branch"
+    "Manage Branch": "Manage Branch",
+    "Branches": "Branches",
+    "Create Branch": "Create Branch",
+    "Branch Name": "Branch Name",
+    "Branch Status": "Branch Status",
+    "Update Branch": "Update Branch",
+    "Delete Branch": "Delete Branch",
+    "Are you sure, you want to delete this branch?": "Are you sure, you want to delete this branch?",
+    "Mobile Number": "Mobile Number",
+    "Address": "Address",
+    "Mobile": "Mobile"
 }
