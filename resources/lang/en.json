@@ -218,5 +218,6 @@
     "Address": "Address",
     "Mobile": "Mobile",
     "Make Default": "Make Default",
-    "Branch default status updated successfully": "Branch default status updated successfully"
+    "Branch default status updated successfully": "Branch default status updated successfully",
+    "Translated branch name": "Translated branch name"
 }

@@ -194,7 +194,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
 
         $('.update-option').click(function() {
             getOptionTranslation()
-            
+
             const id = $(this).data('id')
             const name = $(this).data('name')
             $('#edit-option-id').val(id)

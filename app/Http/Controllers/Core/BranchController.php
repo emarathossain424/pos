@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Core;
 
 use App\Http\Controllers\Controller;
 use App\Models\Branch;
+use App\Models\TranslateBranch;
 use Brian2694\Toastr\Facades\Toastr;
 use Exception;
 use Illuminate\Http\Request;
@@ -67,18 +68,48 @@ class BranchController extends Controller {
         ] );
 
         try {
-            $branch              = Branch::find( $request->id );
-            $branch->branch_name = $request->branch_name;
-            $branch->mobile      = $request->mobile;
-            $branch->address     = $request->address;
-            $branch->status      = $request->status;
-            $branch->saveOrFail();
-
+            $default_lang   = getGeneralSettingsValue( 'default_lang' );
+            $translate_into = $request['translate_into'];
+            if ( $default_lang == $translate_into ) {
+                $branch              = Branch::find( $request->id );
+                $branch->branch_name = $request->branch_name;
+                $branch->mobile      = $request->mobile;
+                $branch->address     = $request->address;
+                $branch->status      = $request->status;
+                $branch->update();
+            } else {
+                $this->setBranchTranslation( $request );
+            }
             Toastr::success( 'Branch updated successfully', 'Success' );
             return back();
         } catch ( Exception $ex ) {
             Toastr::error( 'Unable to update branch', 'Error' );
             return back();
+        }
+    }
+
+    public function setBranchTranslation( Request $request ) {
+        $branch_id      = $request['id'];
+        $translate_into = $request['translate_into'];
+
+        $has_previous_trans = TranslateBranch::where( 'branch_id', $branch_id )
+            ->where( 'lang_id', $translate_into );
+
+        if ( $has_previous_trans->exists() ) {
+            $trans_row_id              = $has_previous_trans->first()->id;
+            $branch_trans              = TranslateBranch::find( $trans_row_id );
+            $branch_trans->branch_id   = $branch_id;
+            $branch_trans->lang_id     = $translate_into;
+            $branch_trans->branch_name = $request['branch_name'];
+            $branch_trans->address     = $request['address'];
+            $branch_trans->update();
+        } else {
+            $branch_trans              = new TranslateBranch();
+            $branch_trans->branch_id   = $branch_id;
+            $branch_trans->lang_id     = $translate_into;
+            $branch_trans->branch_name = $request['branch_name'];
+            $branch_trans->address     = $request['address'];
+            $branch_trans->saveOrFail();
         }
     }
 
@@ -123,6 +154,51 @@ class BranchController extends Controller {
         } catch ( Exception $ex ) {
             Toastr::error( 'Unable to delete branch', 'Error' );
             return back();
+        }
+    }
+
+    /**
+     * Retrieves the translation of a branch based on the provided language ID.
+     *
+     * @param Request $request The HTTP request containing the language ID and branch ID.
+     * @return \Illuminate\Http\JsonResponse A JSON response containing the translated branch name or an error message.
+     *                                       If successful, the response will have the following structure:
+     *                                       {
+     *                                           "success": 1,
+     *                                           "data": {
+     *                                               "name": "Translated branch name"
+     *                                           },
+     *                                           "message": "Translated branch name"
+     *                                       }
+     *                                       If unsuccessful, the response will have the following structure:
+     *                                       {
+     *                                           "success": 0,
+     *                                           "data": [],
+     *                                           "message": "No translation found"
+     *                                       }
+     */
+    public function getBranchTranslation( Request $request ) {
+        $lang_id   = $request['lang_id'];
+        $branch_id = $request['branch_id'];
+
+        $translated_branch = TranslateBranch::where( 'branch_id', $branch_id )
+            ->where( 'lang_id', $lang_id )->first();
+
+        if ( $translated_branch ) {
+            return response()->json( [
+                'success' => 1,
+                'data'    => [
+                    'name'    => $translated_branch->branch_name,
+                    'address' => $translated_branch->address,
+                ],
+                'message' => translate( 'Translated branch name' ),
+            ] );
+        } else {
+            return response()->json( [
+                'success' => 0,
+                'data'    => [],
+                'message' => translate( 'No translation found' ),
+            ] );
         }
     }
 }

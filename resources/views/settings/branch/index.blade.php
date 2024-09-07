@@ -1,4 +1,7 @@
 @php
+$languages = getAllLanguages();
+$default_lang = getGeneralSettingsValue('default_lang');
+$translatedLang = isset(request()->lang)?request()->lang:$default_lang;
 @endphp
 @extends('layouts.master')
 @section('title') {{translate('Branches')}} @endsection
@@ -106,6 +109,14 @@
 <x-dynamic-form-modal route="{{route('update.branch')}}" modal_type="modal-md" id="editBranch" title="{{translate('Update Branch')}}" execute_btn_name="{{translate('Update')}}" execute_btn_class="btn-success">
     <input type="hidden" name="id" id="editable-branch-id" value="">
     <div class="form-group">
+        <label for="translateInto">{{translate('Translate Into')}}</label>
+        <select class="form-control select2 w-100" name="translate_into" id="branchTranslation">
+            @foreach($languages as $lang)
+            <option value="{{$lang->id}}" {{ $lang->id == $translatedLang ? 'selected' : '' }}>{{$lang->name}}</option>
+            @endforeach
+        </select>
+    </div>
+    <div class="form-group">
         <label for="editable-branch-name">{{translate('Branch Name')}}</label>
         <input type="text" class="form-control" id="editable-branch-name" placeholder="Enter branch name" name="branch_name">
     </div>
@@ -149,6 +160,8 @@
         $('#branchList').DataTable()
 
         $('.edit-branch').click(function() {
+            getBranchTranslation()
+
             const id = $(this).data('id')
             const branch_name = $(this).data('branch_name')
             const mobile = $(this).data('mobile')
@@ -166,6 +179,30 @@
             const id = $(this).data('id')
             $('#delete-id').val(id)
         })
+
+        $('#branchTranslation').change(() => {
+            getBranchTranslation()
+        })
+
+        function getBranchTranslation() {
+            const lang_id = $('#branchTranslation').val()
+            const id = $('#editable-branch-id').val()
+            $.ajax({
+                url: "{{ route('get.branch.translation') }}",
+                type: 'GET',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    branch_id: id,
+                    lang_id: lang_id,
+                },
+                success: function(response) {
+                    if (response.success == 1) {
+                        $('#editable-branch-name').val(response.data.name)
+                        $('#editable-address').val(response.data.address)
+                    }
+                }
+            })
+        }
 
         $('.change-default-status').change(function() {
             const id = $(this).data('id')

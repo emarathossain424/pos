@@ -8,17 +8,15 @@ use Illuminate\Http\Request;
 use Plugin\Food\Models\FoodCategory;
 use Plugin\Food\Models\TranslateFoodCategory;
 
-class CategoryController extends Controller
-{
+class CategoryController extends Controller {
     /**
      * Will redirect to food category page
      *
      * @return void
      */
-    public function categories()
-    {
-        $categories = FoodCategory::with('parentCategory')->get();
-        return view('food::admin.category.index', compact('categories'));
+    public function categories() {
+        $categories = FoodCategory::with( 'parentCategory' )->get();
+        return view( 'food::admin.category.index', compact( 'categories' ) );
     }
 
     /**
@@ -26,9 +24,8 @@ class CategoryController extends Controller
      *
      * @return void
      */
-    public function addCategory()
-    {
-        return view('food::admin.category.create');
+    public function addCategory() {
+        return view( 'food::admin.category.create' );
     }
 
     /**
@@ -36,29 +33,28 @@ class CategoryController extends Controller
      *
      * @return void
      */
-    public function storeCategory(Request $request)
-    {
-        $request->validate([
-            'category_name' => 'required|unique:food_categories,name',
-            'category_image' => 'required'
-        ]);
+    public function storeCategory( Request $request ) {
+        $request->validate( [
+            'category_name'  => 'required|unique:food_categories,name',
+            'category_image' => 'required',
+        ] );
 
         try {
-            $category = new FoodCategory();
-            $category->name = $request['category_name'];
-            $category->parent = $request['parent_category'];
-            $category->image = $request['category_image'];
-            $category->status = $request['status'] == 'on' ? 1 : 0;
-            $category->featured_status = $request['featured_status'] == 'on' ? 1 : 0;
-            $category->meta_title = $request['meta_title'];
+            $category                   = new FoodCategory();
+            $category->name             = $request['category_name'];
+            $category->parent           = $request['parent_category'];
+            $category->image            = $request['category_image'];
+            $category->status           = $request['status'] == 'on' ? 1 : 0;
+            $category->featured_status  = $request['featured_status'] == 'on' ? 1 : 0;
+            $category->meta_title       = $request['meta_title'];
             $category->meta_description = $request['meta_description'];
-            $category->meta_image = $request['meta_image'];
+            $category->meta_image       = $request['meta_image'];
             $category->saveOrFail();
 
-            Toastr::success('Food category created successfully', 'Success');
+            Toastr::success( 'Food category created successfully', 'Success' );
             return back();
-        } catch (\Exception $ex) {
-            Toastr::error('Unable to create food category', 'Error');
+        } catch ( \Exception $ex ) {
+            Toastr::error( 'Unable to create food category', 'Error' );
             return back();
         }
     }
@@ -66,50 +62,48 @@ class CategoryController extends Controller
     /**
      * Will redirect to category editing page
      */
-    public function editCategory($id)
-    {
-        $e_category = FoodCategory::find($id);
+    public function editCategory( $id ) {
+        $e_category = FoodCategory::find( $id );
 
-        $default_lang = getGeneralSettingsValue('default_lang');
-        if(isset(request()->lang) && (request()->lang!=$default_lang)){
-            $e_category = $e_category->translateInto(request()->lang)->first();
+        $default_lang = getGeneralSettingsValue( 'default_lang' );
+        if ( isset( request()->lang ) && ( request()->lang != $default_lang ) ) {
+            $e_category = $e_category->translateInto( request()->lang )->first();
         }
-        return view('food::admin.category.edit', compact('e_category'));
+        return view( 'food::admin.category.edit', compact( 'e_category' ) );
     }
 
     /**
      * Will update requested food category
      */
-    public function updateCategory(Request $request)
-    {
-        $default_lang = getGeneralSettingsValue('default_lang');
+    public function updateCategory( Request $request ) {
+        $default_lang   = getGeneralSettingsValue( 'default_lang' );
         $translate_into = $request['translate_into'];
         try {
-            if ($default_lang == $translate_into) {
+            if ( $default_lang == $translate_into ) {
                 $category_id = $request['id'];
-                $request->validate([
-                    'category_name' => 'required|unique:food_categories,name,' . $category_id,
-                    'category_image' => 'required'
-                ]);
+                $request->validate( [
+                    'category_name'  => 'required|unique:food_categories,name,' . $category_id,
+                    'category_image' => 'required',
+                ] );
 
-                $category = FoodCategory::find((int)$category_id);
-                $category->name = $request['category_name'];
-                $category->parent = $request['parent_category'];
-                $category->image = $request['category_image'];
-                $category->status = $request['status'] == 'on' ? 1 : 0;
-                $category->featured_status = $request['featured_status'] == 'on' ? 1 : 0;
-                $category->meta_title = $request['meta_title'];
+                $category                   = FoodCategory::find( (int) $category_id );
+                $category->name             = $request['category_name'];
+                $category->parent           = $request['parent_category'];
+                $category->image            = $request['category_image'];
+                $category->status           = $request['status'] == 'on' ? 1 : 0;
+                $category->featured_status  = $request['featured_status'] == 'on' ? 1 : 0;
+                $category->meta_title       = $request['meta_title'];
                 $category->meta_description = $request['meta_description'];
-                $category->meta_image = $request['meta_image'];
+                $category->meta_image       = $request['meta_image'];
                 $category->update();
             } else {
-                $this->setCategoryTranslation($request);
+                $this->setCategoryTranslation( $request );
             }
 
-            Toastr::success('Food category updated successfully', 'Success');
+            Toastr::success( 'Food category updated successfully', 'Success' );
             return back();
-        } catch (\Exception $ex) {
-            Toastr::error('Unable to update food category', 'Error');
+        } catch ( \Exception $ex ) {
+            Toastr::error( 'Unable to update food category', 'Error' );
             return back();
         }
     }
@@ -117,51 +111,48 @@ class CategoryController extends Controller
     /**
      * Translate category in
      */
-    public function setCategoryTranslation($request)
-    {
-        $category_id = $request['id'];
+    public function setCategoryTranslation( $request ) {
+        $category_id    = $request['id'];
         $translate_into = $request['translate_into'];
 
-        $has_previous_trans = TranslateFoodCategory::where('category_id', $category_id)
-            ->where('lang_id', $translate_into);
+        $has_previous_trans = TranslateFoodCategory::where( 'category_id', $category_id )
+            ->where( 'lang_id', $translate_into );
 
-        if ($has_previous_trans->exists()) {
-            $trans_row_id = $has_previous_trans->first()->id;
-            $category_trans = TranslateFoodCategory::find($trans_row_id);
-            $category_trans->category_id = $category_id;
-            $category_trans->lang_id = $translate_into;
-            $category_trans->name = $request['category_name'];
-            $category_trans->meta_title = $request['meta_title'];
+        if ( $has_previous_trans->exists() ) {
+            $trans_row_id                     = $has_previous_trans->first()->id;
+            $category_trans                   = TranslateFoodCategory::find( $trans_row_id );
+            $category_trans->category_id      = $category_id;
+            $category_trans->lang_id          = $translate_into;
+            $category_trans->name             = $request['category_name'];
+            $category_trans->meta_title       = $request['meta_title'];
             $category_trans->meta_description = $request['meta_description'];
             $category_trans->update();
         } else {
-            $category_trans = new TranslateFoodCategory();
-            $category_trans->category_id = $category_id;
-            $category_trans->lang_id = $translate_into;
-            $category_trans->name = $request['category_name'];
-            $category_trans->meta_title = $request['meta_title'];
+            $category_trans                   = new TranslateFoodCategory();
+            $category_trans->category_id      = $category_id;
+            $category_trans->lang_id          = $translate_into;
+            $category_trans->name             = $request['category_name'];
+            $category_trans->meta_title       = $request['meta_title'];
             $category_trans->meta_description = $request['meta_description'];
             $category_trans->saveOrFail();
         }
     }
 
-
     /**
      * Update category status
      */
-    public function updateCategoryStatus(Request $request)
-    {
+    public function updateCategoryStatus( Request $request ) {
         try {
-            $category = FoodCategory::find($request['id']);
-            if ($request['type'] == 'featured') {
-                if ($category->featured_status == 1) {
+            $category = FoodCategory::find( $request['id'] );
+            if ( $request['type'] == 'featured' ) {
+                if ( $category->featured_status == 1 ) {
                     $category->featured_status = 0;
                 } else {
                     $category->featured_status = 1;
                 }
             }
-            if ($request['type'] == 'general') {
-                if ($category->status == 1) {
+            if ( $request['type'] == 'general' ) {
+                if ( $category->status == 1 ) {
                     $category->status = 0;
                 } else {
                     $category->status = 1;
@@ -169,30 +160,29 @@ class CategoryController extends Controller
             }
 
             $category->update();
-            return response()->json([
+            return response()->json( [
                 'success' => true,
-                'message' => translate('Category status updated successfully')
-            ]);
-        } catch (\Exception $ex) {
-            return response()->json([
+                'message' => translate( 'Category status updated successfully' ),
+            ] );
+        } catch ( \Exception $ex ) {
+            return response()->json( [
                 'success' => false,
-                'message' => translate('Unable to change status')
-            ]);
+                'message' => translate( 'Unable to change status' ),
+            ] );
         }
     }
 
     /**
      * Delete requested category
      */
-    public function deleteCategory(Request $request)
-    {
+    public function deleteCategory( Request $request ) {
         try {
-            $category = FoodCategory::find((int)$request['id']);
+            $category = FoodCategory::find( (int) $request['id'] );
             $category->delete();
-            Toastr::success('Category deleted successfully', 'Success');
+            Toastr::success( 'Category deleted successfully', 'Success' );
             return back();
-        } catch (\Throwable $ex) {
-            Toastr::error('Unable to delete category', 'Error');
+        } catch ( \Throwable $ex ) {
+            Toastr::error( 'Unable to delete category', 'Error' );
             return back();
         }
     }
