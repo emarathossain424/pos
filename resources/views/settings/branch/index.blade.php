@@ -35,6 +35,7 @@
                                     <th>{{translate('Mobile')}}</th>
                                     <th>{{translate('Address')}}</th>
                                     <th>{{translate('Status')}}</th>
+                                    <th>{{translate('Make Default')}}</th>
                                     <th>{{translate('Action')}}</th>
                                 </tr>
                             </thead>
@@ -49,6 +50,12 @@
                                     <td>{{ $branch->mobile }}</td>
                                     <td>{{ $branch->address }}</td>
                                     <td>{{ $branch->status == 1 ? translate('Active') : translate('In active') }}</td>
+                                    <td>
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input change-default-status" id="defaultStatus{{$key}}" data-id="{{$branch->id}}" {{$branch->is_default==1?'checked':''}}>
+                                            <label class="custom-control-label" for="defaultStatus{{$key}}"></label>
+                                        </div>
+                                    </td>
                                     <td>
                                         <div class="btn-group" role="group">
                                             <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -158,6 +165,25 @@
         $('.delete-branch').click(function() {
             const id = $(this).data('id')
             $('#delete-id').val(id)
+        })
+
+        $('.change-default-status').change(function() {
+            const id = $(this).data('id')
+            var postData = {
+                _token: '{{csrf_token()}}',
+                id: id
+            };
+            $.post('{{route("update.branch.default.status")}}', postData, function(response) {
+                if(response.success){
+                    toastr.success(response.message, 'success');
+                    location.reload()
+                }
+                else{
+                    toastr.error(response.message, 'error');
+                }
+            }).fail(function(error){
+                toastr.error('{{translate("Something went wrong")}}', 'error');
+            })
         })
     });
 </script>

@@ -82,6 +82,27 @@ class BranchController extends Controller {
         }
     }
 
+    public function updateDefaultStatus( Request $request ) {
+        $request->validate( [
+            'id' => 'required|exists:core_branches,id',
+        ] );
+
+        try {
+            $branch             = Branch::find( $request->id );
+            $branch->is_default = $branch->is_default == 1 ? 0 : 1;
+            $branch->update();
+            return response()->json( [
+                'success' => true,
+                'message' => translate( 'Branch default status updated successfully' ),
+            ] );
+        } catch ( \Exception $ex ) {
+            return response()->json( [
+                'success' => false,
+                'message' => translate( 'Unable to change default status' ),
+            ] );
+        }
+    }
+
     /**
      * Deletes a branch based on the provided request data.
      *

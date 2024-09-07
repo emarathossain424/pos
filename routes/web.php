@@ -46,6 +46,7 @@ Route::prefix( getAdminPrefix() )->middleware( 'auth' )->group( function () {
     Route::get( '/manage-branch', [BranchController::class, 'allBranches'] )->name( 'manage.branch' );
     Route::post( '/create-branch', [BranchController::class, 'createBranch'] )->name( 'create.branch' );
     Route::post( '/update-branch', [BranchController::class, 'updateBranch'] )->name( 'update.branch' );
+    Route::post( '/update-default-status', [BranchController::class, 'updateDefaultStatus'] )->name( 'update.branch.default.status' );
     Route::post( '/delete-branch', [BranchController::class, 'deleteBranch'] )->name( 'delete.branch' );
 } );
 

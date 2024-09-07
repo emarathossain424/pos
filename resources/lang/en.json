@@ -216,5 +216,7 @@
     "Are you sure, you want to delete this branch?": "Are you sure, you want to delete this branch?",
     "Mobile Number": "Mobile Number",
     "Address": "Address",
-    "Mobile": "Mobile"
+    "Mobile": "Mobile",
+    "Make Default": "Make Default",
+    "Branch default status updated successfully": "Branch default status updated successfully"
 }
