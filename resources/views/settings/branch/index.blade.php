@@ -9,6 +9,12 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-responsive/css/responsive.bootstrap4.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-buttons/css/buttons.bootstrap4.min.css')}}">
+<style>
+    .disabled-div {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+</style>
 @endpush
 @section('breadcrumb')
 <ol class="breadcrumb float-sm-right">
@@ -112,7 +118,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         <label for="translateInto">{{translate('Translate Into')}}</label>
         <select class="form-control select2 w-100" name="translate_into" id="branchTranslation">
             @foreach($languages as $lang)
-            <option value="{{$lang->id}}" {{ $lang->id == $translatedLang ? 'selected' : '' }}>{{$lang->name}}</option>
+            <option value="{{$lang->id}}" {{ $lang->id == $default_lang ? 'selected' : '' }}>{{$lang->name}}</option>
             @endforeach
         </select>
     </div>
@@ -120,7 +126,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         <label for="editable-branch-name">{{translate('Branch Name')}}</label>
         <input type="text" class="form-control" id="editable-branch-name" placeholder="Enter branch name" name="branch_name">
     </div>
-    <div class="form-group">
+    <div class="form-group lang-independent-area">
         <label for="editable-mobile">{{translate('Mobile Number')}}</label>
         <input type="text" class="form-control" id="editable-mobile" placeholder="Enter mobile number" name="mobile">
     </div>
@@ -128,7 +134,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         <label for="editable-address">{{translate('Address')}}</label>
         <textarea name="address" id="editable-address" class="form-control" placeholder="Enter branch address"></textarea>
     </div>
-    <div class="form-group">
+    <div class="form-group lang-independent-area">
         <label for="editable-branch-status">{{translate('Status')}}</label>
         <select class="form-control select2 w-100" name="status" id="editable-branch-status">
             <option value="1">{{translate('Active')}}</option>
@@ -157,9 +163,12 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
     $(function() {
         'use strict'
 
+        const default_lang = '{{$default_lang}}'
+
         $('#branchList').DataTable()
 
         $('.edit-branch').click(function() {
+            $('.lang-independent-area').removeClass('disabled-div')
             getBranchTranslation()
 
             const id = $(this).data('id')
@@ -187,6 +196,13 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         function getBranchTranslation() {
             const lang_id = $('#branchTranslation').val()
             const id = $('#editable-branch-id').val()
+
+            if (lang_id != default_lang) {
+                $('.lang-independent-area').addClass('disabled-div')
+            } else {
+                $('.lang-independent-area').removeClass('disabled-div')
+            }
+
             $.ajax({
                 url: "{{ route('get.branch.translation') }}",
                 type: 'GET',

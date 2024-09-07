@@ -88,6 +88,15 @@ class BranchController extends Controller {
         }
     }
 
+    /**
+     * Sets the translation for a branch.
+     *
+     * @param Request $request The HTTP request containing the branch ID, language ID, branch name, and address.
+     *
+     * @throws \Exception If an error occurs during the update process.
+     *
+     * @return void
+     */
     public function setBranchTranslation( Request $request ) {
         $branch_id      = $request['id'];
         $translate_into = $request['translate_into'];
@@ -113,6 +122,11 @@ class BranchController extends Controller {
         }
     }
 
+    /**
+     * Update default status of a branch
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function updateDefaultStatus( Request $request ) {
         $request->validate( [
             'id' => 'required|exists:core_branches,id',

@@ -113,7 +113,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         <label for="translateInto">{{translate('Translate Into')}}</label>
         <select class="form-control select2 w-100" name="translate_into" id="variantTranslation">
             @foreach($languages as $lang)
-            <option value="{{$lang->id}}" {{ $lang->id == $translatedLang ? 'selected' : '' }}>{{$lang->name}}</option>
+            <option value="{{$lang->id}}" {{ $lang->id == $default_lang ? 'selected' : '' }}>{{$lang->name}}</option>
             @endforeach
         </select>
     </div>
@@ -138,7 +138,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         <label for="translateInto">{{translate('Translate Into')}}</label>
         <select class="form-control select2 w-100" name="translate_into" id="optionTranslation">
             @foreach($languages as $lang)
-            <option value="{{$lang->id}}" {{ $lang->id == $translatedLang ? 'selected' : '' }}>{{$lang->name}}</option>
+            <option value="{{$lang->id}}" {{ $lang->id == $default_lang ? 'selected' : '' }}>{{$lang->name}}</option>
             @endforeach
         </select>
     </div>

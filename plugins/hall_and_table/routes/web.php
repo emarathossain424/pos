@@ -19,6 +19,7 @@ Route::get( '/all-halls', [HallAndTableController::class, 'allHalls'] )->name( '
 Route::post( '/create-hall', [HallAndTableController::class, 'createHall'] )->name( 'create.hall' );
 Route::post( '/update-hall', [HallAndTableController::class, 'updateHall'] )->name( 'update.hall' );
 Route::post( '/delete-hall', [HallAndTableController::class, 'deleteHall'] )->name( 'delete.hall' );
+Route::get( '/get-hall-translation', [HallAndTableController::class, 'getHallTranslation'] )->name( 'get.hall.translation' );
 
 //Tables controllers
 Route::get( '/all-tables/{hall_id}', [HallAndTableController::class, 'allTables'] )->name( 'all.tables' );
