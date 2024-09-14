@@ -30,13 +30,15 @@ class HallAndTableController extends Controller {
      */
     public function createHall( Request $request ) {
         $request->validate( [
-            'hall_name'      => 'required|unique:halls,name',
+            'branch'         => 'required',
+            'hall_name'      => 'required',
             'table_capacity' => 'required',
             'hall_status'    => 'required',
         ] );
 
         try {
             $hall                 = new Hall();
+            $hall->branch_id      = $request['branch'];
             $hall->name           = $request['hall_name'];
             $hall->table_capacity = $request['table_capacity'];
             $hall->status         = $request['hall_status'];
@@ -59,7 +61,8 @@ class HallAndTableController extends Controller {
      */
     public function updateHall( Request $request ) {
         $request->validate( [
-            'hall_name'      => 'required|unique:halls,name,' . $request['id'],
+            'branch'         => 'required',
+            'hall_name'      => 'required',
             'table_capacity' => 'required',
             'hall_status'    => 'required',
         ] );
@@ -69,6 +72,7 @@ class HallAndTableController extends Controller {
             $translate_into = $request['translate_into'];
             if ( $default_lang == $translate_into ) {
                 $hall                 = Hall::find( $request['id'] );
+                $hall->branch_id      = $request['branch'];
                 $hall->name           = $request['hall_name'];
                 $hall->table_capacity = $request['table_capacity'];
                 $hall->status         = $request['hall_status'];
@@ -85,6 +89,12 @@ class HallAndTableController extends Controller {
         }
     }
 
+    /**
+     * Sets the translation for a hall.
+     *
+     * @param Request $request The request data containing the hall ID, translation language, and translation details.
+     * @return void
+     */
     public function setHallTranslation( Request $request ) {
         $hall_id        = $request['id'];
         $translate_into = $request['translate_into'];
@@ -128,6 +138,26 @@ class HallAndTableController extends Controller {
         }
     }
 
+    /**
+     * Retrieves the translation of a hall based on the provided language ID.
+     *
+     * @param Request $request The incoming request containing the language ID and hall ID.
+     * @return \Illuminate\Http\JsonResponse A JSON response containing the translated hall name or an error message.
+     *                                       If successful, the response will have the following structure:
+     *                                       {
+     *                                           "success": 1,
+     *                                           "data": {
+     *                                               "name": "Translated hall name"
+     *                                           },
+     *                                           "message": "Translated hall name"
+     *                                       }
+     *                                       If unsuccessful, the response will have the following structure:
+     *                                       {
+     *                                           "success": 0,
+     *                                           "data": [],
+     *                                           "message": "No translation found"
+     *                                       }
+     */
     public function getHallTranslation( Request $request ) {
         $lang_id = $request['lang_id'];
         $hall_id = $request['hall_id'];

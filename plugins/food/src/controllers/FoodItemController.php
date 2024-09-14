@@ -6,97 +6,94 @@ use App\Http\Controllers\Controller;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Plugin\Food\Models\FoodCategory;
 use Plugin\Food\Models\FoodItem;
-use Plugin\Food\Models\FoodItemsVariantCombos;
 use Plugin\Food\Models\FoodItemVariant;
 use Plugin\Food\Models\FoodItemVariantOption;
 use Plugin\Food\Models\FoodVariant;
 use Plugin\Food\Models\TranslateFoodItem;
 
-class FoodItemController extends Controller
-{
+class FoodItemController extends Controller {
     /**
      * Will redirect to food items list page
      *
      * @return void
      */
-    public function foodItems(Request $request)
-    {
+    public function foodItems( Request $request ) {
         $match_case = [];
-        if (!empty($request->input('category'))) {
-            $match_case[] = ['category', $request->input('category')];
+        if ( !empty( $request->input( 'category' ) ) ) {
+            $match_case[] = ['category', $request->input( 'category' )];
         }
-        if (!empty($request->input('food_type'))) {
-            $match_case[] = ['food_type', $request->input('food_type')];
+        if ( !empty( $request->input( 'food_type' ) ) ) {
+            $match_case[] = ['food_type', $request->input( 'food_type' )];
         }
-        if (!empty($request->input('item_status'))) {
-            $match_case[] = ['status', $request->input('item_status')];
+        if ( !empty( $request->input( 'item_status' ) ) ) {
+            $match_case[] = ['status', $request->input( 'item_status' )];
         }
 
-        $food_items = FoodItem::with('foodItemVariant', 'foodCategory')
-            ->where($match_case)
+        $food_items = FoodItem::with( 'foodItemVariant', 'foodCategory' )
+            ->where( $match_case )
             ->get();
 
-        return view('food::admin.foods.index', compact('food_items'));
+        return view( 'food::admin.foods.index', compact( 'food_items' ) );
     }
 
     /**
      * Will redirect to food item adding page
      */
-    public function addFoodItems()
-    {
-        $variants = FoodVariant::with('options')->get();
-        return view('food::admin.foods.create', compact('variants'));
+    public function addFoodItems() {
+        $variants = FoodVariant::with( 'options' )->get();
+        return view( 'food::admin.foods.create', compact( 'variants' ) );
     }
 
     /**
      * Will store food items
      */
-    public function storeFoodItems(Request $request)
-    {
-        $request->validate([
-            'name' => 'required',
-            'category' => 'required|exists:food_categories,id',
-            'details' => 'required',
-            'image' => 'required|exists:uploads,id',
-            'status' => 'required',
-            'price' => 'required',
+    public function storeFoodItems( Request $request ) {
+        $request->validate( [
+            'name'        => 'required',
+            'category'    => 'required|exists:food_categories,id',
+            'details'     => 'required',
+            'image'       => 'required|exists:uploads,id',
+            'status'      => 'required',
+            'price'       => 'required',
             'offer_price' => 'required',
-            'food_type' => 'required',
-        ]);
+            'food_type'   => 'required',
+            'food_type'   => 'required',
+            'branch'      => 'required',
+        ] );
 
         try {
             DB::beginTransaction();
-            $food_item = new FoodItem();
-            $food_item->name = $request['name'];
-            $food_item->category = $request['category'];
-            $food_item->details = $request['details'];
-            $food_item->image = $request['image'];
-            $food_item->status = $request['status'] == 'on' ? 1 : 0;
-            $food_item->price = $request['price'];
-            $food_item->offer_price = $request['offer_price'];
-            $food_item->meta_title = $request['meta_title'];
-            $food_item->meta_image = $request['meta_image'];
+            $food_item                   = new FoodItem();
+            $food_item->branch_id        = $request['branch'];
+            $food_item->name             = $request['name'];
+            $food_item->category         = $request['category'];
+            $food_item->details          = $request['details'];
+            $food_item->image            = $request['image'];
+            $food_item->status           = $request['status'] == 'on' ? 1 : 0;
+            $food_item->price            = $request['price'];
+            $food_item->offer_price      = $request['offer_price'];
+            $food_item->meta_title       = $request['meta_title'];
+            $food_item->meta_image       = $request['meta_image'];
             $food_item->meta_description = $request['meta_description'];
-            $food_item->food_type = $request['food_type'];
+            $food_item->food_type        = $request['food_type'];
             $food_item->saveOrFail();
 
-            if ($request['food_type'] == 'variant') {
-                $this->storeFoodItemVariantOptions($request['variant_combo'], $food_item->id);
+            if ( $request['food_type'] == 'variant' ) {
+                $this->storeFoodItemVariantOptions( $request['variant_combo'], $food_item->id );
             }
 
             DB::commit();
-            return response()->json([
+            return response()->json( [
                 'success' => 1,
-                'message' => translate('Food item stored successfully')
-            ]);
-        } catch (\Exception $ex) {
+                'message' => translate( 'Food item stored successfully' ),
+            ] );
+        } catch ( \Exception $ex ) {
             DB::rollBack();
-            return response()->json([
+            return response()->json( [
                 'success' => 0,
-                'message' => translate('Unable to store food item')
-            ], 500);
+                'message' => translate( 'Unable to store food item' ),
+            ], 500 );
         }
     }
 
@@ -127,61 +124,62 @@ class FoodItemController extends Controller
      *                                           "message": "Unable to store food item"
      *                                       }
      */
-    public function updateFoodItems(Request $request)
-    {
-        $request->validate([
-            'id' => 'required|exists:food_items,id',
-            'name' => 'required',
-            'category' => 'required|exists:food_categories,id',
-            'details' => 'required',
-            'image' => 'required|exists:uploads,id',
-            'status' => 'required',
-            'price' => 'required',
+    public function updateFoodItems( Request $request ) {
+        $request->validate( [
+            'id'          => 'required|exists:food_items,id',
+            'name'        => 'required',
+            'category'    => 'required|exists:food_categories,id',
+            'details'     => 'required',
+            'image'       => 'required|exists:uploads,id',
+            'status'      => 'required',
+            'price'       => 'required',
             'offer_price' => 'required',
-            'food_type' => 'required',
-        ]);
+            'food_type'   => 'required',
+            'branch'      => 'required',
+        ] );
 
         try {
             DB::beginTransaction();
 
-            $default_lang = getGeneralSettingsValue('default_lang');
+            $default_lang   = getGeneralSettingsValue( 'default_lang' );
             $translate_into = $request['translate_into'];
-            if ($translate_into == $default_lang) {
-                $food_item = FoodItem::find($request['id']);
-                $food_item->name = $request['name'];
-                $food_item->category = $request['category'];
-                $food_item->details = $request['details'];
-                $food_item->image = $request['image'];
-                $food_item->status = $request['status'] == 'on' ? 1 : 0;
-                $food_item->price = $request['price'];
-                $food_item->offer_price = $request['offer_price'];
-                $food_item->meta_title = $request['meta_title'];
-                $food_item->meta_image = $request['meta_image'];
+            if ( $translate_into == $default_lang ) {
+                $food_item                   = FoodItem::find( $request['id'] );
+                $food_item->branch_id        = $request['branch'];
+                $food_item->name             = $request['name'];
+                $food_item->category         = $request['category'];
+                $food_item->details          = $request['details'];
+                $food_item->image            = $request['image'];
+                $food_item->status           = $request['status'] == 'on' ? 1 : 0;
+                $food_item->price            = $request['price'];
+                $food_item->offer_price      = $request['offer_price'];
+                $food_item->meta_title       = $request['meta_title'];
+                $food_item->meta_image       = $request['meta_image'];
                 $food_item->meta_description = $request['meta_description'];
-                $food_item->food_type = $request['food_type'];
+                $food_item->food_type        = $request['food_type'];
                 $food_item->saveOrFail();
 
-                if ($request['food_type'] == 'variant') {
-                    $this->storeFoodItemVariantOptions($request['variant_combo'], $food_item->id, true);
+                if ( $request['food_type'] == 'variant' ) {
+                    $this->storeFoodItemVariantOptions( $request['variant_combo'], $food_item->id, true );
                 } else {
-                    FoodItemVariant::where('item_id', $food_item->id)->delete();
+                    FoodItemVariant::where( 'item_id', $food_item->id )->delete();
                 }
             } else {
-                $this->setFoodItemTranslation($request);
+                $this->setFoodItemTranslation( $request );
             }
 
             DB::commit();
-            return response()->json([
+            return response()->json( [
                 'success' => 1,
-                'message' => translate('Food item updated successfully')
-            ]);
-        } catch (\Exception $ex) {
+                'message' => translate( 'Food item updated successfully' ),
+            ] );
+        } catch ( \Exception $ex ) {
             DB::rollBack();
-            dd($ex);
-            return response()->json([
+            dd( $ex );
+            return response()->json( [
                 'success' => 0,
-                'message' => translate('Unable to store food item')
-            ], 500);
+                'message' => translate( 'Unable to store food item' ),
+            ], 500 );
         }
     }
 
@@ -197,30 +195,29 @@ class FoodItemController extends Controller
      *                      - 'meta_description' (string): The translated meta description of the food item.
      * @return void
      */
-    public function setFoodItemTranslation($request)
-    {
-        $item_id = $request['id'];
+    public function setFoodItemTranslation( $request ) {
+        $item_id        = $request['id'];
         $translate_into = $request['translate_into'];
 
-        $has_previous_trans = TranslateFoodItem::where('item_id', $item_id)
-            ->where('lang_id', $translate_into);
+        $has_previous_trans = TranslateFoodItem::where( 'item_id', $item_id )
+            ->where( 'lang_id', $translate_into );
 
-        if ($has_previous_trans->exists()) {
-            $trans_row_id = $has_previous_trans->first()->id;
-            $item_trans = TranslateFoodItem::find($trans_row_id);
-            $item_trans->name = $request['name'];
-            $item_trans->details = $request['details'];
-            $item_trans->meta_title = $request['meta_title'];
+        if ( $has_previous_trans->exists() ) {
+            $trans_row_id                 = $has_previous_trans->first()->id;
+            $item_trans                   = TranslateFoodItem::find( $trans_row_id );
+            $item_trans->name             = $request['name'];
+            $item_trans->details          = $request['details'];
+            $item_trans->meta_title       = $request['meta_title'];
             $item_trans->meta_description = $request['meta_title'];
             $item_trans->meta_description = $request['meta_description'];
             $item_trans->update();
         } else {
-            $item_trans = new TranslateFoodItem();
-            $item_trans->item_id = $item_id;
-            $item_trans->lang_id = $translate_into;
-            $item_trans->name = $request['name'];
-            $item_trans->details = $request['details'];
-            $item_trans->meta_title = $request['meta_title'];
+            $item_trans                   = new TranslateFoodItem();
+            $item_trans->item_id          = $item_id;
+            $item_trans->lang_id          = $translate_into;
+            $item_trans->name             = $request['name'];
+            $item_trans->details          = $request['details'];
+            $item_trans->meta_title       = $request['meta_title'];
             $item_trans->meta_description = $request['meta_description'];
             $item_trans->saveOrFail();
         }
@@ -242,27 +239,26 @@ class FoodItemController extends Controller
      * @throws \Illuminate\Database\QueryException If there is a database error while saving the model.
      * @return void
      */
-    public function storeFoodItemVariantOptions($variations, $food_item_id, $is_for_update = false)
-    {
-        if ($is_for_update) {
-            FoodItemVariant::where('item_id', $food_item_id)->delete();
+    public function storeFoodItemVariantOptions( $variations, $food_item_id, $is_for_update = false ) {
+        if ( $is_for_update ) {
+            FoodItemVariant::where( 'item_id', $food_item_id )->delete();
         }
 
-        foreach ($variations as $variation) {
+        foreach ( $variations as $variation ) {
             $combinations = $variation['combo'];
 
-            $food_item_variant = new FoodItemVariant();
-            $food_item_variant->item_id = $food_item_id;
-            $food_item_variant->price = $variation['price'];
+            $food_item_variant                = new FoodItemVariant();
+            $food_item_variant->item_id       = $food_item_id;
+            $food_item_variant->price         = $variation['price'];
             $food_item_variant->special_price = $variation['special_price'];
-            $food_item_variant->availability = $variation['availability'];
+            $food_item_variant->availability  = $variation['availability'];
             $food_item_variant->saveOrFail();
 
-            foreach ($combinations as $combo) {
-                $food_item_variant_option = new FoodItemVariantOption();
+            foreach ( $combinations as $combo ) {
+                $food_item_variant_option                       = new FoodItemVariantOption();
                 $food_item_variant_option->food_item_variant_id = $food_item_variant->id;
-                $food_item_variant_option->variant_id = $combo['variant']['id'];
-                $food_item_variant_option->option_id = $combo['options']['id'];
+                $food_item_variant_option->variant_id           = $combo['variant']['id'];
+                $food_item_variant_option->option_id            = $combo['options']['id'];
                 $food_item_variant_option->saveOrFail();
             }
         }
@@ -274,66 +270,65 @@ class FoodItemController extends Controller
      * @param int $id The ID of the food item to edit.
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View The view for editing the food item.
      */
-    public function editFoodItems($id)
-    {
-        $variants = FoodVariant::with('options')->get();
-        $food_item = FoodItem::find($id);
+    public function editFoodItems( $id ) {
+        $variants  = FoodVariant::with( 'options' )->get();
+        $food_item = FoodItem::find( $id );
 
-        $default_lang = getGeneralSettingsValue('default_lang');
-        if (isset(request()->lang) && (request()->lang != $default_lang)) {
-            $food_item = $food_item->translateInto(request()->lang)->first();
+        $default_lang = getGeneralSettingsValue( 'default_lang' );
+        if ( isset( request()->lang ) && ( request()->lang != $default_lang ) ) {
+            $food_item = $food_item->translateInto( request()->lang )->first();
         }
 
-        $food_item_variations = FoodItem::with('foodItemVariant.foodItemVariantOption.variant', 'foodItemVariant.foodItemVariantOption.option')
-            ->find($id);
+        $food_item_variations = FoodItem::with( 'foodItemVariant.foodItemVariantOption.variant', 'foodItemVariant.foodItemVariantOption.option' )
+            ->find( $id );
 
         $variant_option_array = [];
-        $variant_ids = [];
-        $variant_option_ids = [];
+        $variant_ids          = [];
+        $variant_option_ids   = [];
 
-        foreach ($food_item_variations->foodItemVariant as $item) {
-            $data = [];
+        foreach ( $food_item_variations->foodItemVariant as $item ) {
+            $data  = [];
             $combo = [];
-            foreach ($item->foodItemVariantOption as $foodItemVariantOption) {
+            foreach ( $item->foodItemVariantOption as $foodItemVariantOption ) {
                 $variant_name = $foodItemVariantOption->variant->name;
-                $variant_id = $foodItemVariantOption->variant->id;
+                $variant_id   = $foodItemVariantOption->variant->id;
 
                 $option_name = $foodItemVariantOption->option->option_name;
-                $option_id = $foodItemVariantOption->option->id;
+                $option_id   = $foodItemVariantOption->option->id;
 
                 $combo[] = [
                     'variant' => [
                         'name' => $variant_name,
-                        'id' => $variant_id
+                        'id'   => $variant_id,
                     ],
                     'options' => [
                         'name' => $option_name,
-                        'id' => $option_id
-                    ]
+                        'id'   => $option_id,
+                    ],
                 ];
 
-                if (!in_array($variant_id, $variant_ids)) {
-                    array_push($variant_ids, $variant_id);
+                if ( !in_array( $variant_id, $variant_ids ) ) {
+                    array_push( $variant_ids, $variant_id );
                 }
 
-                if (!$this->comboExists($variant_option_ids, $variant_id, $option_id)) {
+                if ( !$this->comboExists( $variant_option_ids, $variant_id, $option_id ) ) {
                     $variant_option_ids[] = [
                         'variant_id' => $variant_id,
-                        'option_id' => $option_id
+                        'option_id'  => $option_id,
                     ];
                 }
             }
-            $data['combo'] = $combo;
-            $data['price'] = $item->price;
-            $data['special_price'] = $item->special_price;
-            $data['availability'] = $item->availability;
+            $data['combo']          = $combo;
+            $data['price']          = $item->price;
+            $data['special_price']  = $item->special_price;
+            $data['availability']   = $item->availability;
             $variant_option_array[] = $data;
         }
 
         // dd($variant_option_array, $variant_ids, $variant_option_ids,$variants,$food_item);
         // dd($variant_option_array);
 
-        return view('food::admin.foods.edit', compact('variants', 'food_item', 'variant_ids', 'variant_option_ids', 'variant_option_array'));
+        return view( 'food::admin.foods.edit', compact( 'variants', 'food_item', 'variant_ids', 'variant_option_ids', 'variant_option_array' ) );
     }
 
     /**
@@ -344,13 +339,12 @@ class FoodItemController extends Controller
      * @param int $option_id The id of the option to check.
      * @return bool Returns true if the variant-option combination exists, false otherwise.
      */
-    function comboExists($variant_option_ids, $variant_id, $option_id)
-    {
+    function comboExists( $variant_option_ids, $variant_id, $option_id ) {
         // Iterate over each item in the variant_option_ids array.
-        foreach ($variant_option_ids as $item) {
+        foreach ( $variant_option_ids as $item ) {
             // Check if the variant_id and option_id of the current item
             // match the provided variant_id and option_id.
-            if ($item["variant_id"] == $variant_id && $item["option_id"] == $option_id) {
+            if ( $item["variant_id"] == $variant_id && $item["option_id"] == $option_id ) {
                 // If there is a match, return true.
                 return true;
             }
@@ -366,16 +360,15 @@ class FoodItemController extends Controller
      * @throws \Exception If an error occurs while deleting the food item.
      * @return \Illuminate\Http\JsonResponse The JSON response indicating the success or failure of the deletion.
      */
-    public function deleteFoodItem(Request $request)
-    {
+    public function deleteFoodItem( Request $request ) {
         try {
-            $food_item = FoodItem::find((int)$request['id']);
+            $food_item = FoodItem::find( (int) $request['id'] );
             $food_item->delete();
 
-            Toastr::success('Food item deleted successfully', 'Success');
+            Toastr::success( 'Food item deleted successfully', 'Success' );
             return back();
-        } catch (\Throwable $ex) {
-            Toastr::error('Unable to delete food item', 'Error');
+        } catch ( \Throwable $ex ) {
+            Toastr::error( 'Unable to delete food item', 'Error' );
             return back();
         }
     }
@@ -387,26 +380,25 @@ class FoodItemController extends Controller
      * @throws \Exception If an error occurs while updating the food item status.
      * @return \Illuminate\Http\JsonResponse The JSON response indicating the success or failure of the status update.
      */
-    public function updateItemStatus(Request $request)
-    {
+    public function updateItemStatus( Request $request ) {
         try {
-            $item = FoodItem::find($request['id']);
-            if ($item->status == 1) {
+            $item = FoodItem::find( $request['id'] );
+            if ( $item->status == 1 ) {
                 $item->status = 0;
             } else {
                 $item->status = 1;
             }
 
             $item->update();
-            return response()->json([
+            return response()->json( [
                 'success' => true,
-                'message' => translate('Food item status updated successfully')
-            ]);
-        } catch (\Exception $ex) {
-            return response()->json([
+                'message' => translate( 'Food item status updated successfully' ),
+            ] );
+        } catch ( \Exception $ex ) {
+            return response()->json( [
                 'success' => false,
-                'message' => translate('Unable to change status')
-            ]);
+                'message' => translate( 'Unable to change status' ),
+            ] );
         }
     }
 }

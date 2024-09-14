@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Branch;
 use App\Models\Language;
 use App\Models\Upload;
 use Illuminate\Support\Facades\DB;
@@ -107,5 +108,15 @@ if ( !function_exists( 'getUniqueString' ) ) {
         $uniqueString = substr( str_replace( '.', '', $microtime ) . $randomNumber, 0, 5 );
 
         return $uniqueString;
+    }
+}
+
+if ( !function_exists( 'getBranches' ) ) {
+    /**
+     * will return all branches
+     */
+    function getBranches() {
+        $branches = Branch::all();
+        return $branches;
     }
 }

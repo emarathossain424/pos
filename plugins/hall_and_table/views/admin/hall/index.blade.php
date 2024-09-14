@@ -2,6 +2,8 @@
 $languages = getAllLanguages();
 $default_lang = getGeneralSettingsValue('default_lang');
 $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
+
+$all_branches = getBranches();
 @endphp
 @extends('layouts.master')
 @section('title') {{translate('Halls')}} @endsection
@@ -66,7 +68,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
                                                 {{translate('Action')}}
                                             </button>
                                             <div class="dropdown-menu">
-                                                <a class="dropdown-item edit-hall" href="#" data-toggle="modal" data-target="#editHall" data-id="{{$hall->id}}" data-name="{{$hall->name}}" data-capacity="{{$hall->table_capacity}}" data-status="{{$hall->status}}">{{translate('Edit')}}</a>
+                                                <a class="dropdown-item edit-hall" href="#" data-toggle="modal" data-target="#editHall" data-id="{{$hall->id}}" data-name="{{$hall->name}}" data-capacity="{{$hall->table_capacity}}" data-status="{{$hall->status}}" data-branch="{{$hall->branch_id}}">{{translate('Edit')}}</a>
                                                 <a class="dropdown-item delete-hall" href="#" data-toggle="modal" data-target="#deleteHall" data-id="{{$hall->id}}">{{translate('Delete')}}</a>
                                             </div>
                                         </div>
@@ -84,6 +86,15 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
 
 <!-- create hall-->
 <x-dynamic-form-modal route="{{route('create.hall')}}" modal_type="modal-md" id="createHall" title="{{translate('Create Hall')}}" execute_btn_name="{{translate('Save')}}" execute_btn_class="btn-success">
+    <div class="form-group">
+        <label for="hall-branch">{{translate('Select Branch')}}  ( <a href="{{route('manage.branch')}}">{{translate("Create branch if you haven't already")}}</a> )</label>
+        <select class="form-control select2 w-100" name="branch" id="hall-branch">
+            <option value="">{{translate('Select Branch')}}</option>
+            @foreach($all_branches as $branch)
+                <option value="{{$branch->id}}">{{$branch->branch_name}}</option>
+            @endforeach
+        </select>
+    </div>
     <div class="form-group">
         <label for="hall-name">{{translate('Hall Name')}}</label>
         <input type="text" class="form-control" id="hall-name" placeholder="Enter hall name" name="hall_name">
@@ -113,6 +124,17 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
             @endforeach
         </select>
     </div>
+
+    <div class="form-group">
+        <label for="editable-hall-branch">{{translate('Select Branch')}} ( <a href="{{route('manage.branch')}}">{{translate("Create branch if you haven't already")}}</a> )</label>
+        <select class="form-control select2 w-100" name="branch" id="editable-hall-branch">
+            <option value="">{{translate('Select Branch')}}</option>
+            @foreach($all_branches as $branch)
+            <option value="{{$branch->id}}">{{$branch->branch_name}}</option>
+            @endforeach
+        </select>
+    </div>
+
     <div class="form-group">
         <label for="editable-hall-name">{{translate('Hall Name')}}</label>
         <input type="text" class="form-control" id="editable-hall-name" placeholder="Enter hall name" name="hall_name">
@@ -159,11 +181,15 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
             const name = $(this).data('name')
             const capacity = $(this).data('capacity')
             const status = $(this).data('status')
+            const branch = $(this).data('branch')
+
+            console.log( branch )
 
             $('#editable-hall-id').val(id)
             $('#editable-hall-name').val(name)
             $('#editable-table-capacity').val(capacity)
             $('#editable-hall-status').val(status)
+            $('#editable-hall-branch').val(branch)
 
             $('.lang-independent-area').removeClass('disabled-div')
             getHallTranslation()

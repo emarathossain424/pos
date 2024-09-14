@@ -2,6 +2,7 @@
 $all_categories = getFoodCategories();
 $placeholder = getPlaceholderImagePath();
 
+$all_branches = getBranches();
 @endphp
 @extends('layouts.master')
 @section('title') {{translate('Add Food Item')}} @endsection
@@ -30,6 +31,19 @@ $placeholder = getPlaceholderImagePath();
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="branch">{{translate('Select Branch')}}  ( <a href="{{route('manage.branch')}}">{{translate("Create branch if you haven't already")}}</a> )</label>
+                            <select class="form-control select2 w-100" name="branch" id="branch">
+                                <option value="">{{translate('Select Branch')}}</option>
+                                @foreach($all_branches as $branch)
+                                    <option value="{{$branch->id}}">{{$branch->branch_name}}</option>
+                                @endforeach
+                            </select>
+                            <div>
+                                <span class="text-danger" id="branch_error"></span>
+                            </div>
+                        </div>
+
                         <div class="form-group">
                             <label for="food-name">{{translate('Food Name')}} <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="food-name" name="food_name" placeholder="Enter food name">
@@ -335,7 +349,7 @@ $placeholder = getPlaceholderImagePath();
         });
     }
 
-    /** 
+    /**
      * Generate variant combinations
      */
     function generateCombinations(variants) {
@@ -471,6 +485,7 @@ $placeholder = getPlaceholderImagePath();
         'use strict';
         let data = {
             'name': $('#food-name').val(),
+            'branch': $('#branch').val(),
             'details': food_details_instance.getData(),
             'category': $('#category').val(),
             'image': $('#food-image-input').val(),

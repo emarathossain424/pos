@@ -4,6 +4,8 @@ $placeholder = getPlaceholderImagePath();
 $languages = getAllLanguages();
 $default_lang = getGeneralSettingsValue('default_lang');
 $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
+
+$all_branches = getBranches();
 @endphp
 @extends('layouts.master')
 @section('title') {{translate('Update Food Item')}} @endsection
@@ -44,6 +46,19 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
                                 <option value="{{$lang->id}}" {{ $lang->id == $translatedLang ? 'selected' : '' }}>{{$lang->name}}</option>
                                 @endforeach
                             </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="branch">{{translate('Select Branch')}}  ( <a href="{{route('manage.branch')}}">{{translate("Create branch if you haven't already")}}</a> )</label>
+                            <select class="form-control select2 w-100" name="branch" id="branch">
+                                <option value="">{{translate('Select Branch')}}</option>
+                                @foreach($all_branches as $branch)
+                                    <option value="{{$branch->id}}" {{$food_item['branch_id'] == $branch->id? 'selected':'' }}>{{$branch->branch_name}}</option>
+                                @endforeach
+                            </select>
+                            <div>
+                                <span class="text-danger" id="branch_error"></span>
+                            </div>
                         </div>
 
                         <div class="form-group">
@@ -232,6 +247,9 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
     let food_details_instance = null
     let meta_description_instance = null
 
+    const initial_food_type = $("#food-type").val();
+    let food_type = $("#food-type").val();
+
     separateSelectedVariantWithOptions()
 
     $(function() {
@@ -281,7 +299,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
 
         // Define the change event handler first
         $('#food-type').change(function() {
-            const food_type = $(this).val();
+            food_type = $(this).val();
             if (food_type == 'variant') {
                 $('.variant-selections').removeClass('d-none');
             } else {
@@ -295,11 +313,11 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
             const variant_id = $('#variant-id').val()
 
             //checking if structure is created for the first time while editing food item
-            if (is_structure_created) {
+            if (is_structure_created || initial_food_type!='variant') {
                 if (variant_id.length > 0) {
 
                     // Find  variant ids that do not exist in variant_id (selected variants) and then
-                    // remove the corresponding elements from the DOM 
+                    // remove the corresponding elements from the DOM
                     let removedVariantIds = selected_variant_with_options
                         .filter(v => !variant_id.includes(v.variant.id))
                         .map(v => v.variant.id);
@@ -343,7 +361,10 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
 
         // Trigger the change event
         $('#food-type').trigger('change');
-        $('#variant-id').trigger('change')
+
+        if (food_type == 'variant') {
+            $('#variant-id').trigger('change')
+        }
 
         let item_image = JSON.stringify([{
             'file_id': "{{$food_item['image']}}"
@@ -439,7 +460,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         });
     }
 
-    /** 
+    /**
      * Generate variant combinations
      */
     function generateCombinations(variants) {
@@ -487,7 +508,6 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         const existingComboKeys = new Set(variant_option_array.map(item => generateComboKey(item.combo)));
         const newCombinations = combinations.filter(item => !existingComboKeys.has(generateComboKey(item.combo)));
         variant_option_array = [...variant_option_array, ...newCombinations];
-
     }
 
     /**
@@ -496,7 +516,6 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
     function generateTableFromVariantCombinations() {
         'use strict';
         let data = variant_option_array;
-
         // Extract unique variant names
         const variantNames = new Set();
         data.forEach(item => {
@@ -543,7 +562,6 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
      */
     function separateSelectedVariantWithOptions() {
         'use strict';
-        console.log(variant_option_array)
         variant_option_array.forEach(v => {
             v.combo.forEach(c => {
                 const variantIndex = selected_variant_with_options.findIndex(v => v.variant.id == c.variant.id);
@@ -607,6 +625,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         let data = {
             'id': "{{$food_item['id']}}",
             'name': $('#food-name').val(),
+            'branch': $('#branch').val(),
             'translate_into': $('#translateInto').val(),
             'details': food_details_instance.getData(),
             'category': $('#category').val(),
