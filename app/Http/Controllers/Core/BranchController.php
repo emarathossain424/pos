@@ -133,6 +133,7 @@ class BranchController extends Controller {
         ] );
 
         try {
+            Branch::where( 'is_default', 1 )->update( ['is_default' => 0] );
             $branch             = Branch::find( $request->id );
             $branch->is_default = $branch->is_default == 1 ? 0 : 1;
             $branch->update();
