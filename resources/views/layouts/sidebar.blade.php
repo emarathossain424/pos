@@ -85,6 +85,16 @@
           <ul class="nav nav-treeview">
               <li class="nav-item">
                   @php
+                      $active_menu_list = ['general.settings'];
+                      $is_active = in_array(Route::currentRouteName(), $active_menu_list);
+                  @endphp
+                  <a href="{{route('general.settings')}}" class="nav-link {{$is_active? 'active':'' }}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>{{translate('General Settings')}}</p>
+                  </a>
+              </li>
+              <li class="nav-item">
+                  @php
                       $active_menu_list = ['manage.branch','create.branch','update.branch','delete.branch'];
                       $is_active = in_array(Route::currentRouteName(), $active_menu_list);
                   @endphp

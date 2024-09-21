@@ -222,5 +222,16 @@
     "Translated branch name": "Translated branch name",
     "Translated hall name": "Translated hall name",
     "Select Branch": "Select Branch",
-    "Create branch if you haven't already": "Create branch if you haven't already"
+    "Create branch if you haven't already": "Create branch if you haven't already",
+    "General Settings": "General Settings",
+    "Manage Currencies": "Manage Currencies",
+    "Default Currency": "Default Currency",
+    "Currency Position": "Currency Position",
+    "Left": "Left",
+    "Right": "Right",
+    "Thousands Separator": "Thousands Separator",
+    "Decimal Separator": "Decimal Separator",
+    "Decimal Position": "Decimal Position",
+    "Default Language": "Default Language",
+    "Placeholder Image": "Placeholder Image"
 }

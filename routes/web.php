@@ -4,6 +4,7 @@ use App\Http\Controllers\Core\BranchController;
 use App\Http\Controllers\Core\LanguageController;
 use App\Http\Controllers\Core\MediaController;
 use App\Http\Controllers\Core\PluginController;
+use App\Http\Controllers\Core\SettingsController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +50,8 @@ Route::prefix( getAdminPrefix() )->middleware( 'auth' )->group( function () {
     Route::post( '/update-default-status', [BranchController::class, 'updateDefaultStatus'] )->name( 'update.branch.default.status' );
     Route::post( '/delete-branch', [BranchController::class, 'deleteBranch'] )->name( 'delete.branch' );
     Route::get( '/get-branch-translation', [BranchController::class, 'getBranchTranslation'] )->name( 'get.branch.translation' );
+
+    Route::get( '/general-settings', [SettingsController::class, 'generalSettings'] )->name( 'general.settings' );
 } );
 
 Auth::routes();

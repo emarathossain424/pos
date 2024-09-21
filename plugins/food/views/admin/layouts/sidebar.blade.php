@@ -1,5 +1,5 @@
 @php
-    $active_menu_list = ['categories','add.category','edit.category','variations','properties','food.items'];
+    $active_menu_list = ['categories','add.category','edit.category','variations','properties','food.items','add.food.items','edit.food.item'];
     $is_active = in_array(Route::currentRouteName(), $active_menu_list);
 @endphp
 <li class="nav-item {{$is_active? 'menu-open':'' }}">

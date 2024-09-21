@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Branch;
+use App\Models\Currency;
 use App\Models\Language;
 use App\Models\Upload;
 use Illuminate\Support\Facades\DB;
@@ -118,5 +119,15 @@ if ( !function_exists( 'getBranches' ) ) {
     function getBranches() {
         $branches = Branch::all();
         return $branches;
+    }
+}
+
+if ( !function_exists( 'getAllCurrencies' ) ) {
+    /**
+     * will return currency list
+     */
+    function getAllCurrencies() {
+        $currencies = Currency::all();
+        return $currencies;
     }
 }
