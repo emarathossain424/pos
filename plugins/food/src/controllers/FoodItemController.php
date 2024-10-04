@@ -7,6 +7,7 @@ use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Plugin\Food\Models\FoodItem;
+use Plugin\Food\Models\FoodItemBranches;
 use Plugin\Food\Models\FoodItemVariant;
 use Plugin\Food\Models\FoodItemVariantOption;
 use Plugin\Food\Models\FoodVariant;
@@ -33,7 +34,6 @@ class FoodItemController extends Controller {
         $food_items = FoodItem::with( 'foodItemVariant', 'foodCategory' )
             ->where( $match_case )
             ->get();
-
         return view( 'food::admin.foods.index', compact( 'food_items' ) );
     }
 
@@ -65,7 +65,6 @@ class FoodItemController extends Controller {
         try {
             DB::beginTransaction();
             $food_item                   = new FoodItem();
-            $food_item->branch_id        = $request['branch'];
             $food_item->name             = $request['name'];
             $food_item->category         = $request['category'];
             $food_item->details          = $request['details'];
@@ -83,6 +82,8 @@ class FoodItemController extends Controller {
                 $this->storeFoodItemVariantOptions( $request['variant_combo'], $food_item->id );
             }
 
+            $this->storeBranchForEachFoodItem( $request['branch'], $food_item );
+
             DB::commit();
             return response()->json( [
                 'success' => 1,
@@ -95,6 +96,26 @@ class FoodItemController extends Controller {
                 'message' => translate( 'Unable to store food item' ),
             ], 500 );
         }
+    }
+
+    /**
+     * Stores branches for each food item
+     *
+     * @param array $branches List of branch IDs
+     * @param FoodItem $food_item The food item object
+     * @return void
+     */
+    public function storeBranchForEachFoodItem( $branches, $food_item ) {
+        $data = [];
+        foreach ( $branches as $branch ) {
+            $data[] = [
+                'branch_id'    => $branch,
+                'food_item_id' => $food_item->id,
+            ];
+        }
+
+        FoodItemBranches::where( 'food_item_id', $food_item->id )->delete();
+        FoodItemBranches::insert( $data );
     }
 
     /**
@@ -271,8 +292,9 @@ class FoodItemController extends Controller {
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View The view for editing the food item.
      */
     public function editFoodItems( $id ) {
-        $variants  = FoodVariant::with( 'options' )->get();
-        $food_item = FoodItem::find( $id );
+        $variants           = FoodVariant::with( 'options' )->get();
+        $food_item          = FoodItem::find( $id );
+        $food_item_branches = $food_item->branches->pluck( 'id' )->toArray();
 
         $default_lang = getGeneralSettingsValue( 'default_lang' );
         if ( isset( request()->lang ) && ( request()->lang != $default_lang ) ) {
@@ -328,7 +350,7 @@ class FoodItemController extends Controller {
         // dd($variant_option_array, $variant_ids, $variant_option_ids,$variants,$food_item);
         // dd($variant_option_array);
 
-        return view( 'food::admin.foods.edit', compact( 'variants', 'food_item', 'variant_ids', 'variant_option_ids', 'variant_option_array' ) );
+        return view( 'food::admin.foods.edit', compact( 'variants', 'food_item', 'variant_ids', 'variant_option_ids', 'variant_option_array', 'food_item_branches' ) );
     }
 
     /**

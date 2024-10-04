@@ -33,8 +33,7 @@ $all_branches = getBranches();
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="branch">{{translate('Select Branch')}}  ( <a href="{{route('manage.branch')}}">{{translate("Create branch if you haven't already")}}</a> )</label>
-                            <select class="form-control select2 w-100" name="branch" id="branch">
-                                <option value="">{{translate('Select Branch')}}</option>
+                            <select class="form-control select2 w-100" name="branch" id="branch" multiple>
                                 @foreach($all_branches as $branch)
                                     <option value="{{$branch->id}}">{{$branch->branch_name}}</option>
                                 @endforeach
@@ -218,6 +217,11 @@ $all_branches = getBranches();
         })
         // Initialize Select2 for variant list
         $('#variant-id').select2({
+            theme: 'bootstrap4',
+            width: '100%'
+        })
+        // Initialize Select2 for variant list
+        $('#branch').select2({
             theme: 'bootstrap4',
             width: '100%'
         })
