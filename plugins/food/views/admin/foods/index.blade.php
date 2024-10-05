@@ -1,5 +1,6 @@
 @php
 $all_categories = getFoodCategories();
+$all_branches = getBranches();
 @endphp
 @extends('layouts.master')
 @section('title') {{translate('Food items')}} @endsection
@@ -40,6 +41,16 @@ $all_categories = getFoodCategories();
                     <div class="card-body">
                         <form action="{{route('food.items')}}" method="get">
                             <div class="row d-flex justify-content-center">
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <select class="form-control select2 w-100" name="branch" id="branch">
+                                            <option value="">{{translate('Select Branch')}}</option>
+                                            @foreach($all_branches as $branch)
+                                            <option value="{{$branch->id}}" {{ request()->get('branch') == $branch->id ? 'selected' : '' }}>{{$branch->branch_name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
                                         <select class="form-control select2 w-100" name="category" id="category">

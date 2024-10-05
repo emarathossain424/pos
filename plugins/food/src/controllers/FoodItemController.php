@@ -21,6 +21,7 @@ class FoodItemController extends Controller {
      */
     public function foodItems( Request $request ) {
         $match_case = [];
+
         if ( !empty( $request->input( 'category' ) ) ) {
             $match_case[] = ['category', $request->input( 'category' )];
         }
@@ -32,8 +33,20 @@ class FoodItemController extends Controller {
         }
 
         $food_items = FoodItem::with( 'foodItemVariant', 'foodCategory' )
-            ->where( $match_case )
-            ->get();
+            ->where( $match_case );
+
+        // Check if branch is provided
+        if ( !empty( $request->input( 'branch' ) ) ) {
+            $branch_id = $request->input( 'branch' );
+
+            // Filter by branch_id using whereHas to query the related branches
+            $food_items = $food_items->whereHas( 'branches', function ( $query ) use ( $branch_id ) {
+                $query->where( 'core_branches.id', $branch_id );
+            } );
+        }
+
+        $food_items = $food_items->get();
+
         return view( 'food::admin.foods.index', compact( 'food_items' ) );
     }
 
