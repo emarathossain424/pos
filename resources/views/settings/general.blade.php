@@ -1,10 +1,11 @@
 @php
-    $currencies = getAllCurrencies();
     $settings = request()->query('settings', 'manage_currency');
 @endphp
 @extends('layouts.master')
 @section('title') {{translate('General Settings')}} @endsection
 @push('css')
+<link rel="stylesheet" href="{{asset('pos/plugins/select2/css/select2.min.css')}}">
+<link rel="stylesheet" href="{{asset('pos/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
 @endpush
 @section('breadcrumb')
 <ol class="breadcrumb float-sm-right">
@@ -45,11 +46,34 @@
           @if($settings == 'manage_currency')
            @include('settings.partial.manage_currency')
           @endif
+          @if($settings == 'default_language')
+           @include('settings.partial.default_language')
+          @endif
+          @if($settings == 'placeholder')
+           @include('settings.partial.placeholder')
+          @endif
         </div>
       </div>
     </section>
 @endsection
 
 @push('script')
+<script src="{{asset('pos/plugins/select2/js/select2.full.min.js')}}"></script>
+<script>
+    $(function() {
+        'use strict'
 
+        $('#defaultLanguage').select2({
+            theme: 'bootstrap4'
+        })
+
+        $('#defaultCurrency').select2({
+            theme: 'bootstrap4'
+        })
+
+        $('#currencyPosition').select2({
+            theme: 'bootstrap4'
+        })
+    });
+</script>
 @endpush

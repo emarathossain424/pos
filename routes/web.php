@@ -52,6 +52,10 @@ Route::prefix( getAdminPrefix() )->middleware( 'auth' )->group( function () {
     Route::get( '/get-branch-translation', [BranchController::class, 'getBranchTranslation'] )->name( 'get.branch.translation' );
 
     Route::get( '/general-settings', [SettingsController::class, 'generalSettings'] )->name( 'general.settings' );
+
+    Route::post( '/manage-currency', [SettingsController::class, 'manageCurrency'] )->name( 'manage.currency' );
+    Route::post( '/set-default-language', [SettingsController::class, 'setDefaultLanguage'] )->name( 'set.default.language' );
+    Route::post( '/set-placeholder-image', [SettingsController::class, 'setPlaceholderImage'] )->name( 'set.placeholder.image' );
 } );
 
 Auth::routes();
