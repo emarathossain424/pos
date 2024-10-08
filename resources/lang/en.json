@@ -233,5 +233,10 @@
     "Decimal Separator": "Decimal Separator",
     "Decimal Position": "Decimal Position",
     "Default Language": "Default Language",
-    "Placeholder Image": "Placeholder Image"
+    "Placeholder Image": "Placeholder Image",
+    "Manage Taxes": "Manage Taxes",
+    "Taxes": "Taxes",
+    "Tax Rate": "Tax Rate",
+    "Tax Name": "Tax Name",
+    "Create Tax": "Create Tax"
 }

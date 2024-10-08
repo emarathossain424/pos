@@ -5,6 +5,7 @@ use App\Http\Controllers\Core\LanguageController;
 use App\Http\Controllers\Core\MediaController;
 use App\Http\Controllers\Core\PluginController;
 use App\Http\Controllers\Core\SettingsController;
+use App\Http\Controllers\Core\TaxController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -51,11 +52,14 @@ Route::prefix( getAdminPrefix() )->middleware( 'auth' )->group( function () {
     Route::post( '/delete-branch', [BranchController::class, 'deleteBranch'] )->name( 'delete.branch' );
     Route::get( '/get-branch-translation', [BranchController::class, 'getBranchTranslation'] )->name( 'get.branch.translation' );
 
+    //General Settings
     Route::get( '/general-settings', [SettingsController::class, 'generalSettings'] )->name( 'general.settings' );
-
     Route::post( '/manage-currency', [SettingsController::class, 'manageCurrency'] )->name( 'manage.currency' );
     Route::post( '/set-default-language', [SettingsController::class, 'setDefaultLanguage'] )->name( 'set.default.language' );
     Route::post( '/set-placeholder-image', [SettingsController::class, 'setPlaceholderImage'] )->name( 'set.placeholder.image' );
+
+    //Manage Taxes
+    Route::get( '/manage-taxes', [TaxController::class, 'allTaxes'] )->name( 'manage.taxes' );
 } );
 
 Auth::routes();
