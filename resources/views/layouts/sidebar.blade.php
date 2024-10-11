@@ -71,7 +71,7 @@
         @endforeach
 
         @php
-          $active_menu_list = ['manage.branch','general.settings'];
+          $active_menu_list = ['manage.branch','general.settings','manage.taxes'];
           $is_active = in_array(Route::currentRouteName(), $active_menu_list);
         @endphp
         <li class="nav-item {{$is_active? 'menu-open':'' }}">

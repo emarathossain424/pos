@@ -36,7 +36,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>{{translate('Name')}}</th>
-                                    <th>{{translate('Tax Rate')}}</th>
+                                    <th>{{translate('Tax Rate (%)')}}</th>
                                     <th>{{translate('Status')}}</th>
                                     <th>{{translate('Action')}}</th>
                                 </tr>
@@ -74,13 +74,13 @@
 </div>
 
 <!-- create tax-->
-<x-dynamic-form-modal route="{{route('create.branch')}}" modal_type="modal-md" id="createTax" title="{{translate('Create Tax')}}" execute_btn_name="{{translate('Save')}}" execute_btn_class="btn-success">
+<x-dynamic-form-modal route="{{route('create.tax')}}" modal_type="modal-md" id="createTax" title="{{translate('Create Tax')}}" execute_btn_name="{{translate('Save')}}" execute_btn_class="btn-success">
     <div class="form-group">
         <label for="tax-name">{{translate('Tax Name')}}</label>
         <input type="text" class="form-control" id="tax-name" placeholder="Enter tax name" name="tax_name">
     </div>
     <div class="form-group">
-        <label for="tax-rate">{{translate('Tax Rate')}}</label>
+        <label for="tax-rate">{{translate('Tax Rate (%) ')}}</label>
         <input type="number" class="form-control" id="tax-rate" placeholder="Enter tax rate" name="tax_rate">
     </div>
     <div class="form-group">
@@ -93,37 +93,33 @@
 </x-dynamic-form-modal>
 <!-- /create tax-->
 
-<!-- edit branch-->
-<!-- <x-dynamic-form-modal route="{{route('update.branch')}}" modal_type="modal-md" id="editBranch" title="{{translate('Update Branch')}}" execute_btn_name="{{translate('Update')}}" execute_btn_class="btn-success">
-    <input type="hidden" name="id" id="editable-branch-id" value="">
+<!-- edit tax-->
+<x-dynamic-form-modal route="{{route('update.tax')}}" modal_type="modal-md" id="editTax" title="{{translate('Update Tax')}}" execute_btn_name="{{translate('Update')}}" execute_btn_class="btn-success">
+    <input type="hidden" name="id" id="editable-tax-id" value="">
     <div class="form-group">
-        <label for="editable-branch-name">{{translate('Branch Name')}}</label>
-        <input type="text" class="form-control" id="editable-branch-name" placeholder="Enter branch name" name="branch_name">
-    </div>
-    <div class="form-group lang-independent-area">
-        <label for="editable-mobile">{{translate('Mobile Number')}}</label>
-        <input type="text" class="form-control" id="editable-mobile" placeholder="Enter mobile number" name="mobile">
+        <label for="editable-tax-name">{{translate('Tax Name')}}</label>
+        <input type="text" class="form-control" id="editable-tax-name" placeholder="Enter tax name" name="tax_name">
     </div>
     <div class="form-group">
-        <label for="editable-address">{{translate('Address')}}</label>
-        <textarea name="address" id="editable-address" class="form-control" placeholder="Enter branch address"></textarea>
+        <label for="editable-tax-rate">{{translate('Tax Rate (%) ')}}</label>
+        <input type="number" class="form-control" id="editable-tax-rate" placeholder="Enter tax rate" name="tax_rate">
     </div>
     <div class="form-group lang-independent-area">
-        <label for="editable-branch-status">{{translate('Status')}}</label>
-        <select class="form-control select2 w-100" name="status" id="editable-branch-status">
+        <label for="editable-tax-status">{{translate('Status')}}</label>
+        <select class="form-control select2 w-100" name="status" id="editable-tax-status">
             <option value="1">{{translate('Active')}}</option>
             <option value="0">{{translate('In active')}}</option>
         </select>
     </div>
-</x-dynamic-form-modal> -->
-<!-- /edit branch-->
+</x-dynamic-form-modal>
+<!-- /edit tax-->
 
-<!-- delete branch-->
-<!-- <x-dynamic-form-modal route="{{route('delete.branch')}}" modal_type="modal-sm" id="deleteBranch" title="{{translate('Delete Branch')}}" execute_btn_name="{{translate('Delete')}}" execute_btn_class="btn-danger">
+<!-- delete tax-->
+<x-dynamic-form-modal route="{{route('delete.tax')}}" modal_type="modal-sm" id="deleteTax" title="{{translate('Delete Tax')}}" execute_btn_name="{{translate('Delete')}}" execute_btn_class="btn-danger">
     <input type="hidden" name="id" id="delete-id">
-    <span>{{translate('Are you sure, you want to delete this branch?')}}</span>
-</x-dynamic-form-modal> -->
-<!-- /delete branch-->
+    <span>{{translate('Are you sure, you want to delete this tax?')}}</span>
+</x-dynamic-form-modal>
+<!-- /delete tax-->
 
 @endsection
 
@@ -153,7 +149,7 @@
 
         $('.delete-tax').click(function() {
             const id = $(this).data('id')
-            $('#tax-id').val(id)
+            $('#delete-id').val(id)
         })
     });
 </script>

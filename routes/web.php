@@ -60,6 +60,9 @@ Route::prefix( getAdminPrefix() )->middleware( 'auth' )->group( function () {
 
     //Manage Taxes
     Route::get( '/manage-taxes', [TaxController::class, 'allTaxes'] )->name( 'manage.taxes' );
+    Route::post( '/create-tax', [TaxController::class, 'createTax'] )->name( 'create.tax' );
+    Route::post( '/update-tax', [TaxController::class, 'updateTax'] )->name( 'update.tax' );
+    Route::post( '/delete-tax', [TaxController::class, 'deleteTax'] )->name( 'delete.tax' );
 } );
 
 Auth::routes();

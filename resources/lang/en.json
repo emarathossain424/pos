@@ -238,5 +238,10 @@
     "Taxes": "Taxes",
     "Tax Rate": "Tax Rate",
     "Tax Name": "Tax Name",
-    "Create Tax": "Create Tax"
+    "Create Tax": "Create Tax",
+    "Tax Rate (%) ": "Tax Rate (%) ",
+    "Tax Rate (%)": "Tax Rate (%)",
+    "Update Tax": "Update Tax",
+    "Delete Tax": "Delete Tax",
+    "Are you sure, you want to delete this tax?": "Are you sure, you want to delete this tax?"
 }
