@@ -361,7 +361,7 @@ class FoodItemController extends Controller {
         }
 
         // dd($variant_option_array, $variant_ids, $variant_option_ids,$variants,$food_item);
-        // dd($variant_option_array);
+        // dd( $variant_option_array );
 
         return view( 'food::admin.foods.edit', compact( 'variants', 'food_item', 'variant_ids', 'variant_option_ids', 'variant_option_array', 'food_item_branches' ) );
     }

@@ -1,5 +1,5 @@
 @php
-    $test = 4;  
+    $test = 4;
 @endphp
 <!DOCTYPE html>
 <!--
@@ -11,8 +11,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 <body class="hold-transition sidebar-mini accent-pink">
     <div class="wrapper">
-
-        @includeIf('layouts.nav')
+        @if( Route::currentRouteName() != 'pos')
+            @includeIf('layouts.nav')
+        @endif
         @includeIf('layouts.sidebar')
 
         <!-- Content Wrapper. Contains page content -->

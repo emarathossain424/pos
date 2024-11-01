@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Core\PluginController;
+use Plugin\Pos\Controllers\PosController;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,9 +12,6 @@ use App\Http\Controllers\Core\PluginController;
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "web" middleware group. Make something great!
 |
-*/
+ */
 
-Route::get('/', function () {
-    // dd('web.php');
-});
-
+Route::get( '/pos', [PosController::class, 'index'] )->name( 'pos' );
