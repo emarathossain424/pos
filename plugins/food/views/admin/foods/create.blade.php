@@ -1,6 +1,7 @@
 @php
 $all_categories = getFoodCategories();
 $placeholder = getPlaceholderImagePath();
+$properties = getFoodProperties();
 
 $all_branches = getBranches();
 @endphp
@@ -70,6 +71,20 @@ $all_branches = getBranches();
                             <div>
                                 <span class="text-danger" id="details_error"></span>
                             </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="properties">{{translate('Select Properties')}}</label>
+                            <select class="form-control select2 w-100" name="properties" id="properties" multiple>
+                                <option value="">{{translate('Select Properties')}}</option>
+                                @foreach($properties as $property)
+                                <option value="{{$property->id}}">{{$property->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div id="property-items">
+
                         </div>
 
                         <div class="form-group">
@@ -210,6 +225,11 @@ $all_branches = getBranches();
             theme: 'bootstrap4',
             width: '100%'
         })
+        // Initialize Select2 for properties
+        $('#properties').select2({
+            theme: 'bootstrap4',
+            width: '100%'
+        })
         // Initialize Select2 for food type
         $('#food-type').select2({
             theme: 'bootstrap4',
@@ -270,6 +290,32 @@ $all_branches = getBranches();
 
             generateCombinations(selected_variant_with_options);
             generateTableFromVariantCombinations()
+        })
+
+        $('#properties').change(() => {
+            const properties = $('#properties').val()
+            console.log(properties)
+            let data = {
+                'properties': properties,
+                '_token': '{{ csrf_token() }}'
+            }
+
+            $.ajax({
+                url: '{{ route("get.property.items") }}', // Your endpoint URL
+                type: 'GET',
+                data: data,
+                success: function(response) {
+                    console.log(response)
+                    $('#property-items').html(response)
+
+                    $('select.property_items').select2({
+                        theme: 'bootstrap4',
+                    })
+                },
+                error: function(xhr) {
+                    console.log('Unable to get property items');
+                }
+            });
         })
 
         ClassicEditor
