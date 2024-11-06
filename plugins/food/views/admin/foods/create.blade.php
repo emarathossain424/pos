@@ -294,7 +294,6 @@ $all_branches = getBranches();
 
         $('#properties').change(() => {
             const properties = $('#properties').val()
-            console.log(properties)
             let data = {
                 'properties': properties,
                 '_token': '{{ csrf_token() }}'
@@ -533,6 +532,19 @@ $all_branches = getBranches();
      */
     function storeFoodItems() {
         'use strict';
+
+        let selected_properties = [];
+
+        $('.property_items').each(function() {
+            // Get the selected options for this specific property
+            let selectedValues = $(this).val();
+            let propertyId = $(this).attr('name').match(/\d+/)[0]; // Extract property ID from the name attribute
+
+            selected_properties[ 'property_' + propertyId + '' ] = selectedValues;
+        });
+
+        console.log(selected_properties);
+
         let data = {
             'name': $('#food-name').val(),
             'branch': $('#branch').val(),
@@ -547,8 +559,12 @@ $all_branches = getBranches();
             'meta_description': meta_description_instance.getData(),
             'meta_image': $('#meta-image-input').val(),
             'variant_combo': variant_option_array,
+            'properties': {...selected_properties},
             '_token': '{{ csrf_token() }}'
         }
+
+        console.log(data);
+
 
         $.ajax({
             url: '{{ route("store.food.items") }}', // Your endpoint URL

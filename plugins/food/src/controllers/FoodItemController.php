@@ -95,6 +95,10 @@ class FoodItemController extends Controller {
                 $this->storeFoodItemVariantOptions( $request['variant_combo'], $food_item->id );
             }
 
+            if ( !empty( $request['properties'] ) ) {
+                $this->storeFoodItemProperties( $request['properties'], $food_item->id );
+            }
+
             $this->storeBranchForEachFoodItem( $request['branch'], $food_item );
 
             DB::commit();
@@ -294,6 +298,18 @@ class FoodItemController extends Controller {
                 $food_item_variant_option->variant_id           = $combo['variant']['id'];
                 $food_item_variant_option->option_id            = $combo['options']['id'];
                 $food_item_variant_option->saveOrFail();
+            }
+        }
+    }
+
+    public function storeFoodItemProperties( $properties, $food_item_id ) {
+        foreach ( $properties as $property => $items ) {
+            foreach ( $items as $item ) {
+                $food_item_property               = new FoodItemProperty();
+                $food_item_property->food_item_id = $food_item_id;
+                $food_item_property->property_id  = str_replace( 'property_', '', $property );
+                $food_item_property->item_id      = $item;
+                $food_item_property->saveOrFail();
             }
         }
     }
