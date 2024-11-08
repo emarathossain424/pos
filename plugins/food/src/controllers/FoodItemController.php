@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Plugin\Food\Models\FoodItem;
 use Plugin\Food\Models\FoodItemBranches;
+use Plugin\Food\Models\FoodItemProperty;
 use Plugin\Food\Models\FoodItemVariant;
 use Plugin\Food\Models\FoodItemVariantOption;
 use Plugin\Food\Models\FoodVariant;
@@ -183,7 +184,6 @@ class FoodItemController extends Controller {
             $translate_into = $request['translate_into'];
             if ( $translate_into == $default_lang ) {
                 $food_item                   = FoodItem::find( $request['id'] );
-                $food_item->branch_id        = $request['branch'];
                 $food_item->name             = $request['name'];
                 $food_item->category         = $request['category'];
                 $food_item->details          = $request['details'];
@@ -202,6 +202,13 @@ class FoodItemController extends Controller {
                 } else {
                     FoodItemVariant::where( 'item_id', $food_item->id )->delete();
                 }
+
+                if ( !empty( $request['properties'] ) ) {
+                    $this->storeFoodItemProperties( $request['properties'], $food_item->id );
+                }
+
+                $this->storeBranchForEachFoodItem( $request['branch'], $food_item );
+
             } else {
                 $this->setFoodItemTranslation( $request );
             }
@@ -302,13 +309,23 @@ class FoodItemController extends Controller {
         }
     }
 
+    /**
+     * Stores food item properties associated with a given food item ID.
+     *
+     * @param array $properties An associative array where keys are property IDs and values are arrays of item IDs.
+     * @param int $food_item_id The ID of the food item to associate with the properties.
+     * @throws \Illuminate\Database\Eloquent\MassAssignmentException If mass assignment is not allowed for the model.
+     * @throws \Illuminate\Database\QueryException If there is a database error while saving the model.
+     * @return void
+     */
     public function storeFoodItemProperties( $properties, $food_item_id ) {
+        FoodItemProperty::where( 'food_item_id', $food_item_id )->delete();
         foreach ( $properties as $property => $items ) {
             foreach ( $items as $item ) {
-                $food_item_property               = new FoodItemProperty();
-                $food_item_property->food_item_id = $food_item_id;
-                $food_item_property->property_id  = str_replace( 'property_', '', $property );
-                $food_item_property->item_id      = $item;
+                $food_item_property                   = new FoodItemProperty();
+                $food_item_property->food_item_id     = $food_item_id;
+                $food_item_property->property_id      = str_replace( 'property_', '', $property );
+                $food_item_property->property_item_id = $item;
                 $food_item_property->saveOrFail();
             }
         }
@@ -321,9 +338,17 @@ class FoodItemController extends Controller {
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View The view for editing the food item.
      */
     public function editFoodItems( $id ) {
-        $variants           = FoodVariant::with( 'options' )->get();
-        $food_item          = FoodItem::find( $id );
-        $food_item_branches = $food_item->branches->pluck( 'id' )->toArray();
+        $variants             = FoodVariant::with( 'options' )->get();
+        $food_item            = FoodItem::find( $id );
+        $food_item_branches   = $food_item->branches->pluck( 'id' )->toArray();
+        $food_item_properties = FoodItemProperty::where( 'food_item_id', $id )->get();
+        $property_ids         = [];
+        $property_item_ids    = [];
+
+        foreach ( $food_item_properties as $property ) {
+            $property_ids[]      = $property->property_id;
+            $property_item_ids[] = $property->property_item_id;
+        }
 
         $default_lang = getGeneralSettingsValue( 'default_lang' );
         if ( isset( request()->lang ) && ( request()->lang != $default_lang ) ) {
@@ -379,7 +404,7 @@ class FoodItemController extends Controller {
         // dd($variant_option_array, $variant_ids, $variant_option_ids,$variants,$food_item);
         // dd( $variant_option_array );
 
-        return view( 'food::admin.foods.edit', compact( 'variants', 'food_item', 'variant_ids', 'variant_option_ids', 'variant_option_array', 'food_item_branches' ) );
+        return view( 'food::admin.foods.edit', compact( 'variants', 'food_item', 'variant_ids', 'variant_option_ids', 'variant_option_array', 'food_item_branches', 'property_ids', 'property_item_ids' ) );
     }
 
     /**

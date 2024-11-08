@@ -308,12 +308,22 @@ class PropertyController extends Controller {
         }
     }
 
+    /**
+     * Retrieves a list of food property items based on the provided request data.
+     *
+     * @param Request $request The HTTP request object containing the selected property items and properties.
+     *                        The request should have the following parameters:
+     *                        - selected_property_items: An array of IDs of the selected property items.
+     *                        - properties: An array of IDs of the food property groups associated with the selected property items.
+     * @return \Illuminate\Http\Response The rendered view containing the list of food property items.
+     */
     public function getPropertyItems( Request $request ) {
-        $property_ids   = $request['properties'];
-        $properties = FoodPropertyGroups::whereIn( 'id', $property_ids )
+        $property_item_ids = $request['selected_property_items'] ?? [];
+        $property_ids      = $request['properties'];
+        $properties        = FoodPropertyGroups::whereIn( 'id', $property_ids )
             ->with( 'items' )
             ->get();
 
-        return view( 'food::admin.foods.partial.property_items', compact( 'properties' ) );
+        return view( 'food::admin.foods.partial.property_items', compact( 'properties', 'property_item_ids' ) );
     }
 }

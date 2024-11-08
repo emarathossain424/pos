@@ -543,8 +543,6 @@ $all_branches = getBranches();
             selected_properties[ 'property_' + propertyId + '' ] = selectedValues;
         });
 
-        console.log(selected_properties);
-
         let data = {
             'name': $('#food-name').val(),
             'branch': $('#branch').val(),
@@ -562,9 +560,6 @@ $all_branches = getBranches();
             'properties': {...selected_properties},
             '_token': '{{ csrf_token() }}'
         }
-
-        console.log(data);
-
 
         $.ajax({
             url: '{{ route("store.food.items") }}', // Your endpoint URL

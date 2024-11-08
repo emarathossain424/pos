@@ -4,6 +4,8 @@ $placeholder = getPlaceholderImagePath();
 $languages = getAllLanguages();
 $default_lang = getGeneralSettingsValue('default_lang');
 $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
+$properties = getFoodProperties();
+
 
 $all_branches = getBranches();
 @endphp
@@ -117,6 +119,20 @@ $all_branches = getBranches();
                             <div>
                                 <span class="text-danger" id="image_error"></span>
                             </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="properties">{{translate('Select Properties')}}</label>
+                            <select class="form-control select2 w-100" name="properties" id="properties" multiple>
+                                <option value="">{{translate('Select Properties')}}</option>
+                                @foreach($properties as $property)
+                                <option value="{{$property->id}}" {{in_array($property->id, $property_ids) ? 'selected' : ''}}>{{$property->name}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div id="property-items">
+
                         </div>
 
                         <div class="form-group lang-independent-area">
@@ -291,6 +307,13 @@ $all_branches = getBranches();
             theme: 'bootstrap4',
             width: '100%'
         })
+
+        // Initialize Select2 for properties
+        $('#properties').select2({
+            theme: 'bootstrap4',
+            width: '100%'
+        })
+
         // Initialize Select2 for food type
         $('#food-type').select2({
             theme: 'bootstrap4',
@@ -380,6 +403,34 @@ $all_branches = getBranches();
             'file_id': "{{$food_item['meta_image']}}"
         }])
         $('#meta-image-input').data('filedetails', meta_image)
+
+        $('#properties').change(() => {
+            const properties = $('#properties').val()
+            let data = {
+                'properties': properties,
+                'selected_property_items':<?php echo json_encode( $property_item_ids ); ?>,
+                '_token': '{{ csrf_token() }}'
+            }
+
+            $.ajax({
+                url: '{{ route("get.property.items") }}', // Your endpoint URL
+                type: 'GET',
+                data: data,
+                success: function(response) {
+                    console.log(response)
+                    $('#property-items').html(response)
+
+                    $('select.property_items').select2({
+                        theme: 'bootstrap4',
+                    })
+                },
+                error: function(xhr) {
+                    console.log('Unable to get property items');
+                }
+            });
+        })
+
+        $('#properties').trigger('change')
 
         ClassicEditor
             .create(document.querySelector('#food-details'))
@@ -627,6 +678,17 @@ $all_branches = getBranches();
      */
     function updateFoodItems() {
         'use strict';
+
+        let selected_properties = [];
+
+        $('.property_items').each(function() {
+            // Get the selected options for this specific property
+            let selectedValues = $(this).val();
+            let propertyId = $(this).attr('name').match(/\d+/)[0]; // Extract property ID from the name attribute
+
+            selected_properties[ 'property_' + propertyId + '' ] = selectedValues;
+        });
+
         let data = {
             'id': "{{$food_item['id']}}",
             'name': $('#food-name').val(),
@@ -643,6 +705,7 @@ $all_branches = getBranches();
             'meta_description': meta_description_instance.getData(),
             'meta_image': $('#meta-image-input').val(),
             'variant_combo': variant_option_array,
+            'properties': {...selected_properties},
             '_token': '{{ csrf_token() }}'
         }
 
