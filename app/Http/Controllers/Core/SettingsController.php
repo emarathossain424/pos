@@ -7,24 +7,26 @@ use App\Models\GeneralSettings;
 use Brian2694\Toastr\Facades\Toastr;
 use Illuminate\Http\Request;
 
-class SettingsController extends Controller {
+class SettingsController extends Controller
+{
 
     /**
      * Displays the general settings view.
      *
      * @return \Illuminate\Http\Response
      */
-    public function generalSettings( Request $request ) {
+    public function generalSettings(Request $request)
+    {
         $data             = [];
         $general_settings = GeneralSettings::all();
 
-        foreach ( $general_settings as $general_setting ) {
+        foreach ($general_settings as $general_setting) {
             $key_name        = $general_setting->key_name;
             $key_value       = $general_setting->key_value;
             $data[$key_name] = $key_value;
         }
 
-        return view( 'settings.general', compact( 'data' ) );
+        return view('settings.general', compact('data'));
     }
 
     /**
@@ -33,14 +35,15 @@ class SettingsController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function manageCurrency( Request $request ) {
-        $request->validate( [
+    public function manageCurrency(Request $request)
+    {
+        $request->validate([
             'default_currency'    => 'required',
             'currency_position'   => 'required',
             'thousands_separator' => 'required',
             'decimal_separator'   => 'required',
             'decimal_position'    => 'required',
-        ] );
+        ]);
 
         GeneralSettings::updateOrInsert(
             ['key_name' => 'default_currency'],
@@ -67,7 +70,7 @@ class SettingsController extends Controller {
             ['key_value' => $request->decimal_position]
         );
 
-        Toastr::success( 'Settings updated successfully', 'Success' );
+        Toastr::success('Settings updated successfully', 'Success');
         return back();
     }
 
@@ -77,17 +80,18 @@ class SettingsController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function setDefaultLanguage( Request $request ) {
-        $request->validate( [
-            'default_language' => 'required',
-        ] );
+    public function setDefaultLanguage(Request $request)
+    {
+        $request->validate([
+            'default_lang' => 'required',
+        ]);
 
         GeneralSettings::updateOrInsert(
             ['key_name' => 'default_lang'],
-            ['key_value' => $request['default_language']]
+            ['key_value' => $request['default_lang']]
         );
 
-        Toastr::success( 'Settings updated successfully', 'Success' );
+        Toastr::success('Settings updated successfully', 'Success');
         return back();
     }
 
@@ -97,17 +101,18 @@ class SettingsController extends Controller {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function setPlaceholderImage( Request $request ) {
-        $request->validate( [
+    public function setPlaceholderImage(Request $request)
+    {
+        $request->validate([
             'placeholder_image' => 'required',
-        ] );
+        ]);
 
         GeneralSettings::updateOrInsert(
             ['key_name' => 'placeholder_image'],
             ['key_value' => $request['placeholder_image']]
         );
 
-        Toastr::success( 'Settings updated successfully', 'Success' );
+        Toastr::success('Settings updated successfully', 'Success');
         return back();
     }
 }

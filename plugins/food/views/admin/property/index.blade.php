@@ -62,7 +62,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
                                         $status_class = $item->status == 1 ? 'success' : 'danger';
                                         @endphp
                                         <div class="btn-group">
-                                            <button type="button" class="btn btn-sm btn-{{$status_class}}">{{ $item->item_name }} ({{ $item->price}})</button>
+                                            <button type="button" class="btn btn-sm btn-{{$status_class}}">{{ $item->item_name }} ({{ setPriceFormat( $item->price )}})</button>
                                             <button type="button" class="btn btn-sm btn-{{$status_class}} dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                                                 <span class="sr-only">Toggle Dropdown</span>
                                             </button>
@@ -172,7 +172,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         <input type="text" class="form-control" id="edit-item-name" placeholder="Enter item name" name="item_name">
     </div>
     <div class="form-group lang-independent-area">
-        <label for="edit-item-price">{{translate('Item Price')}}</label>
+        <label for="edit-item-price">{{translate('Item Price')}} ({{getCurrencySymbol(getGeneralSettingsValue( 'default_currency' ))}})</label>
         <input type="text" class="form-control" id="edit-item-price" placeholder="Enter item price" name="item_price">
     </div>
     <div class="form-group lang-independent-area">
@@ -193,7 +193,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         <input type="text" class="form-control" id="item-name" placeholder="Enter item name" name="item_name">
     </div>
     <div class="form-group">
-        <label for="item-price">{{translate('Item Price')}}</label>
+        <label for="item-price">{{translate('Item Price')}} ({{getCurrencySymbol(getGeneralSettingsValue( 'default_currency' ))}})</label>
         <input type="number" class="form-control" id="item-price" placeholder="Enter item price" name="item_price" step="0.01">
     </div>
     <div class="form-group">
@@ -225,7 +225,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
         //Set property editable properties
         $('.update-property').click(function() {
             $('.lang-independent-area').removeClass('disabled-div')
-            
+
             getPropertyTranslation()
 
             const id = $(this).data('id')
@@ -248,7 +248,7 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
             $('#property-id').val(id)
         })
 
-        //Set item editable content 
+        //Set item editable content
         $('.update-item').click(function() {
             $('.lang-independent-area').removeClass('disabled-div')
 

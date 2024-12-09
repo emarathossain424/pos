@@ -156,7 +156,7 @@ $all_branches = getBranches();
                         </div>
 
                         <div class="form-group lang-independent-area">
-                            <label for="price">{{translate('Price')}} <span class="text-danger">*</span></label>
+                            <label for="price">{{translate('Price')}} ({{getCurrencySymbol(getGeneralSettingsValue( 'default_currency' ))}}) <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="price" name="price" placeholder="Enter price" value="{{$food_item['price']}}">
                             <div>
                                 <span class="text-danger" id="price_error"></span>
@@ -164,7 +164,7 @@ $all_branches = getBranches();
                         </div>
 
                         <div class="form-group lang-independent-area">
-                            <label for="offer-price">{{translate('Offer Price')}} <span class="text-danger">*</span></label>
+                            <label for="offer-price">{{translate('Offer Price')}} ({{getCurrencySymbol(getGeneralSettingsValue( 'default_currency' ))}}) <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="offer-price" name="offer_price" placeholder="Enter offer price" value="{{$food_item['offer_price']}}">
                             <div>
                                 <span class="text-danger" id="offer_price_error"></span>
@@ -589,7 +589,7 @@ $all_branches = getBranches();
         });
 
         // Add headers for price and availability
-        tableHTML += '<th>{{translate("Price")}}</th><th>{{translate("Special Price")}}</th><th>{{translate("Is Available")}}</th></tr></thead><tbody>';
+        tableHTML += '<th>{{translate("Price")}} ({{getCurrencySymbol(getGeneralSettingsValue( "default_currency" ))}})</th><th>{{translate("Special Price")}} ({{getCurrencySymbol(getGeneralSettingsValue( "default_currency" ))}})</th><th>{{translate("Is Available")}}</th></tr></thead><tbody>';
 
         // Add rows for each data item
         data.forEach((item, index) => {

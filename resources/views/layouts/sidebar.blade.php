@@ -105,6 +105,16 @@
               </li>
               <li class="nav-item">
                   @php
+                      $active_menu_list = ['manage.order.status'];
+                      $is_active = in_array(Route::currentRouteName(), $active_menu_list);
+                  @endphp
+                  <a href="{{route('manage.order.status')}}" class="nav-link {{$is_active? 'active':'' }}">
+                      <i class="far fa-circle nav-icon"></i>
+                      <p>{{translate('Manage Order Status')}}</p>
+                  </a>
+              </li>
+              <li class="nav-item">
+                  @php
                       $active_menu_list = ['manage.taxes'];
                       $is_active = in_array(Route::currentRouteName(), $active_menu_list);
                   @endphp

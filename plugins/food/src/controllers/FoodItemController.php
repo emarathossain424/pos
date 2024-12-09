@@ -14,56 +14,60 @@ use Plugin\Food\Models\FoodItemVariantOption;
 use Plugin\Food\Models\FoodVariant;
 use Plugin\Food\Models\TranslateFoodItem;
 
-class FoodItemController extends Controller {
+class FoodItemController extends Controller
+{
     /**
      * Will redirect to food items list page
      *
      * @return void
      */
-    public function foodItems( Request $request ) {
+    public function foodItems(Request $request)
+    {
         $match_case = [];
 
-        if ( !empty( $request->input( 'category' ) ) ) {
-            $match_case[] = ['category', $request->input( 'category' )];
+        if (!empty($request->input('category'))) {
+            $match_case[] = ['category', $request->input('category')];
         }
-        if ( !empty( $request->input( 'food_type' ) ) ) {
-            $match_case[] = ['food_type', $request->input( 'food_type' )];
+        if (!empty($request->input('food_type'))) {
+            $match_case[] = ['food_type', $request->input('food_type')];
         }
-        if ( !empty( $request->input( 'item_status' ) ) ) {
-            $match_case[] = ['status', $request->input( 'item_status' )];
+        if (!empty($request->input('item_status'))) {
+            $match_case[] = ['status', $request->input('item_status')];
         }
 
-        $food_items = FoodItem::with( 'foodItemVariant', 'foodCategory' )
-            ->where( $match_case );
+        $food_items = FoodItem::with('foodItemVariant', 'foodCategory')
+            ->where($match_case);
 
         // Check if branch is provided
-        if ( !empty( $request->input( 'branch' ) ) ) {
-            $branch_id = $request->input( 'branch' );
+        if (!empty($request->input('branch'))) {
+            $branch_id = $request->input('branch');
 
             // Filter by branch_id using whereHas to query the related branches
-            $food_items = $food_items->whereHas( 'branches', function ( $query ) use ( $branch_id ) {
-                $query->where( 'core_branches.id', $branch_id );
-            } );
+            $food_items = $food_items->whereHas('branches', function ($query) use ($branch_id) {
+                $query->where('core_branches.id', $branch_id);
+            });
         }
 
         $food_items = $food_items->get();
 
-        return view( 'food::admin.foods.index', compact( 'food_items' ) );
+        return view('food::admin.foods.index', compact('food_items'));
     }
 
     /**
      * Will redirect to food item adding page
      */
-    public function addFoodItems() {
-        $variants = FoodVariant::with( 'options' )->get();
-        return view( 'food::admin.foods.create', compact( 'variants' ) );
+    public function addFoodItems()
+    {
+        $variants = FoodVariant::with('options')->get();
+        return view('food::admin.foods.create', compact('variants'));
     }
 
     /**
      * Will store food items
      */
-    public function storeFoodItems( Request $request ) {
-        $request->validate( [
+    public function storeFoodItems(Request $request)
+    {
+        $request->validate([
             'name'        => 'required',
             'category'    => 'required|exists:food_categories,id',
             'details'     => 'required',
@@ -74,7 +78,7 @@ class FoodItemController extends Controller {
             'food_type'   => 'required',
             'food_type'   => 'required',
             'branch'      => 'required',
-        ] );
+        ]);
 
         try {
             DB::beginTransaction();
@@ -92,27 +96,27 @@ class FoodItemController extends Controller {
             $food_item->food_type        = $request['food_type'];
             $food_item->saveOrFail();
 
-            if ( $request['food_type'] == 'variant' ) {
-                $this->storeFoodItemVariantOptions( $request['variant_combo'], $food_item->id );
+            if ($request['food_type'] == 'variant') {
+                $this->storeFoodItemVariantOptions($request['variant_combo'], $food_item->id);
             }
 
-            if ( !empty( $request['properties'] ) ) {
-                $this->storeFoodItemProperties( $request['properties'], $food_item->id );
+            if (!empty($request['properties'])) {
+                $this->storeFoodItemProperties($request['properties'], $food_item->id);
             }
 
-            $this->storeBranchForEachFoodItem( $request['branch'], $food_item );
+            $this->storeBranchForEachFoodItem($request['branch'], $food_item);
 
             DB::commit();
-            return response()->json( [
+            return response()->json([
                 'success' => 1,
-                'message' => translate( 'Food item stored successfully' ),
-            ] );
-        } catch ( \Exception $ex ) {
+                'message' => translate('Food item stored successfully'),
+            ]);
+        } catch (\Exception $ex) {
             DB::rollBack();
-            return response()->json( [
+            return response()->json([
                 'success' => 0,
-                'message' => translate( 'Unable to store food item' ),
-            ], 500 );
+                'message' => translate('Unable to store food item'),
+            ], 500);
         }
     }
 
@@ -123,17 +127,18 @@ class FoodItemController extends Controller {
      * @param FoodItem $food_item The food item object
      * @return void
      */
-    public function storeBranchForEachFoodItem( $branches, $food_item ) {
+    public function storeBranchForEachFoodItem($branches, $food_item)
+    {
         $data = [];
-        foreach ( $branches as $branch ) {
+        foreach ($branches as $branch) {
             $data[] = [
                 'branch_id'    => $branch,
                 'food_item_id' => $food_item->id,
             ];
         }
 
-        FoodItemBranches::where( 'food_item_id', $food_item->id )->delete();
-        FoodItemBranches::insert( $data );
+        FoodItemBranches::where('food_item_id', $food_item->id)->delete();
+        FoodItemBranches::insert($data);
     }
 
     /**
@@ -163,8 +168,9 @@ class FoodItemController extends Controller {
      *                                           "message": "Unable to store food item"
      *                                       }
      */
-    public function updateFoodItems( Request $request ) {
-        $request->validate( [
+    public function updateFoodItems(Request $request)
+    {
+        $request->validate([
             'id'          => 'required|exists:food_items,id',
             'name'        => 'required',
             'category'    => 'required|exists:food_categories,id',
@@ -175,15 +181,15 @@ class FoodItemController extends Controller {
             'offer_price' => 'required',
             'food_type'   => 'required',
             'branch'      => 'required',
-        ] );
+        ]);
 
         try {
             DB::beginTransaction();
 
-            $default_lang   = getGeneralSettingsValue( 'default_lang' );
+            $default_lang   = getGeneralSettingsValue('default_lang');
             $translate_into = $request['translate_into'];
-            if ( $translate_into == $default_lang ) {
-                $food_item                   = FoodItem::find( $request['id'] );
+            if ($translate_into == $default_lang) {
+                $food_item                   = FoodItem::find($request['id']);
                 $food_item->name             = $request['name'];
                 $food_item->category         = $request['category'];
                 $food_item->details          = $request['details'];
@@ -197,34 +203,32 @@ class FoodItemController extends Controller {
                 $food_item->food_type        = $request['food_type'];
                 $food_item->saveOrFail();
 
-                if ( $request['food_type'] == 'variant' ) {
-                    $this->storeFoodItemVariantOptions( $request['variant_combo'], $food_item->id, true );
+                if ($request['food_type'] == 'variant') {
+                    $this->storeFoodItemVariantOptions($request['variant_combo'], $food_item->id, true);
                 } else {
-                    FoodItemVariant::where( 'item_id', $food_item->id )->delete();
+                    FoodItemVariant::where('item_id', $food_item->id)->delete();
                 }
 
-                if ( !empty( $request['properties'] ) ) {
-                    $this->storeFoodItemProperties( $request['properties'], $food_item->id );
+                if (!empty($request['properties'])) {
+                    $this->storeFoodItemProperties($request['properties'], $food_item->id);
                 }
 
-                $this->storeBranchForEachFoodItem( $request['branch'], $food_item );
-
+                $this->storeBranchForEachFoodItem($request['branch'], $food_item);
             } else {
-                $this->setFoodItemTranslation( $request );
+                $this->setFoodItemTranslation($request);
             }
 
             DB::commit();
-            return response()->json( [
+            return response()->json([
                 'success' => 1,
-                'message' => translate( 'Food item updated successfully' ),
-            ] );
-        } catch ( \Exception $ex ) {
+                'message' => translate('Food item updated successfully'),
+            ]);
+        } catch (\Exception $ex) {
             DB::rollBack();
-            dd( $ex );
-            return response()->json( [
+            return response()->json([
                 'success' => 0,
-                'message' => translate( 'Unable to store food item' ),
-            ], 500 );
+                'message' => translate('Unable to store food item'),
+            ], 500);
         }
     }
 
@@ -240,16 +244,17 @@ class FoodItemController extends Controller {
      *                      - 'meta_description' (string): The translated meta description of the food item.
      * @return void
      */
-    public function setFoodItemTranslation( $request ) {
+    public function setFoodItemTranslation($request)
+    {
         $item_id        = $request['id'];
         $translate_into = $request['translate_into'];
 
-        $has_previous_trans = TranslateFoodItem::where( 'item_id', $item_id )
-            ->where( 'lang_id', $translate_into );
+        $has_previous_trans = TranslateFoodItem::where('item_id', $item_id)
+            ->where('lang_id', $translate_into);
 
-        if ( $has_previous_trans->exists() ) {
+        if ($has_previous_trans->exists()) {
             $trans_row_id                 = $has_previous_trans->first()->id;
-            $item_trans                   = TranslateFoodItem::find( $trans_row_id );
+            $item_trans                   = TranslateFoodItem::find($trans_row_id);
             $item_trans->name             = $request['name'];
             $item_trans->details          = $request['details'];
             $item_trans->meta_title       = $request['meta_title'];
@@ -284,12 +289,13 @@ class FoodItemController extends Controller {
      * @throws \Illuminate\Database\QueryException If there is a database error while saving the model.
      * @return void
      */
-    public function storeFoodItemVariantOptions( $variations, $food_item_id, $is_for_update = false ) {
-        if ( $is_for_update ) {
-            FoodItemVariant::where( 'item_id', $food_item_id )->delete();
+    public function storeFoodItemVariantOptions($variations, $food_item_id, $is_for_update = false)
+    {
+        if ($is_for_update) {
+            FoodItemVariant::where('item_id', $food_item_id)->delete();
         }
 
-        foreach ( $variations as $variation ) {
+        foreach ($variations as $variation) {
             $combinations = $variation['combo'];
 
             $food_item_variant                = new FoodItemVariant();
@@ -299,7 +305,7 @@ class FoodItemController extends Controller {
             $food_item_variant->availability  = $variation['availability'];
             $food_item_variant->saveOrFail();
 
-            foreach ( $combinations as $combo ) {
+            foreach ($combinations as $combo) {
                 $food_item_variant_option                       = new FoodItemVariantOption();
                 $food_item_variant_option->food_item_variant_id = $food_item_variant->id;
                 $food_item_variant_option->variant_id           = $combo['variant']['id'];
@@ -318,13 +324,14 @@ class FoodItemController extends Controller {
      * @throws \Illuminate\Database\QueryException If there is a database error while saving the model.
      * @return void
      */
-    public function storeFoodItemProperties( $properties, $food_item_id ) {
-        FoodItemProperty::where( 'food_item_id', $food_item_id )->delete();
-        foreach ( $properties as $property => $items ) {
-            foreach ( $items as $item ) {
+    public function storeFoodItemProperties($properties, $food_item_id)
+    {
+        FoodItemProperty::where('food_item_id', $food_item_id)->delete();
+        foreach ($properties as $property => $items) {
+            foreach ($items as $item) {
                 $food_item_property                   = new FoodItemProperty();
                 $food_item_property->food_item_id     = $food_item_id;
-                $food_item_property->property_id      = str_replace( 'property_', '', $property );
+                $food_item_property->property_id      = str_replace('property_', '', $property);
                 $food_item_property->property_item_id = $item;
                 $food_item_property->saveOrFail();
             }
@@ -337,35 +344,36 @@ class FoodItemController extends Controller {
      * @param int $id The ID of the food item to edit.
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View The view for editing the food item.
      */
-    public function editFoodItems( $id ) {
-        $variants             = FoodVariant::with( 'options' )->get();
-        $food_item            = FoodItem::find( $id );
-        $food_item_branches   = $food_item->branches->pluck( 'id' )->toArray();
-        $food_item_properties = FoodItemProperty::where( 'food_item_id', $id )->get();
+    public function editFoodItems($id)
+    {
+        $variants             = FoodVariant::with('options')->get();
+        $food_item            = FoodItem::find($id);
+        $food_item_branches   = $food_item->branches->pluck('id')->toArray();
+        $food_item_properties = FoodItemProperty::where('food_item_id', $id)->get();
         $property_ids         = [];
         $property_item_ids    = [];
 
-        foreach ( $food_item_properties as $property ) {
+        foreach ($food_item_properties as $property) {
             $property_ids[]      = $property->property_id;
             $property_item_ids[] = $property->property_item_id;
         }
 
-        $default_lang = getGeneralSettingsValue( 'default_lang' );
-        if ( isset( request()->lang ) && ( request()->lang != $default_lang ) ) {
-            $food_item = $food_item->translateInto( request()->lang )->first();
+        $default_lang = getGeneralSettingsValue('default_lang');
+        if (isset(request()->lang) && (request()->lang != $default_lang)) {
+            $food_item = $food_item->translateInto(request()->lang)->first();
         }
 
-        $food_item_variations = FoodItem::with( 'foodItemVariant.foodItemVariantOption.variant', 'foodItemVariant.foodItemVariantOption.option' )
-            ->find( $id );
+        $food_item_variations = FoodItem::with('foodItemVariant.foodItemVariantOption.variant', 'foodItemVariant.foodItemVariantOption.option')
+            ->find($id);
 
         $variant_option_array = [];
         $variant_ids          = [];
         $variant_option_ids   = [];
 
-        foreach ( $food_item_variations->foodItemVariant as $item ) {
+        foreach ($food_item_variations->foodItemVariant as $item) {
             $data  = [];
             $combo = [];
-            foreach ( $item->foodItemVariantOption as $foodItemVariantOption ) {
+            foreach ($item->foodItemVariantOption as $foodItemVariantOption) {
                 $variant_name = $foodItemVariantOption->variant->name;
                 $variant_id   = $foodItemVariantOption->variant->id;
 
@@ -383,11 +391,11 @@ class FoodItemController extends Controller {
                     ],
                 ];
 
-                if ( !in_array( $variant_id, $variant_ids ) ) {
-                    array_push( $variant_ids, $variant_id );
+                if (!in_array($variant_id, $variant_ids)) {
+                    array_push($variant_ids, $variant_id);
                 }
 
-                if ( !$this->comboExists( $variant_option_ids, $variant_id, $option_id ) ) {
+                if (!$this->comboExists($variant_option_ids, $variant_id, $option_id)) {
                     $variant_option_ids[] = [
                         'variant_id' => $variant_id,
                         'option_id'  => $option_id,
@@ -401,10 +409,7 @@ class FoodItemController extends Controller {
             $variant_option_array[] = $data;
         }
 
-        // dd($variant_option_array, $variant_ids, $variant_option_ids,$variants,$food_item);
-        // dd( $variant_option_array );
-
-        return view( 'food::admin.foods.edit', compact( 'variants', 'food_item', 'variant_ids', 'variant_option_ids', 'variant_option_array', 'food_item_branches', 'property_ids', 'property_item_ids' ) );
+        return view('food::admin.foods.edit', compact('variants', 'food_item', 'variant_ids', 'variant_option_ids', 'variant_option_array', 'food_item_branches', 'property_ids', 'property_item_ids'));
     }
 
     /**
@@ -415,12 +420,13 @@ class FoodItemController extends Controller {
      * @param int $option_id The id of the option to check.
      * @return bool Returns true if the variant-option combination exists, false otherwise.
      */
-    function comboExists( $variant_option_ids, $variant_id, $option_id ) {
+    function comboExists($variant_option_ids, $variant_id, $option_id)
+    {
         // Iterate over each item in the variant_option_ids array.
-        foreach ( $variant_option_ids as $item ) {
+        foreach ($variant_option_ids as $item) {
             // Check if the variant_id and option_id of the current item
             // match the provided variant_id and option_id.
-            if ( $item["variant_id"] == $variant_id && $item["option_id"] == $option_id ) {
+            if ($item["variant_id"] == $variant_id && $item["option_id"] == $option_id) {
                 // If there is a match, return true.
                 return true;
             }
@@ -436,15 +442,16 @@ class FoodItemController extends Controller {
      * @throws \Exception If an error occurs while deleting the food item.
      * @return \Illuminate\Http\JsonResponse The JSON response indicating the success or failure of the deletion.
      */
-    public function deleteFoodItem( Request $request ) {
+    public function deleteFoodItem(Request $request)
+    {
         try {
-            $food_item = FoodItem::find( (int) $request['id'] );
+            $food_item = FoodItem::find((int) $request['id']);
             $food_item->delete();
 
-            Toastr::success( 'Food item deleted successfully', 'Success' );
+            Toastr::success('Food item deleted successfully', 'Success');
             return back();
-        } catch ( \Throwable $ex ) {
-            Toastr::error( 'Unable to delete food item', 'Error' );
+        } catch (\Throwable $ex) {
+            Toastr::error('Unable to delete food item', 'Error');
             return back();
         }
     }
@@ -456,25 +463,88 @@ class FoodItemController extends Controller {
      * @throws \Exception If an error occurs while updating the food item status.
      * @return \Illuminate\Http\JsonResponse The JSON response indicating the success or failure of the status update.
      */
-    public function updateItemStatus( Request $request ) {
+    public function updateItemStatus(Request $request)
+    {
         try {
-            $item = FoodItem::find( $request['id'] );
-            if ( $item->status == 1 ) {
+            $item = FoodItem::find($request['id']);
+            if ($item->status == 1) {
                 $item->status = 0;
             } else {
                 $item->status = 1;
             }
 
             $item->update();
-            return response()->json( [
+            return response()->json([
                 'success' => true,
-                'message' => translate( 'Food item status updated successfully' ),
-            ] );
-        } catch ( \Exception $ex ) {
-            return response()->json( [
+                'message' => translate('Food item status updated successfully'),
+            ]);
+        } catch (\Exception $ex) {
+            return response()->json([
                 'success' => false,
-                'message' => translate( 'Unable to change status' ),
-            ] );
+                'message' => translate('Unable to change status'),
+            ]);
         }
+    }
+
+    /**
+     * Returns a view with the variations of a food item.
+     *
+     * @param Request $request The HTTP request containing the food item ID, name, quantity, and order index.
+     * @return \Illuminate\View\View The rendered view with the food item variations.
+     */
+    public function getVariants(Request $request)
+    {
+        $food_item_variant    = $request->variant ?? [];
+        $food_item_id         = $request->item_id;
+        $food_item_name       = $request->item_name ?? '';
+        $food_item_quantity   = $request->item_quantity ?? '';
+        $order_index          = $request->index ?? '-1';
+        $food_item_variations = FoodItem::with('foodItemVariant.foodItemVariantOption.variant', 'foodItemVariant.foodItemVariantOption.option')
+            ->find($request->item_id);
+
+        $variants           = [];
+        $variant_ids        = [];
+        $variant_option_ids = [];
+
+        foreach ($food_item_variations->foodItemVariant as $item) {
+            $data  = [];
+            $combo = [];
+            foreach ($item->foodItemVariantOption as $foodItemVariantOption) {
+                $variant_name = $foodItemVariantOption->variant->name;
+                $variant_id   = $foodItemVariantOption->variant->id;
+
+                $option_name = $foodItemVariantOption->option->option_name;
+                $option_id   = $foodItemVariantOption->option->id;
+
+                $combo[] = [
+                    'variant' => [
+                        'name' => $variant_name,
+                        'id'   => $variant_id,
+                    ],
+                    'options' => [
+                        'name' => $option_name,
+                        'id'   => $option_id,
+                    ],
+                ];
+
+                if (!in_array($variant_id, $variant_ids)) {
+                    array_push($variant_ids, $variant_id);
+                }
+
+                if (!$this->comboExists($variant_option_ids, $variant_id, $option_id)) {
+                    $variant_option_ids[] = [
+                        'variant_id' => $variant_id,
+                        'option_id'  => $option_id,
+                    ];
+                }
+            }
+            $data['combo']         = $combo;
+            $data['price']         = $item->price;
+            $data['special_price'] = $item->special_price;
+            $data['availability']  = $item->availability;
+            $variants[]            = $data;
+        }
+
+        return view('pos::admin.pos.partial.item_variants', compact('variants', 'food_item_id', 'food_item_name', 'food_item_quantity', 'order_index', 'food_item_variant'));
     }
 }

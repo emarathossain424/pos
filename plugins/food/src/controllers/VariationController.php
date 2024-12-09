@@ -195,7 +195,6 @@ class VariationController extends Controller
             Toastr::success('Food variant option updated successfully', 'Success');
             return back();
         } catch (\Exception $ex) {
-            dd($ex);
             Toastr::error('Unable to update food variant option', 'Error');
             return back();
         }

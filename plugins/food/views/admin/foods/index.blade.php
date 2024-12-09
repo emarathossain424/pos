@@ -94,8 +94,8 @@ $all_branches = getBranches();
                                     <th>{{translate('Category')}}</th>
                                     <th>{{translate('Food Type')}}</th>
                                     <th>{{translate('Status')}}</th>
-                                    <th>{{translate('Price')}}</th>
-                                    <th>{{translate('Offer Price')}}</th>
+                                    <th>{{translate('Price')}} ({{getCurrencySymbol(getGeneralSettingsValue( 'default_currency' ))}})</th>
+                                    <th>{{translate('Offer Price')}} ({{getCurrencySymbol(getGeneralSettingsValue( 'default_currency' ))}})</th>
                                     <th>{{translate('Action')}}</th>
                                 </tr>
                             </thead>
@@ -122,8 +122,8 @@ $all_branches = getBranches();
                                             <label class="custom-control-label" for="status{{$key}}"></label>
                                         </div>
                                     </td>
-                                    <td>{{ $item->price }}</td>
-                                    <td>{{ $item->offer_price }}</td>
+                                    <td>{{ setPriceFormat($item->price) }}</td>
+                                    <td>{{ setPriceFormat($item->offer_price) }}</td>
                                     <td>
                                         <div class="btn-group" role="group">
                                             <button id="btnGroupDrop1" type="button" class="btn btn-sm btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

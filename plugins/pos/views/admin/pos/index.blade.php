@@ -4,6 +4,7 @@ $default_lang = getGeneralSettingsValue('default_lang');
 $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
 
 $all_branches = getBranches();
+$taxes = getAllActiveTaxes();
 @endphp
 @extends('layouts.master')
 @section('title') {{translate('Halls')}} @endsection
@@ -11,20 +12,105 @@ $all_branches = getBranches();
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-responsive/css/responsive.bootstrap4.min.css')}}">
 <link rel="stylesheet" href="{{asset('pos/plugins/datatables-buttons/css/buttons.bootstrap4.min.css')}}">
+<link rel="stylesheet" href="{{asset('pos/plugins/select2/css/select2.min.css')}}">
+<link rel="stylesheet" href="{{asset('pos/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css')}}">
 
 <style>
     .fixed-image {
-        height: 150px; /* Set the fixed height */
-        background-color: #f5f5f5; /* Optional background color */
+        height: 150px;
+        /* Set the fixed height */
+        background-color: #f5f5f5;
+        /* Optional background color */
     }
 
     .fixed-image img {
-        object-fit: cover; /* Ensure the image covers the container */
-        width: 100%; /* Fill the container width */
-        height: 100%; /* Fill the container height */
+        object-fit: cover;
+        /* Ensure the image covers the container */
+        width: 100%;
+        /* Fill the container width */
+        height: 100%;
+        /* Fill the container height */
     }
 
+    .quantity-selector {
+        display: flex;
+        align-items: center;
+    }
 
+    .quantity-selector .btn-decrement,
+    .quantity-selector .btn-increment {
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .quantity-selector .btn-decrement {
+        border-color: #e43d89;
+        color: #e43d89;
+        border: 1px solid #e43d89;
+    }
+
+    .quantity-selector .btn-increment {
+        color: #e43d89;
+        border: 1px solid #e43d89;
+    }
+
+    .quantity-selector .quantity-input {
+        width: 40px;
+        text-align: center;
+        border: none;
+        font-weight: bold;
+        margin: 0 8px;
+    }
+
+    /* Place Order Button Styling */
+    .place-order-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+    }
+
+    .btn-outline-pink {
+        color: #e43d89;
+        border-color: #e43d89;
+    }
+
+    .btn-pink {
+        color: #fff;
+        background-color: #e43d89;
+        border-color: #e43d89;
+        box-shadow: none;
+    }
+
+    .btn-pink:hover,
+    .btn-pink:focus,
+    .btn-pink:active {
+        color: #fff;
+        background-color: #e43d89;
+        border-color: #e43d89;
+        box-shadow: none;
+    }
+
+    .btn-outline-pink:hover,
+    .btn-outline-pink:focus,
+    .btn-outline-pink:active {
+        color: #fff;
+        background-color: #e43d89;
+        border-color: #e43d89;
+        box-shadow: none;
+    }
 </style>
 
 @endpush
@@ -34,12 +120,13 @@ $all_branches = getBranches();
     <div class="container-fluid">
         <x-alert column="col-md-12" alert_type="alert-warning" />
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-lg-8">
                 <div class="card">
                     <div class="card-body">
-                        <form action="{{route('pos')}}" method="get">
+                        <!-- food item filtering options -->
+                        <form action="{{route('pos')}}" method="get" id="filterForm">
                             <div class="row d-flex">
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <div class="form-group">
                                         <select class="form-control select2 w-100" name="branch" id="branchSelect">
                                             <option value="">{{translate('All Branches')}}</option>
@@ -47,143 +134,596 @@ $all_branches = getBranches();
                                             <option value="{{$branch->id}}" {{ request()->get('branch') == $branch->id ? 'selected' : '' }}>{{$branch->branch_name}}</option>
                                             @endforeach
                                         </select>
+                                        <input type="hidden" name="category" value="" id="categorySelect">
                                     </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <select class="form-control" name="category" id="categorySelect">
-                                            <option value="">{{translate('All Categories')}}</option>
-                                            @foreach($categories as $category)
-                                                <option value="{{$category->id}}" {{ request()->get('category') == $category->id ? 'selected' : '' }}>{{$category->name}}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-5">
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <input type="text" class="form-control" name="search" placeholder="{{translate('Search')}}" value="{{ request()->get('search') }}">
                                     </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <button class="btn btn-primary sm">{{translate('Filter')}}</button>
-                                    <a class="btn btn-danger sm" href="{{route('pos')}}">{{translate('Clear')}}</a>
+                                <div class="col-md-3">
+                                    <button class="btn btn-pink rounded-pill btn-sm px-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+                                            <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
+                                        </svg>
+                                    </button>
+                                    <a href="{{route('pos')}}" class="btn btn-pink rounded-pill btn-sm px-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+                                            <path d="m336-280 144-144 144 144 56-56-144-144 144-144-56-56-144 144-144-144-56 56 144 144-144 144 56 56ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
+                                        </svg>
+                                    </a>
                                 </div>
                             </div>
                         </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-body">
+                        <!-- /food item filtering options -->
+                        <hr>
+
+                        <!-- Categories Section -->
+                        <div class="row">
+                            <div class="col-md-12 d-flex justify-content-center">
+                                <button class="btn {{ empty(request()->get('category')) ? 'btn-pink' : 'btn-outline-pink'}} btn-sm rounded-pill mr-2 mb-2 selectedCategory px-3" data-id="">{{translate('All Categories')}}</button>
+                                @foreach($categories as $category)
+                                <button class="btn {{ request()->get('category') == $category->id ? 'btn-pink' : 'btn-outline-pink'}} btn-sm rounded-pill mr-2 mb-2 selectedCategory px-3" data-id="{{$category->id}}">{{$category->name}}</button>
+                                @endforeach
+                            </div>
+                        </div>
+                        <!-- /Categories Section -->
+
                         <!-- Food Items Section -->
                         <div class="row">
-                            @foreach($food_items as $item)
-                            <div class="col-md-6 col-lg-4 col-xl-4 mb-4">
-                                <div class="card single-food-item h-100 shadow-sm border-0 rounded-lg p-3">
-                                    <!-- Food Image with fixed size -->
-                                    <div class="food-img-container fixed-image rounded-lg overflow-hidden mb-3">
-                                        <img src="/{{ getFilePath($item->image) }}" class="food-img-top img-fluid w-100 h-100 object-cover" alt="{{ $item->name }}">
-                                    </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Image</th>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">{{translate('Price')}} ({{getCurrencySymbol(getGeneralSettingsValue( 'default_currency' ))}})</th>
+                                            <th scope="col">Quantity</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($food_items as $item)
+                                        <tr class="single-food-item">
+                                            <!-- Food Image -->
+                                            <td class="text-center">
+                                                <img src="/{{ getFilePath($item->image) }}" alt="item-image" class="img-fluid" style="max-width: 50px; max-height: 50px;">
+                                            </td>
 
-                                    <!-- Card Body -->
-                                    <div class="card-body p-0 d-flex flex-column">
-                                        <!-- Food Title and Description -->
-                                        <h5 class="food-title mb-2 font-weight-bold">{{ $item->name }}</h5>
+                                            <!-- Food Title -->
+                                            <td>{{ $item->name }}</td>
 
-                                        <!-- Price and Sold Info -->
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <div>
-                                                <strong class="text-primary">${{ number_format($item->price, 2) }}</strong>
-                                                @if($item->offer_price)
-                                                <small class="text-danger d-block"><strike>${{ number_format($item->offer_price, 2) }}</strike></small>
+                                            <!-- Price -->
+                                            <td>
+                                                <strong>{{setPriceFormat($item->price)}}</strong>
+                                            </td>
+
+                                            <!-- Quantity Selector -->
+                                            <td>
+                                                <div class="d-flex justify-content-center quantity-selector">
+                                                    <button class="btn btn-sm btn-outline-pink btn-decrement" type="button"> - </button>
+                                                    <input type="number" class="form-control quantity-input mx-2" min="1" value="1" style="width: 100px; text-align: center; height: 31px;" aria-label="Quantity">
+                                                    <button class="btn btn-sm btn-outline-pink btn-increment" type="button">+</button>
+                                                </div>
+                                            </td>
+
+                                            <!-- Action Button -->
+                                            <td>
+                                                @if($item->food_type == 'variant')
+                                                <button type="button" class="btn btn-outline-pink btn-sm show-variant rounded-pill px-3" data-id="{{$item->id}}" data-name="{{$item->name}}" data-toggle="modal" data-target="#item-variant">{{ translate('Select Variant') }}</button>
+                                                @else
+                                                <button type="button" class="btn btn-outline-pink btn-sm add-to-cart rounded-pill px-3" data-id="{{$item->id}}" data-name="{{$item->name}}" data-price="{{$item->price}}">{{ translate('Place Order') }}</button>
                                                 @endif
-                                            </div>
-                                            <small class="text-muted">{{ $item->sold ?? 0 }} Sold</small>
-                                        </div>
-
-                                        <!-- Quantity Selector & Add to Cart Button -->
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            @if($item->food_type == 'variant')
-                                                <button type="button" class="btn btn-sm btn-outline-primary">{{translate('Select Variant')}}</button>
-                                            @else
-                                                <button type="button" class="btn btn-sm btn-outline-primary">{{translate('Place Order')}}</button>
-                                            @endif
-                                            <button type="button" class="btn btn-sm btn-outline-primary">{{translate('Add Property')}}</button>
-                                        </div>
-                                    </div>
-                                </div>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
-                            @endforeach
                         </div>
                         {{ $food_items->links('pagination::bootstrap-5') }}
-
+                        <!-- /Food Items Section -->
                     </div>
                 </div>
             </div>
             <div class="col-lg-4">
-                <div class="card">
-                    <div class="card-body">
+                <!-- Order Summary Section -->
+                <div class="card shadow-lg border-0 rounded-3">
+                    <div class="card-body p-0" id="order-summary">
 
                     </div>
                 </div>
+                <!-- /Order Summary Section -->
             </div>
         </div>
     </div>
 
-    <div class="modal fade" id="place-order-modal">
+    <!-- Variant Modal -->
+    <div class="modal fade" id="item-variant">
         <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h4 class="modal-title">{{translate('Add Properties')}}</h4>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">{{translate('Select Variant')}}</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div id="variant-list">
+
+                </div>
             </div>
-            <div class="modal-body">
-              <form>
-                <div class="row">
-                    <div class="col-md-3">
-                        <ul class="nav nav-pills flex-column">
-                            <li class="nav-item active">
-                                <button class="btn btn-outline-pink w-100">
-                                    <i class="fas fa-dollar-sign"></i> {{translate('Manage Currencies')}}
-                                </button>
-                            </li>
-                            <li class="nav-item active mt-1">
-                                <button class="btn btn-outline-pink w-100">
-                                    <i class="fas fa-language"></i> {{translate('Default Language')}}
-                                </button>
-                            </li>
-                            <li class="nav-item active mt-1">
-                                <button class="btn btn-outline-pink w-100">
-                                    <i class="fas fa-image"></i> {{translate('Placeholder Image')}}
-                                </button>
-                            </li>
-                        </ul>
+        </div>
+    </div>
+    <!-- /Variant Modal -->
+
+    <!-- Properties Modal -->
+    <div class="modal fade" id="item-properties">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">{{translate('Select Property')}}</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="property-list">
+
                     </div>
                 </div>
             </div>
-            <div class="modal-footer justify-content-between">
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-          </div>
-          <!-- /.modal-content -->
+            <!-- /.modal-content -->
         </div>
         <!-- /.modal-dialog -->
-      </div>
+    </div>
+    <!-- /Properties Modal -->
+
+    <!-- Add Discount -->
+    <div class="modal fade" id="order-discount">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <label for="discount_type">{{translate('Discount Type')}}</label>
+                    <select name="discount_type" id="discount_type" class="form-control">
+                        <option value="percent">{{translate('Percent (%)')}}</option>
+                        <option value="amount">{{translate('Fixed Amount')}}</option>
+                    </select>
+
+                    <label for="discount">{{translate('Discount Amount')}}</label>
+                    <input type="number" class="form-control" name="discount" id="discount">
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">{{translate('Close')}}</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="apply-discount" data-dismiss="modal">{{translate('Apply Discount')}}</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /Add Discount -->
+
+    <!-- Select Tax -->
+    <div class="modal fade" id="order-Tax">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <label for="tax_percentage">{{translate('Select Applicable Taxes')}}</label>
+                    <select name="tax_percentage" id="tax_percentage" class="form-control select2" multiple>
+                        @foreach($taxes as $tax)
+                        <option value="{{$tax->tax_name .'~'. $tax->id . '~'. $tax->tax_rate}}">{{$tax->tax_name}} ({{$tax->tax_rate}}%)</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">{{translate('Close')}}</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="apply-tax" data-dismiss="modal">{{translate('Apply Discount')}}</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /Select Tax -->
 
 </div>
 @endsection
 
 @push('script')
+<script src="{{asset('pos/plugins/select2/js/select2.full.min.js')}}"></script>
 <script>
     $(function() {
         'use strict'
+
+        let ordered_items = JSON.parse(localStorage.getItem("ordered_items")) ?? [];
+        let tax_details = JSON.parse(localStorage.getItem('tax_details')) ?? [];
+        let order_discount = JSON.parse(localStorage.getItem('order_discount')) ?? [];
+
+        addToCart();
+        makeTaxPercentageSelected();
+        makeDiscountSelected();
+
         $('body').addClass('sidebar-collapse');
+
+        $('#tax_percentage').select2({
+            theme: 'bootstrap4',
+            width: '100%'
+        })
+
+        $('#apply-tax').click(function() {
+            let taxes = $('#tax_percentage').val();
+
+            taxes.forEach(tax => {
+                let tax_name = tax.split('~')[0];
+                let tax_id = tax.split('~')[1];
+                let tax_rate = tax.split('~')[2];
+                tax_details.push({
+                    tax_name: tax_name,
+                    tax_id: tax_id,
+                    tax_rate: tax_rate
+                });
+            });
+
+            localStorage.setItem('tax_details', JSON.stringify(tax_details));
+            addToCart();
+        });
+
+        $('#apply-discount').click(function() {
+            let discount_type = $('#discount_type').val();
+            let discount_amount = $('#discount').val();
+            order_discount = {
+                discount_type: discount_type,
+                discount_amount: discount_amount
+            };
+            localStorage.setItem('order_discount', JSON.stringify(order_discount));
+            addToCart();
+        });
+
+        /**
+         * Select category
+         */
+        $('.selectedCategory').click(function() {
+            $('#categorySelect').val($(this).data('id'));
+            $('#filterForm').submit();
+        });
+
+        /**
+         * Decrement
+         */
+        $(document).on('click', '.quantity-selector .btn-decrement', function() {
+            var $input = $(this).parent().find('.quantity-input');
+            var currentVal = parseInt($input.val());
+            if (!isNaN(currentVal) && currentVal > 1) {
+                $input.val(currentVal - 1);
+            }
+        });
+
+        /**
+         * Increment
+         */
+        $(document).on('click', '.quantity-selector .btn-increment', function() {
+            var $input = $(this).parent().find('.quantity-input');
+            $input.val(parseInt($input.val()) + 1);
+        });
+
+        /**
+         * Add to cart
+         */
+        $('.single-food-item .add-to-cart').click(function() {
+            const id = $(this).data('id');
+            const name = $(this).data('name');
+            const price = $(this).data('price');
+
+            // Try selecting and logging the single-food-item container
+            const foodItemContainer = $(this).closest('.single-food-item');
+
+            // Now try selecting and logging the quantity input
+            const quantityInput = foodItemContainer.find('.quantity-input');
+
+            // Get the value of the quantity input
+            const quantity = quantityInput.val();
+
+            quantityInput.val(1);
+
+            if (quantity !== undefined) {
+                ordered_items.push({
+                    id: id,
+                    name: name,
+                    unit_price: price,
+                    quantity: quantity,
+                    price: (quantity * price)
+                });
+
+                localStorage.setItem("ordered_items", JSON.stringify(ordered_items));
+
+                addToCart();
+            } else {
+                console.error("Quantity not found.");
+            }
+        });
+
+        /**
+         * Increment ordered item
+         */
+        $(document).on('click', '.ordered-item-amount-increment', function() {
+            let index = $(this).data('index');
+            ordered_items[index].quantity++;
+            ordered_items[index].price = calculateSingleItemTotalPrice(index);
+            localStorage.setItem("ordered_items", JSON.stringify(ordered_items));
+            addToCart();
+        });
+
+        /**
+         * Decrement ordered item
+         */
+        $(document).on('click', '.ordered-item-amount-decrement', function() {
+            let index = $(this).data('index');
+            if (ordered_items[index].quantity > 1) {
+                ordered_items[index].quantity--;
+                ordered_items[index].price = calculateSingleItemTotalPrice(index);
+                localStorage.setItem("ordered_items", JSON.stringify(ordered_items));
+                addToCart();
+            }
+        });
+
+        /**
+         * Remove ordered item
+         */
+        $(document).on('click', '.ordered-item-remove', function() {
+            let index = $(this).data('index');
+            ordered_items.splice(index, 1);
+            localStorage.setItem("ordered_items", JSON.stringify(ordered_items));
+            addToCart();
+        });
+
+        /**
+         * Show variant
+         */
+        $(document).on('click', '.show-variant', function() {
+            let id = $(this).data('id');
+            let name = $(this).data('name');
+
+            const foodItemContainer = $(this).closest('.single-food-item');
+            const quantityInput = foodItemContainer.find('.quantity-input');
+            const quantity = quantityInput.val();
+
+            quantityInput.val(1);
+
+            $.ajax({
+                url: "{{ route('single.item.variants') }}",
+                method: 'POST',
+                data: {
+                    item_id: id,
+                    item_name: name,
+                    item_quantity: quantity,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+
+                    $('#variant-list').html(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+
+        /**
+         * Change variant
+         */
+        $(document).on('click', '.change-variant', function() {
+            let index = $(this).data('index');
+            let id = ordered_items[index].id;
+            let variant = ordered_items[index].variant;
+            $.ajax({
+                url: "{{ route('single.item.variants') }}",
+                method: 'POST',
+                data: {
+                    index: index,
+                    item_id: id,
+                    variant: variant,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+
+                    $('#variant-list').html(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+
+        /**
+         * Use variant
+         */
+        $(document).on('click', '.use-variant', function() {
+            let id = $('#variant-list').find('#food_item_id').val();
+            let name = $('#variant-list').find('#food_item_name').val();
+            let quantity = $('#variant-list').find('#food_item_quantity').val();
+            let selected_variant = $('#variant-list input[name="variant"]:checked').val();
+
+            selected_variant = JSON.parse(selected_variant);
+
+            let price = selected_variant.price;
+
+            ordered_items.push({
+                id: id,
+                name: name,
+                unit_price: price,
+                quantity: quantity,
+                price: (quantity * price),
+                variant: selected_variant
+            });
+            localStorage.setItem("ordered_items", JSON.stringify(ordered_items));
+            addToCart();
+        });
+
+        /**
+         * Update variant
+         */
+        $(document).on('click', '.update-variant', function() {
+            let index = $('#variant-list').find('#order_index').val();
+            let selected_variant = $('#variant-list input[name="variant"]:checked').val();
+
+            console.log(selected_variant);
+
+            selected_variant = JSON.parse(selected_variant);
+
+            let price = selected_variant.price;
+
+            ordered_items[index].unit_price = price;
+            ordered_items[index].price = calculateSingleItemTotalPrice(index);
+            ordered_items[index].variant = selected_variant;
+
+            localStorage.setItem("ordered_items", JSON.stringify(ordered_items));
+            addToCart();
+        });
+
+        /**
+         * Change properties
+         */
+        $(document).on('click', '.change-properties', function() {
+            let index = $(this).data('index');
+            let id = ordered_items[index].id;
+            let properties = ordered_items[index].properties;
+            $.ajax({
+                url: "{{ route('get.single.item.properties') }}",
+                method: 'POST',
+                data: {
+                    index: index,
+                    item_id: id,
+                    properties: properties,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    $('#property-list').html(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+
+        /**
+         * Update Property
+         */
+        $(document).on('click', '.update-property', function() {
+            let index = $('#property-list').find('#order_index').val();
+            let selected_property = [];
+
+            $(".food-property-items:checked").each(function() {
+                // Get the parent row
+                let parentRow = $(this).closest("tr");
+
+                // Get the checkbox value (parsed JSON)
+                let itemValue = JSON.parse($(this).val());
+
+                // Get the quantity input value
+                let quantity = parentRow.find(".food-property-quantity").val();
+
+                // Add quantity directly to the item object
+                itemValue.quantity = parseInt(quantity); // Convert quantity to an integer
+
+                // Push the modified item object into the array
+                selected_property.push(itemValue);
+            });
+
+            ordered_items[index].properties = selected_property;
+            ordered_items[index].price = calculateSingleItemTotalPrice(index);
+            console.log(ordered_items);
+
+            localStorage.setItem("ordered_items", JSON.stringify(ordered_items));
+            addToCart();
+        });
+
+        /**
+         * Add ordered items to cart
+         *
+         * @return void
+         */
+        function addToCart() {
+            let discount = $('#discount').val();
+            let discount_type = $('#discount_type').val();
+
+            $.ajax({
+                url: "{{ route('pos.add.to.cart') }}",
+                method: 'POST',
+                data: {
+                    ordered_items: ordered_items,
+                    order_discount: order_discount,
+                    discount: discount,
+                    taxes: tax_details,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    $('#order-summary').html(response);
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        /**
+         * Calculate total price
+         */
+        function calculateSingleItemTotalPrice($index) {
+            let quantity = ordered_items[$index].quantity;
+            let price = ordered_items[$index].unit_price;
+            let totalPrice = quantity * price;
+            let properties = ordered_items[$index].properties;
+
+            console.log(properties)
+            if (properties !== undefined && properties !== null) {
+                properties.forEach(property => {
+                    totalPrice += property.quantity * property.price;
+                });
+            }
+
+            return totalPrice;
+        }
+
+        /**
+         * Calculate total price
+         */
+        function calculateTotalPrice() {
+            let totalPrice = 0;
+            ordered_items.forEach(item => {
+                totalPrice += item.price;
+            });
+            return totalPrice;
+        }
+
+        /**
+         * Make tax percentage selected
+         *
+         * @return void
+         */
+        function makeTaxPercentageSelected() {
+            // Prepare the array of option values to select
+            const valuesToSelect = tax_details.map(tax => {
+                return `${tax.tax_name}~${tax.tax_id}~${tax.tax_rate}`;
+            });
+
+            // Select options in the select2 dropdown
+            $('#tax_percentage').val(valuesToSelect).trigger('change');
+        }
+
+        /**
+         * Make discount selected
+         *
+         * @return void
+         */
+        function makeDiscountSelected() {
+            let discount_amount = order_discount.discount_amount;
+            let discount_type = order_discount.discount_type;
+
+            // Select options in the select2 dropdown
+            $('#discount_type').val(discount_type);
+            $('#discount').val(discount_amount);
+        }
     });
 </script>
 @endpush
