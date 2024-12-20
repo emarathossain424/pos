@@ -9,15 +9,17 @@ use Brian2694\Toastr\Facades\Toastr;
 use Exception;
 use Illuminate\Http\Request;
 
-class BranchController extends Controller {
+class BranchController extends Controller
+{
     /**
      * Displays a list of all the branches in the system.
      *
      * @return \Illuminate\Http\Response
      */
-    public function allBranches() {
+    public function allBranches()
+    {
         $branches = Branch::all();
-        return view( 'settings.branch.index', compact( 'branches' ) );
+        return view('settings.branch.index', compact('branches'));
     }
 
     /**
@@ -27,13 +29,14 @@ class BranchController extends Controller {
      * @throws \Exception If an error occurs during the creation process.
      * @return \Illuminate\Http\RedirectResponse Redirects back to the previous page.
      */
-    public function createBranch( Request $request ) {
-        $request->validate( [
+    public function createBranch(Request $request)
+    {
+        $request->validate([
             'branch_name' => 'required|unique:core_branches,branch_name',
             'mobile'      => 'required',
             'address'     => 'required',
             'status'      => 'required',
-        ] );
+        ]);
 
         try {
             $branch              = new Branch();
@@ -43,10 +46,10 @@ class BranchController extends Controller {
             $branch->status      = $request->status;
             $branch->saveOrFail();
 
-            Toastr::success( 'Branch created successfully', 'Success' );
+            Toastr::success('Branch created successfully', 'Success');
             return back();
-        } catch ( Exception $ex ) {
-            Toastr::error( 'Unable to create branch', 'Error' );
+        } catch (Exception $ex) {
+            Toastr::error('Unable to create branch', 'Error');
             return back();
         }
     }
@@ -58,32 +61,33 @@ class BranchController extends Controller {
      * @throws \Exception If an error occurs during the update process.
      * @return \Illuminate\Http\RedirectResponse Redirects back to the previous page.
      */
-    public function updateBranch( Request $request ) {
-        $request->validate( [
+    public function updateBranch(Request $request)
+    {
+        $request->validate([
             'id'          => 'required|exists:core_branches,id',
             'branch_name' => 'required|unique:core_branches,branch_name,' . $request->id,
             'mobile'      => 'required',
             'address'     => 'required',
             'status'      => 'required',
-        ] );
+        ]);
 
         try {
-            $default_lang   = getGeneralSettingsValue( 'default_lang' );
+            $default_lang   = getGeneralSettingsValue('default_lang');
             $translate_into = $request['translate_into'];
-            if ( $default_lang == $translate_into ) {
-                $branch              = Branch::find( $request->id );
+            if ($default_lang == $translate_into) {
+                $branch              = Branch::find($request->id);
                 $branch->branch_name = $request->branch_name;
                 $branch->mobile      = $request->mobile;
                 $branch->address     = $request->address;
                 $branch->status      = $request->status;
                 $branch->update();
             } else {
-                $this->setBranchTranslation( $request );
+                $this->setBranchTranslation($request);
             }
-            Toastr::success( 'Branch updated successfully', 'Success' );
+            Toastr::success('Branch updated successfully', 'Success');
             return back();
-        } catch ( Exception $ex ) {
-            Toastr::error( 'Unable to update branch', 'Error' );
+        } catch (Exception $ex) {
+            Toastr::error('Unable to update branch', 'Error');
             return back();
         }
     }
@@ -97,16 +101,17 @@ class BranchController extends Controller {
      *
      * @return void
      */
-    public function setBranchTranslation( Request $request ) {
+    public function setBranchTranslation(Request $request)
+    {
         $branch_id      = $request['id'];
         $translate_into = $request['translate_into'];
 
-        $has_previous_trans = TranslateBranch::where( 'branch_id', $branch_id )
-            ->where( 'lang_id', $translate_into );
+        $has_previous_trans = TranslateBranch::where('branch_id', $branch_id)
+            ->where('lang_id', $translate_into);
 
-        if ( $has_previous_trans->exists() ) {
+        if ($has_previous_trans->exists()) {
             $trans_row_id              = $has_previous_trans->first()->id;
-            $branch_trans              = TranslateBranch::find( $trans_row_id );
+            $branch_trans              = TranslateBranch::find($trans_row_id);
             $branch_trans->branch_id   = $branch_id;
             $branch_trans->lang_id     = $translate_into;
             $branch_trans->branch_name = $request['branch_name'];
@@ -127,25 +132,26 @@ class BranchController extends Controller {
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateDefaultStatus( Request $request ) {
-        $request->validate( [
+    public function updateDefaultStatus(Request $request)
+    {
+        $request->validate([
             'id' => 'required|exists:core_branches,id',
-        ] );
+        ]);
 
         try {
-            Branch::where( 'is_default', 1 )->update( ['is_default' => 0] );
-            $branch             = Branch::find( $request->id );
+            Branch::where('is_default', 1)->update(['is_default' => 0]);
+            $branch             = Branch::find($request->id);
             $branch->is_default = $branch->is_default == 1 ? 0 : 1;
             $branch->update();
-            return response()->json( [
+            return response()->json([
                 'success' => true,
-                'message' => translate( 'Branch default status updated successfully' ),
-            ] );
-        } catch ( \Exception $ex ) {
-            return response()->json( [
+                'message' => translate('Branch default status updated successfully'),
+            ]);
+        } catch (\Exception $ex) {
+            return response()->json([
                 'success' => false,
-                'message' => translate( 'Unable to change default status' ),
-            ] );
+                'message' => translate('Unable to change default status'),
+            ]);
         }
     }
 
@@ -156,18 +162,19 @@ class BranchController extends Controller {
      * @throws \Exception If an error occurs during the deletion process.
      * @return \Illuminate\Http\RedirectResponse Redirects back to the previous page.
      */
-    public function deleteBranch( Request $request ) {
-        $request->validate( [
+    public function deleteBranch(Request $request)
+    {
+        $request->validate([
             'id' => 'required|exists:core_branches,id',
-        ] );
+        ]);
 
         try {
-            $branch = Branch::find( $request['id'] );
+            $branch = Branch::find($request['id']);
             $branch->delete();
-            Toastr::success( 'Branch deleted successfully', 'Success' );
+            Toastr::success('Branch deleted successfully', 'Success');
             return back();
-        } catch ( Exception $ex ) {
-            Toastr::error( 'Unable to delete branch', 'Error' );
+        } catch (Exception $ex) {
+            Toastr::error('Unable to delete branch', 'Error');
             return back();
         }
     }
@@ -192,28 +199,29 @@ class BranchController extends Controller {
      *                                           "message": "No translation found"
      *                                       }
      */
-    public function getBranchTranslation( Request $request ) {
+    public function getBranchTranslation(Request $request)
+    {
         $lang_id   = $request['lang_id'];
         $branch_id = $request['branch_id'];
 
-        $translated_branch = TranslateBranch::where( 'branch_id', $branch_id )
-            ->where( 'lang_id', $lang_id )->first();
+        $translated_branch = TranslateBranch::where('branch_id', $branch_id)
+            ->where('lang_id', $lang_id)->first();
 
-        if ( $translated_branch ) {
-            return response()->json( [
+        if ($translated_branch) {
+            return response()->json([
                 'success' => 1,
                 'data'    => [
                     'name'    => $translated_branch->branch_name,
                     'address' => $translated_branch->address,
                 ],
-                'message' => translate( 'Translated branch name' ),
-            ] );
+                'message' => translate('Translated branch name'),
+            ]);
         } else {
-            return response()->json( [
+            return response()->json([
                 'success' => 0,
                 'data'    => [],
-                'message' => translate( 'No translation found' ),
-            ] );
+                'message' => translate('No translation found'),
+            ]);
         }
     }
 }
