@@ -2,6 +2,7 @@
 
 use App\Models\Branch;
 use App\Models\Currency;
+use App\Models\Customer;
 use App\Models\Language;
 use App\Models\Tax;
 use App\Models\Upload;
@@ -185,5 +186,16 @@ if (!function_exists('getAllActiveTaxes')) {
     {
         $taxes = Tax::where('status', 1)->get();
         return $taxes;
+    }
+}
+
+if (!function_exists('getAllCustomers')) {
+    /**
+     * will return all customers
+     */
+    function getAllCustomers()
+    {
+        $customers = Customer::all();
+        return $customers;
     }
 }

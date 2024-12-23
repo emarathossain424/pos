@@ -5,6 +5,9 @@ $translatedLang = isset(request()->lang)?request()->lang:$default_lang;
 
 $all_branches = getBranches();
 $taxes = getAllActiveTaxes();
+$customers = getAllCustomers();
+
+$hall_and_tables = getAllHallAndTables();
 @endphp
 @extends('layouts.master')
 @section('title') {{translate('Halls')}} @endsection
@@ -318,7 +321,7 @@ $taxes = getAllActiveTaxes();
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">{{translate('Close')}}</button>
-                    <button type="button" class="btn btn-primary btn-sm" id="apply-tax" data-dismiss="modal">{{translate('Apply Discount')}}</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="apply-tax" data-dismiss="modal">{{translate('Apply Tax')}}</button>
                 </div>
             </div>
             <!-- /.modal-content -->
@@ -327,6 +330,65 @@ $taxes = getAllActiveTaxes();
     </div>
     <!-- /Select Tax -->
 
+    <!-- Select Customer -->
+    <div class="modal fade" id="order-customer">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <label for="order_customer">{{translate('Select Customer')}}</label>
+                    <select name="order_customer" id="order_customer" class="form-control select2">
+                        <option value="walk_in" data-name="Walk-in">{{translate('Walk-in')}}</option>
+
+                        @foreach($customers as $customer)
+                        <option value="{{$customer->id}}" data-name="{{$customer->name}}">{{$customer->name}} {{ $customer->mobile ? '('. $customer->mobile .')' : ''}}</option>
+                        @endforeach
+                        <option value="add_customer" data-name="Add Customer">{{translate('Add Customer')}}</option>
+                    </select>
+
+                    <div id="new-customer-form">
+                        <hr>
+
+                        <label for="order_customer_name">{{translate('Customer Name')}}</label>
+                        <input type="text" class="form-control" name="customer_name" id="order_customer_name" placeholder="Enter customer name">
+
+                        <label for="order_customer_mobile">{{translate('Customer Mobile')}}</label>
+                        <input type="text" class="form-control" name="customer_mobile" id="order_customer_mobile" placeholder="Enter customer mobile">
+
+                        <label for="order_customer_email">{{translate('Customer Email')}}</label>
+                        <input type="text" class="form-control" name="customer_email" id="order_customer_email" placeholder="Enter customer email">
+
+                        <label for="order_customer_address">{{translate('Customer Address')}}</label>
+                        <input type="text" class="form-control" name="customer_address" id="order_customer_address" placeholder="Enter customer address">
+                    </div>
+
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">{{translate('Close')}}</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="select-customer" data-dismiss="modal">{{translate('Select Customer')}}</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /Select Customer -->
+
+    <!-- Select Tables -->
+    <div class="modal fade" id="order-customer">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">{{translate('Close')}}</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="select-customer" data-dismiss="modal">{{translate('Select Customer')}}</button>
+                </div>
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+    <!-- /Select Tables -->
 </div>
 @endsection
 
@@ -339,6 +401,7 @@ $taxes = getAllActiveTaxes();
         let ordered_items = JSON.parse(localStorage.getItem("ordered_items")) ?? [];
         let tax_details = JSON.parse(localStorage.getItem('tax_details')) ?? [];
         let order_discount = JSON.parse(localStorage.getItem('order_discount')) ?? [];
+        let customer_details = JSON.parse(localStorage.getItem('customer_details')) ?? [];
 
         addToCart();
         makeTaxPercentageSelected();
@@ -346,11 +409,30 @@ $taxes = getAllActiveTaxes();
 
         $('body').addClass('sidebar-collapse');
 
+        $('#new-customer-form').hide();
+
         $('#tax_percentage').select2({
             theme: 'bootstrap4',
             width: '100%'
         })
 
+        $('#order_customer').select2({
+            theme: 'bootstrap4',
+            width: '100%'
+        })
+
+        $('#order_customer').change(function() {
+            let selected_customer = $('#order_customer').val();
+            if (selected_customer == 'add_customer') {
+                $('#new-customer-form').show();
+            } else {
+                $('#new-customer-form').hide();
+            }
+        });
+
+        /**
+         * Apply Tax
+         */
         $('#apply-tax').click(function() {
             let taxes = $('#tax_percentage').val();
 
@@ -369,6 +451,9 @@ $taxes = getAllActiveTaxes();
             addToCart();
         });
 
+        /**
+         * Apply Discount
+         */
         $('#apply-discount').click(function() {
             let discount_type = $('#discount_type').val();
             let discount_amount = $('#discount').val();
@@ -378,6 +463,36 @@ $taxes = getAllActiveTaxes();
             };
             localStorage.setItem('order_discount', JSON.stringify(order_discount));
             addToCart();
+        });
+
+        $('#select-customer').click(function() {
+            let selected_customer = $('#order_customer').val();
+            if (selected_customer == 'add_customer') {
+                let customer_name = $('#order_customer_name').val();
+                let customer_mobile = $('#order_customer_mobile').val();
+                let customer_email = $('#order_customer_email').val();
+                let customer_address = $('#order_customer_address').val();
+                $('#selected-customer').text(customer_name);
+
+                let customer_details = {
+                    customer_id: '-1',
+                    customer_name: customer_name,
+                    customer_mobile: customer_mobile,
+                    customer_email: customer_email,
+                    customer_address: customer_address
+                };
+
+                localStorage.setItem('customer_details', JSON.stringify(customer_details));
+            } else {
+                let selected_customer_name = $('#order_customer option:selected').data('name');
+                $('#selected-customer').text(selected_customer_name);
+
+                let customer_details = {
+                    customer_id: selected_customer,
+                    customer_name: selected_customer_name
+                };
+                localStorage.setItem('customer_details', JSON.stringify(customer_details));
+            }
         });
 
         /**
@@ -659,6 +774,7 @@ $taxes = getAllActiveTaxes();
                 },
                 success: function(response) {
                     $('#order-summary').html(response);
+                    makeCustomerSelected();
                 },
                 error: function(xhr, status, error) {
                     console.error(error);
@@ -723,6 +839,25 @@ $taxes = getAllActiveTaxes();
             // Select options in the select2 dropdown
             $('#discount_type').val(discount_type);
             $('#discount').val(discount_amount);
+        }
+
+        /**
+         * Make customer selected
+         */
+        function makeCustomerSelected() {
+
+            let customer_id = customer_details.customer_id;
+            if (customer_id == '-1') {
+                $('#order_customer_name').val(customer_details.customer_name);
+                $('#order_customer_mobile').val(customer_details.customer_mobile);
+                $('#order_customer_email').val(customer_details.customer_email);
+                $('#order_customer_address').val(customer_details.customer_address);
+                $('#order_customer').val('add_customer').trigger('change');
+            } else {
+                $('#order_customer').val(customer_id).trigger('change');
+            }
+            console.log(customer_details)
+            $('#selected-customer').text(customer_details.customer_name);
         }
     });
 </script>

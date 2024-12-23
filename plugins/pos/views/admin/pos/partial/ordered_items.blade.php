@@ -1,3 +1,6 @@
+@php
+$order_types = getOrderTypes();
+@endphp
 @if($ordered_items)
 <table class="table table-sm">
     <thead>
@@ -139,6 +142,25 @@
             <td class="text-right"><span class="fs-5"><strong>{{setPriceFormat($total)}}</strong></span></td>
         </tr>
         <tr>
+            <td><strong>{{translate('Order Type')}}</strong></td>
+            <td class="text-right">
+                <select name="order_type" id="order_type" class="form-control form-control-sm">
+                    @foreach( $order_types as $order_type )
+                    <option value="{{$order_type->id}}">{{$order_type->name}}</option>
+                    @endforeach
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>{{translate('Select Customer')}}</strong></td>
+            <td class="text-right">
+                <button type="button" class="btn btn-outline-primary btn-sm" id="select-customer" data-toggle="modal" data-target="#order-customer">
+                    <span id="selected-customer">{{translate('Walk-in')}}</span>
+                    <i class="fa fa-angle-down"></i>
+                </button>
+            </td>
+        </tr>
+        <tr>
             <td><strong>Select Table</strong></td>
             <td class="text-right">
                 <button type="button" class="btn btn-outline-primary btn-sm">Select Table</button>
@@ -149,12 +171,21 @@
             <td class="text-right">
                 <div class="btn-group" role="group">
                     <button type="button" class="btn btn-outline-success btn-sm">
-                        <i class="fa-solid fa-cash-register"></i> Cash
+                        Cash
                     </button>
                     <button type="button" class="btn btn-outline-warning btn-sm">
-                        <i class="fa-solid fa-credit-card"></i> Card
+                        Card
+                    </button>
+                    <button type="button" class="btn btn-outline-info btn-sm">
+                        Online
                     </button>
                 </div>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>Order Status</strong></td>
+            <td class="text-right">
+                <button type="button" class="btn btn-outline-primary btn-sm">Delivered</button>
             </td>
         </tr>
         <tr>

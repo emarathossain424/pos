@@ -304,5 +304,11 @@
     "Update Status": "Update Status",
     "Delete Status": "Delete Status",
     "Are you sure, you want to delete this status?": "Are you sure, you want to delete this status?",
-    "Translated order status name": "Translated order status name"
+    "Translated order status name": "Translated order status name",
+    "Walk-in": "Walk-in",
+    "Apply Tax": "Apply Tax",
+    "Customer Name": "Customer Name",
+    "Customer Mobile": "Customer Mobile",
+    "Customer Email": "Customer Email",
+    "Customer Address": "Customer Address"
 }
