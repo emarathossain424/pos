@@ -334,6 +334,12 @@ $hall_and_tables = getAllHallAndTables();
     <div class="modal fade" id="order-customer">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">{{translate('Select / Add Customer')}}</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
                 <div class="modal-body">
                     <label for="order_customer">{{translate('Select Customer')}}</label>
                     <select name="order_customer" id="order_customer" class="form-control select2">
@@ -374,14 +380,119 @@ $hall_and_tables = getAllHallAndTables();
     <!-- /Select Customer -->
 
     <!-- Select Tables -->
-    <div class="modal fade" id="order-customer">
-        <div class="modal-dialog modal-md">
+    <div class="modal fade" id="order-table">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">{{translate('Select Table')}}</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
                 <div class="modal-body">
+                    @foreach($hall_and_tables as $hall)
+                    <!-- @if($hall['tables']->count() > 0) -->
+                    <div id="accordion">
+                        <div class="card">
+                            <div class="card-header p-0" id="heading-{{$hall['id']}}">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link text-left btn-block" data-toggle="collapse" data-target="#collapse-{{$hall['id']}}" aria-expanded="true" aria-controls="collapse-{{$hall['id']}}">
+                                        <h5>
+                                            {{ $hall['name'] }} <i class="icon-toggle fa fa-chevron-down float-right"></i>
+                                        </h5>
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <div id="collapse-{{$hall['id']}}" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                                <div class="card-body">
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>{{ translate('Select') }}</th>
+                                                <th>{{ translate('Table No.') }}</th>
+                                                <th>{{ translate('Table Type') }}</th>
+                                                <th>{{ translate('Table Shape') }}</th>
+                                                <th>{{ translate('Capacity') }}</th>
+                                                <th>{{ translate('Status') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($hall['tables'] as $table)
+                                            @php
+                                            $table_types = getAllTableTypes();
+                                            $table_status = getAllTableStatus();
+                                            $table_shapes = getAllTableShapes();
+                                            @endphp
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" name="tables" class="selected-tables" id="table-{{ $table->id }}" value="{{ json_encode($table) }}" data-hall="{{json_encode($hall)}}" />
+                                                </td>
+                                                <td>{{ $table->table_number }}</td>
+                                                <td>{{ $table_types[$table->type] }}</td>
+                                                <td>{{ $table_shapes[$table->shape] }}</td>
+                                                <td>{{ $table->chair_limit }}</td>
+                                                <td>{{ $table_status[$table->status] }}</td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- @endif -->
+                    @endforeach
+
+                    <!-- <div id="accordion">
+                        <div class="card">
+                            <div class="card-header" id="headingOne">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link text-left btn-block" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                        Collapsible Group Item #1
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                                <div class="card-body">
+                                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header" id="headingTwo">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link text-left btn-block" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                        Collapsible Group Item #2
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                                <div class="card-body">
+                                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header" id="headingThree">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link text-left btn-block" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                        Collapsible Group Item #3
+                                    </button>
+                                </h5>
+                            </div>
+                            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                                <div class="card-body">
+                                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">{{translate('Close')}}</button>
-                    <button type="button" class="btn btn-primary btn-sm" id="select-customer" data-dismiss="modal">{{translate('Select Customer')}}</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="select-table" data-dismiss="modal">{{translate('Select Table')}}</button>
                 </div>
             </div>
             <!-- /.modal-content -->
@@ -402,10 +513,14 @@ $hall_and_tables = getAllHallAndTables();
         let tax_details = JSON.parse(localStorage.getItem('tax_details')) ?? [];
         let order_discount = JSON.parse(localStorage.getItem('order_discount')) ?? [];
         let customer_details = JSON.parse(localStorage.getItem('customer_details')) ?? [];
+        let checked_tables = JSON.parse(localStorage.getItem('checked_tables')) ?? [];
 
-        addToCart();
-        makeTaxPercentageSelected();
-        makeDiscountSelected();
+        $(document).ready(function() {
+            addToCart();
+            makeTaxPercentageSelected();
+            makeDiscountSelected();
+            makeTablesSelected();
+        })
 
         $('body').addClass('sidebar-collapse');
 
@@ -421,6 +536,9 @@ $hall_and_tables = getAllHallAndTables();
             width: '100%'
         })
 
+        /**
+         * Select Customer
+         */
         $('#order_customer').change(function() {
             let selected_customer = $('#order_customer').val();
             if (selected_customer == 'add_customer') {
@@ -465,6 +583,9 @@ $hall_and_tables = getAllHallAndTables();
             addToCart();
         });
 
+        /**
+         * Select Customer
+         */
         $('#select-customer').click(function() {
             let selected_customer = $('#order_customer').val();
             if (selected_customer == 'add_customer') {
@@ -682,8 +803,6 @@ $hall_and_tables = getAllHallAndTables();
             let index = $('#variant-list').find('#order_index').val();
             let selected_variant = $('#variant-list input[name="variant"]:checked').val();
 
-            console.log(selected_variant);
-
             selected_variant = JSON.parse(selected_variant);
 
             let price = selected_variant.price;
@@ -747,11 +866,37 @@ $hall_and_tables = getAllHallAndTables();
 
             ordered_items[index].properties = selected_property;
             ordered_items[index].price = calculateSingleItemTotalPrice(index);
-            console.log(ordered_items);
 
             localStorage.setItem("ordered_items", JSON.stringify(ordered_items));
             addToCart();
         });
+
+        $('#select-table').click(function() {
+            let html = '';
+            checked_tables = [];
+
+            $('.selected-tables:checked').each(function() {
+                let table_data = JSON.parse($(this).val());
+                let hall_data = $(this).data('hall');
+
+                let hall_id = table_data.hall_id;
+                let hall_name = hall_data.name;
+                let table_id = table_data.id;
+                let table_number = table_data.table_number;
+
+                checked_tables.push({
+                    hall_id: hall_id,
+                    hall_name: hall_name,
+                    table_id: table_id,
+                    table_number: table_number
+                });
+
+                html = html + `<span class="badge badge-primary">H${hall_name}/T${table_number}</span>`
+            });
+
+            localStorage.setItem("checked_tables", JSON.stringify(checked_tables));
+            $('#all-selected-table').html(html);
+        })
 
         /**
          * Add ordered items to cart
@@ -791,7 +936,6 @@ $hall_and_tables = getAllHallAndTables();
             let totalPrice = quantity * price;
             let properties = ordered_items[$index].properties;
 
-            console.log(properties)
             if (properties !== undefined && properties !== null) {
                 properties.forEach(property => {
                     totalPrice += property.quantity * property.price;
@@ -856,9 +1000,29 @@ $hall_and_tables = getAllHallAndTables();
             } else {
                 $('#order_customer').val(customer_id).trigger('change');
             }
-            console.log(customer_details)
             $('#selected-customer').text(customer_details.customer_name);
         }
+
+        function makeTablesSelected() {
+            let tables = checked_tables;
+            let html = '';
+
+            tables.forEach(table => {
+                html += `<span class="badge badge-primary">H${table.hall_name}/T${table.table_number}</span>`;
+                $(`#table-${table.table_id}`).prop('checked', true);
+            });
+
+            // Wait for #all-selected-table to appear
+            let interval = setInterval(() => {
+                let selectedTableContainer = $('#all-selected-table');
+                if (selectedTableContainer.length) {
+                    clearInterval(interval);
+                    selectedTableContainer.html(html);
+                }
+            }, 100);
+        }
+
+
     });
 </script>
 @endpush
