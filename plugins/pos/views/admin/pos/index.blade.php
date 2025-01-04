@@ -1017,7 +1017,9 @@ $hall_and_tables = getAllHallAndTables();
                 let selectedTableContainer = $('#all-selected-table');
                 if (selectedTableContainer.length) {
                     clearInterval(interval);
-                    selectedTableContainer.html(html);
+                    if (html != '') {
+                        selectedTableContainer.html(html);
+                    }
                 }
             }, 100);
         }

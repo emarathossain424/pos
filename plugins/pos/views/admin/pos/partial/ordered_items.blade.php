@@ -162,11 +162,15 @@ $order_types = getOrderTypes();
         </tr>
         <tr>
             <td>
-                <strong>{{translate('Select Table')}}</strong>
-                <div class="small" id="all-selected-table"></div>
+                <strong>{{translate('Table')}}</strong>
+                <div class="small">
+                    <a href="#" id="select-table" data-toggle="modal" data-target="#order-table">{{translate('Select Table')}}</a>
+                </div>
             </td>
             <td class="text-right">
-                <button type="button" class="btn btn-outline-primary btn-sm" id="select-table" data-toggle="modal" data-target="#order-table">{{translate('Select Table')}}</button>
+                <div id="all-selected-table">
+                    <i class="fa fa-ban"></i>
+                </div>
             </td>
         </tr>
         <tr>
