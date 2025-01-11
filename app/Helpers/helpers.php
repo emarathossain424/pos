@@ -4,6 +4,7 @@ use App\Models\Branch;
 use App\Models\Currency;
 use App\Models\Customer;
 use App\Models\Language;
+use App\Models\OrderStatus;
 use App\Models\Tax;
 use App\Models\Upload;
 use Illuminate\Support\Facades\DB;
@@ -197,5 +198,16 @@ if (!function_exists('getAllCustomers')) {
     {
         $customers = Customer::all();
         return $customers;
+    }
+}
+
+if (!function_exists('getOrderStatus')) {
+    /**
+     * will return all active order status
+     */
+    function getOrderStatus()
+    {
+        $order_status = OrderStatus::all();
+        return $order_status;
     }
 }

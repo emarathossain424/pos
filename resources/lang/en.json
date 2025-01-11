@@ -312,5 +312,14 @@
     "Customer Email": "Customer Email",
     "Customer Address": "Customer Address",
     "Select \/ Add Customer": "Select \/ Add Customer",
-    "Table": "Table"
+    "Table": "Table",
+    "Payment Method": "Payment Method",
+    "Select Payment Method": "Select Payment Method",
+    "Grand Total": "Grand Total",
+    "Assigned Table": "Assigned Table",
+    "Selected Customer": "Selected Customer",
+    "Cash": "Cash",
+    "Card": "Card",
+    "Mobile Banking": "Mobile Banking",
+    "Name and mobile are required for new customer": "Name and mobile are required for new customer"
 }

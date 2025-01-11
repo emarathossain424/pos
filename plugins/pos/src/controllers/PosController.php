@@ -14,8 +14,8 @@ class PosController extends Controller
      * Display a listing of food items with filtering and pagination.
      *
      * This method fetches all available categories and filters food items
-     * based on the provided request parameters including category, branch, 
-     * and search term. It paginates the results and returns a view with 
+     * based on the provided request parameters including category, branch,
+     * and search term. It paginates the results and returns a view with
      * the relevant data.
      *
      * @param \Illuminate\Http\Request $request
@@ -51,7 +51,14 @@ class PosController extends Controller
             $food_items = $food_items->where('name', 'LIKE', "%{$searchTerm}%");
         }
 
-        $food_items = $food_items->paginate(9);
+        $food_items = $food_items->paginate(2);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'data'       => view('pos::admin.pos.partial.food_items', compact('food_items'))->render(),
+                'pagination' => (string) $food_items->links('pagination::bootstrap-5'),
+            ]);
+        }
 
         return view('pos::admin.pos.index', compact('categories', 'food_items'));
     }
@@ -66,11 +73,27 @@ class PosController extends Controller
     public function posAddToCart(Request $request)
     {
         $order_discount = $request['order_discount'] ?? [];
-        $taxes = $request['taxes'] ?? [];
+        $taxes          = $request['taxes'] ?? [];
 
         $ordered_items = $request['ordered_items'] ?? [];
 
-
         return view('pos::admin.pos.partial.ordered_items', compact('ordered_items', 'order_discount', 'taxes'));
+    }
+
+    /**
+     * Will return a rendered partial view of the ordered items
+     * given the ordered items data from the request.
+     *
+     * @param  Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function itemSearch(Request $request)
+    {
+        $searchTerm = $request->input('query');
+        $food_items = FoodItem::where('name', 'LIKE', "%{$searchTerm}%")->get();
+        foreach ($food_items as $item) {
+            $item->image = getFilePath($item->image);
+        }
+        return response()->json($food_items);
     }
 }

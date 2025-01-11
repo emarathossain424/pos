@@ -1,23 +1,15 @@
 @php
 $order_types = getOrderTypes();
+$order_status = getOrderStatus();
 @endphp
 @if($ordered_items)
 <table class="table table-sm">
     <thead>
         <tr>
-            <th>{{translate('Order Details')}}</th>
+            <td><strong>{{translate('Order Details')}}<strong></td>
         </tr>
     </thead>
     <tbody>
-        <tr>
-            <td>
-                <strong>{{translate('Customer')}}</strong>
-                <div class="small">
-                    <a href="#" id="add-customer" data-toggle="modal" data-target="#order-customer">{{translate('Select Customer')}}</a>
-                </div>
-            </td>
-            <td class="text-right"><span class="badge bg-info">{{translate('Guest')}}</span></td>
-        </tr>
         @foreach($ordered_items as $key=>$item)
         @php
         $subtotal = $item['price'];
@@ -138,8 +130,30 @@ $order_types = getOrderTypes();
         @endif
 
         <tr>
-            <td><strong>{{translate('Total')}}</strong></td>
+            <td><strong>{{translate('Grand Total')}}</strong></td>
             <td class="text-right"><span class="fs-5"><strong>{{setPriceFormat($total)}}</strong></span></td>
+        </tr>
+        <tr>
+            <td>
+                <strong>{{translate('Assigned Table')}}</strong>
+                <div class="small">
+                    <a href="#" id="select-table" data-toggle="modal" data-target="#order-table">{{translate('Select Table')}}</a>
+                </div>
+            </td>
+            <td class="text-right">
+                <div id="all-selected-table">
+                    <i class="fa fa-ban"></i>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td><strong>{{translate('Customer Name')}}</strong></td>
+            <td class="text-right">
+                <button type="button" class="btn btn-outline-primary btn-sm" id="select-customer" data-toggle="modal" data-target="#order-customer">
+                    <span id="selected-customer">{{translate('Walk-in')}}</span>
+                    <i class="fa fa-angle-down"></i>
+                </button>
+            </td>
         </tr>
         <tr>
             <td><strong>{{translate('Order Type')}}</strong></td>
@@ -152,47 +166,25 @@ $order_types = getOrderTypes();
             </td>
         </tr>
         <tr>
-            <td><strong>{{translate('Select Customer')}}</strong></td>
-            <td class="text-right">
-                <button type="button" class="btn btn-outline-primary btn-sm" id="select-customer" data-toggle="modal" data-target="#order-customer">
-                    <span id="selected-customer">{{translate('Walk-in')}}</span>
-                    <i class="fa fa-angle-down"></i>
-                </button>
-            </td>
-        </tr>
-        <tr>
             <td>
-                <strong>{{translate('Table')}}</strong>
-                <div class="small">
-                    <a href="#" id="select-table" data-toggle="modal" data-target="#order-table">{{translate('Select Table')}}</a>
-                </div>
+                <strong>{{translate('Payment Type')}}</strong>
             </td>
             <td class="text-right">
-                <div id="all-selected-table">
-                    <i class="fa fa-ban"></i>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td><strong>Select Payment</strong></td>
-            <td class="text-right">
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-outline-success btn-sm">
-                        Cash
-                    </button>
-                    <button type="button" class="btn btn-outline-warning btn-sm">
-                        Card
-                    </button>
-                    <button type="button" class="btn btn-outline-info btn-sm">
-                        Online
-                    </button>
-                </div>
+                <select name="payment_method" id="payment_method" class="form-control form-control-sm">
+                    <option value="cash">{{translate('Cash')}}</option>
+                    <option value="card">{{translate('Card')}}</option>
+                    <option value="mobile_banking">{{translate('Mobile Banking')}}</option>
+                </select>
             </td>
         </tr>
         <tr>
-            <td><strong>Order Status</strong></td>
+            <td><strong>{{translate('Order Status')}}</strong></td>
             <td class="text-right">
-                <button type="button" class="btn btn-outline-primary btn-sm">Delivered</button>
+                <select name="order_status" id="order_status" class="form-control form-control-sm">
+                    @foreach( $order_status as $order_status )
+                    <option value="{{$order_status->id}}">{{$order_status->name}}</option>
+                    @endforeach
+                </select>
             </td>
         </tr>
         <tr>

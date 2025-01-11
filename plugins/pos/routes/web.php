@@ -16,5 +16,6 @@ use Plugin\Pos\Controllers\PosController;
 
 Route::prefix( '/pos' )->middleware( 'auth' )->group( function () {
     Route::get( '/', [PosController::class, 'index'] )->name( 'pos' );
+    Route::get( '/item-search', [PosController::class, 'itemSearch'] )->name( 'pos.item.search' );
     Route::post( '/add-to-cart', [PosController::class, 'posAddToCart'] )->name( 'pos.add.to.cart' );
 } );

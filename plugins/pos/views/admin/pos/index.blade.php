@@ -114,51 +114,121 @@ $hall_and_tables = getAllHallAndTables();
         border-color: #e43d89;
         box-shadow: none;
     }
+
+    .card {
+        box-shadow: 0 0 0px rgba(0, 0, 0, 0.1);
+        border-radius: 0rem;
+    }
+
+
+    /* Full-page overlay */
+    #loader-overlay {
+        position: fixed;
+        /* Covers the entire viewport */
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        /* Semi-transparent background */
+        display: flex;
+        /* Flexbox to center the spinner */
+        align-items: center;
+        /* Center vertically */
+        justify-content: center;
+        /* Center horizontally */
+        z-index: 9999;
+        /* Ensure it appears on top */
+    }
+
+    .spinner {
+        width: 30px;
+        aspect-ratio: 1;
+        --_c: no-repeat radial-gradient(farthest-side, rgb(226, 45, 130) 92%, #0000);
+        background:
+            var(--_c) top,
+            var(--_c) left,
+            var(--_c) right,
+            var(--_c) bottom;
+        background-size: 8px 8px;
+        animation: l7 1s infinite;
+    }
+
+    #suggestions {
+        position: absolute;
+        /* Ensures the dropdown is positioned relative to the input */
+        z-index: 1000;
+        /* Places the dropdown above other elements */
+        background-color: #fff;
+        border: 1px solid #ddd;
+        max-height: 200px;
+        /* Adjust max height as needed */
+        overflow-y: auto;
+        width: 96%;
+        /* Matches the width of the parent container */
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        /* Optional: Adds a shadow for better visibility */
+        display: none;
+        /* Initially hidden */
+    }
+
+
+    /* Spinner animation */
+    @keyframes l7 {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
 </style>
 
 @endpush
 
 @section('content')
-<div class="content">
+<div class="bg-white">
     <div class="container-fluid">
         <x-alert column="col-md-12" alert_type="alert-warning" />
         <div class="row">
-            <div class="col-lg-8">
-                <div class="card">
+            <div class="col-sm-8">
+                <div class="card border-0">
                     <div class="card-body">
                         <!-- food item filtering options -->
-                        <form action="{{route('pos')}}" method="get" id="filterForm">
-                            <div class="row d-flex">
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <select class="form-control select2 w-100" name="branch" id="branchSelect">
-                                            <option value="">{{translate('All Branches')}}</option>
-                                            @foreach($all_branches as $branch)
-                                            <option value="{{$branch->id}}" {{ request()->get('branch') == $branch->id ? 'selected' : '' }}>{{$branch->branch_name}}</option>
-                                            @endforeach
-                                        </select>
-                                        <input type="hidden" name="category" value="" id="categorySelect">
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <input type="text" class="form-control" name="search" placeholder="{{translate('Search')}}" value="{{ request()->get('search') }}">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <button class="btn btn-pink rounded-pill btn-sm px-3">
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
-                                            <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
-                                        </svg>
-                                    </button>
-                                    <a href="{{route('pos')}}" class="btn btn-pink rounded-pill btn-sm px-3">
-                                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
-                                            <path d="m336-280 144-144 144 144 56-56-144-144 144-144-56-56-144 144-144-144-56 56 144 144-144 144 56 56ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
-                                        </svg>
-                                    </a>
+                        <!-- <form action="{{route('pos')}}" method="get" id="filterForm"> -->
+                        <div class="row d-flex">
+                            <div class="col-md-3">
+                                <div class="form-group">
+                                    <select class="form-control select2 w-100" name="branch" id="branchSelect">
+                                        <option value="">{{translate('All Branches')}}</option>
+                                        @foreach($all_branches as $branch)
+                                        <option value="{{$branch->id}}" {{ request()->get('branch') == $branch->id ? 'selected' : '' }}>{{$branch->branch_name}}</option>
+                                        @endforeach
+                                    </select>
+                                    <input type="hidden" name="category" value="" id="categorySelect">
                                 </div>
                             </div>
-                        </form>
+                            <div class="col-md-7">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="search" name="search" placeholder="{{translate('Search')}}" value="{{ request()->get('search') }}">
+                                    <div id="suggestions"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-pink rounded-pill btn-sm px-3" id="filter-btn">
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+                                        <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 44-14 83t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z" />
+                                    </svg>
+                                </button>
+                                <a href="{{route('pos')}}" class="btn btn-pink rounded-pill btn-sm px-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#FFFFFF">
+                                        <path d="m336-280 144-144 144 144 56-56-144-144 144-144-56-56-144 144-144-144-56 56 144 144-144 144 56 56ZM480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                        <!-- </form> -->
                         <!-- /food item filtering options -->
                         <hr>
 
@@ -173,66 +243,20 @@ $hall_and_tables = getAllHallAndTables();
                         </div>
                         <!-- /Categories Section -->
 
-                        <!-- Food Items Section -->
-                        <div class="row">
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Image</th>
-                                            <th scope="col">Name</th>
-                                            <th scope="col">{{translate('Price')}} ({{getCurrencySymbol(getGeneralSettingsValue( 'default_currency' ))}})</th>
-                                            <th scope="col">Quantity</th>
-                                            <th scope="col">Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($food_items as $item)
-                                        <tr class="single-food-item">
-                                            <!-- Food Image -->
-                                            <td class="text-center">
-                                                <img src="/{{ getFilePath($item->image) }}" alt="item-image" class="img-fluid" style="max-width: 50px; max-height: 50px;">
-                                            </td>
-
-                                            <!-- Food Title -->
-                                            <td>{{ $item->name }}</td>
-
-                                            <!-- Price -->
-                                            <td>
-                                                <strong>{{setPriceFormat($item->price)}}</strong>
-                                            </td>
-
-                                            <!-- Quantity Selector -->
-                                            <td>
-                                                <div class="d-flex justify-content-center quantity-selector">
-                                                    <button class="btn btn-sm btn-outline-pink btn-decrement" type="button"> - </button>
-                                                    <input type="number" class="form-control quantity-input mx-2" min="1" value="1" style="width: 100px; text-align: center; height: 31px;" aria-label="Quantity">
-                                                    <button class="btn btn-sm btn-outline-pink btn-increment" type="button">+</button>
-                                                </div>
-                                            </td>
-
-                                            <!-- Action Button -->
-                                            <td>
-                                                @if($item->food_type == 'variant')
-                                                <button type="button" class="btn btn-outline-pink btn-sm show-variant rounded-pill px-3" data-id="{{$item->id}}" data-name="{{$item->name}}" data-toggle="modal" data-target="#item-variant">{{ translate('Select Variant') }}</button>
-                                                @else
-                                                <button type="button" class="btn btn-outline-pink btn-sm add-to-cart rounded-pill px-3" data-id="{{$item->id}}" data-name="{{$item->name}}" data-price="{{$item->price}}">{{ translate('Place Order') }}</button>
-                                                @endif
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
+                        <div id="data-container">
+                            @include('pos::admin.pos.partial.food_items', ['food_items' => $food_items])
                         </div>
-                        {{ $food_items->links('pagination::bootstrap-5') }}
+
+                        <div id="pagination-links">
+                            {{ $food_items->links('pagination::bootstrap-5') }}
+                        </div>
                         <!-- /Food Items Section -->
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4">
+            <div class="col-sm-4">
                 <!-- Order Summary Section -->
-                <div class="card shadow-lg border-0 rounded-3">
+                <div class="card border-left">
                     <div class="card-body p-0" id="order-summary">
 
                     </div>
@@ -443,52 +467,6 @@ $hall_and_tables = getAllHallAndTables();
                     </div>
                     <!-- @endif -->
                     @endforeach
-
-                    <!-- <div id="accordion">
-                        <div class="card">
-                            <div class="card-header" id="headingOne">
-                                <h5 class="mb-0">
-                                    <button class="btn btn-link text-left btn-block" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                        Collapsible Group Item #1
-                                    </button>
-                                </h5>
-                            </div>
-
-                            <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
-                                <div class="card-body">
-                                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header" id="headingTwo">
-                                <h5 class="mb-0">
-                                    <button class="btn btn-link text-left btn-block" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                        Collapsible Group Item #2
-                                    </button>
-                                </h5>
-                            </div>
-                            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
-                                <div class="card-body">
-                                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card">
-                            <div class="card-header" id="headingThree">
-                                <h5 class="mb-0">
-                                    <button class="btn btn-link text-left btn-block" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                        Collapsible Group Item #3
-                                    </button>
-                                </h5>
-                            </div>
-                            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
-                                <div class="card-body">
-                                    Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. 3 wolf moon officia aute, non cupidatat skateboard dolor brunch. Food truck quinoa nesciunt laborum eiusmod. Brunch 3 wolf moon tempor, sunt aliqua put a bird on it squid single-origin coffee nulla assumenda shoreditch et. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident. Ad vegan excepteur butcher vice lomo. Leggings occaecat craft beer farm-to-table, raw denim aesthetic synth nesciunt you probably haven't heard of them accusamus labore sustainable VHS.
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">{{translate('Close')}}</button>
@@ -501,6 +479,11 @@ $hall_and_tables = getAllHallAndTables();
     </div>
     <!-- /Select Tables -->
 </div>
+
+<div id="loader-overlay" style="display: none;">
+    <div class="spinner"></div>
+</div>
+
 @endsection
 
 @push('script')
@@ -514,6 +497,8 @@ $hall_and_tables = getAllHallAndTables();
         let order_discount = JSON.parse(localStorage.getItem('order_discount')) ?? [];
         let customer_details = JSON.parse(localStorage.getItem('customer_details')) ?? [];
         let checked_tables = JSON.parse(localStorage.getItem('checked_tables')) ?? [];
+
+        let category_id_to_filter = '';
 
         $(document).ready(function() {
             addToCart();
@@ -536,6 +521,21 @@ $hall_and_tables = getAllHallAndTables();
             width: '100%'
         })
 
+        $('#branchSelect').select2({
+            theme: 'bootstrap4',
+            width: '100%'
+        })
+
+        /**
+         * Pagination
+         */
+        $(document).on('click', '.page-link', function(e) {
+            e.preventDefault();
+            console.log('Pagination link clicked'); // Debugging log
+            let url = $(this).attr('href');
+            fetchPage(url);
+        });
+
         /**
          * Select Customer
          */
@@ -553,7 +553,7 @@ $hall_and_tables = getAllHallAndTables();
          */
         $('#apply-tax').click(function() {
             let taxes = $('#tax_percentage').val();
-
+            tax_details = [];
             taxes.forEach(tax => {
                 let tax_name = tax.split('~')[0];
                 let tax_id = tax.split('~')[1];
@@ -593,17 +593,22 @@ $hall_and_tables = getAllHallAndTables();
                 let customer_mobile = $('#order_customer_mobile').val();
                 let customer_email = $('#order_customer_email').val();
                 let customer_address = $('#order_customer_address').val();
-                $('#selected-customer').text(customer_name);
 
-                let customer_details = {
-                    customer_id: '-1',
-                    customer_name: customer_name,
-                    customer_mobile: customer_mobile,
-                    customer_email: customer_email,
-                    customer_address: customer_address
-                };
+                if (customer_name != '' && customer_mobile != '') {
+                    $('#selected-customer').text(customer_name);
 
-                localStorage.setItem('customer_details', JSON.stringify(customer_details));
+                    let customer_details = {
+                        customer_id: '-1',
+                        customer_name: customer_name,
+                        customer_mobile: customer_mobile,
+                        customer_email: customer_email,
+                        customer_address: customer_address
+                    };
+
+                    localStorage.setItem('customer_details', JSON.stringify(customer_details));
+                } else {
+                    toastr.error("{{translate('Name and mobile are required for new customer')}}", 'error');
+                }
             } else {
                 let selected_customer_name = $('#order_customer option:selected').data('name');
                 $('#selected-customer').text(selected_customer_name);
@@ -620,8 +625,82 @@ $hall_and_tables = getAllHallAndTables();
          * Select category
          */
         $('.selectedCategory').click(function() {
-            $('#categorySelect').val($(this).data('id'));
-            $('#filterForm').submit();
+            $('.selectedCategory').removeClass('btn-pink');
+            $('.selectedCategory').addClass('btn-outline-pink');
+            $(this).addClass('btn-pink');
+
+            category_id_to_filter = $(this).data('id')
+            let url = '{{ route("pos") }}';
+            fetchPage(url);
+        });
+
+        /**
+         * Filter
+         */
+        $('#filter-btn').click(function() {
+            let url = '{{ route("pos") }}';
+            fetchPage(url);
+        });
+
+        /**
+         * Filter after branch selection
+         */
+        $('#branchSelect').change(function() {
+            let url = '{{ route("pos") }}';
+            fetchPage(url);
+        })
+
+        /**
+         * Filter based on search input
+         */
+        $('#search').on('input', function() {
+            let query = $(this).val();
+            if (query.length > 2) {
+                $.ajax({
+                    url: '{{ route("pos.item.search") }}',
+                    method: 'GET',
+                    data: {
+                        query: query
+                    },
+                    success: function(data) {
+                        console.log(data);
+                        let suggestions = '';
+                        data.forEach(item => {
+                            suggestions += `<div class="my-2 border-bottom suggested-item" data-name="${item.name}">
+                                <a href="#" class="dropdown-item">
+                                <img src="/${item.image}" width="30" height="30">
+                                ${item.name}
+                            </a>
+                            </div>`;
+                        });
+                        $('#suggestions').html(suggestions).show();
+                    },
+                    error: function() {
+                        $('#suggestions').hide();
+                    }
+                });
+            } else {
+                $('#suggestions').hide();
+            }
+        });
+
+        /**
+         * Filter based on suggested item
+         */
+        $(document).on('click', '.suggested-item', function(e) {
+            let product_name = $(this).data('name');
+            $('#search').val(product_name);
+            $('#suggestions').hide();
+
+            let url = '{{ route("pos") }}';
+            fetchPage(url);
+        })
+
+        // Hide suggestions when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('#search, #suggestions').length) {
+                $('#suggestions').hide();
+            }
         });
 
         /**
@@ -632,6 +711,8 @@ $hall_and_tables = getAllHallAndTables();
             var currentVal = parseInt($input.val());
             if (!isNaN(currentVal) && currentVal > 1) {
                 $input.val(currentVal - 1);
+            } else {
+                $input.val(1);
             }
         });
 
@@ -640,13 +721,18 @@ $hall_and_tables = getAllHallAndTables();
          */
         $(document).on('click', '.quantity-selector .btn-increment', function() {
             var $input = $(this).parent().find('.quantity-input');
-            $input.val(parseInt($input.val()) + 1);
+            var currentVal = parseInt($input.val());
+            if (!isNaN(currentVal) && currentVal > 0) {
+                $input.val(currentVal + 1);
+            } else {
+                $input.val(1);
+            }
         });
 
         /**
          * Add to cart
          */
-        $('.single-food-item .add-to-cart').click(function() {
+        $(document).on('click', '.single-food-item .add-to-cart',function() {
             const id = $(this).data('id');
             const name = $(this).data('name');
             const price = $(this).data('price');
@@ -658,7 +744,10 @@ $hall_and_tables = getAllHallAndTables();
             const quantityInput = foodItemContainer.find('.quantity-input');
 
             // Get the value of the quantity input
-            const quantity = quantityInput.val();
+            let quantity = quantityInput.val();
+            if (quantity == '' || quantity < 1) {
+                quantity = 1;
+            }
 
             quantityInput.val(1);
 
@@ -726,6 +815,8 @@ $hall_and_tables = getAllHallAndTables();
 
             quantityInput.val(1);
 
+            $('#loader-overlay').fadeIn();
+
             $.ajax({
                 url: "{{ route('single.item.variants') }}",
                 method: 'POST',
@@ -736,10 +827,11 @@ $hall_and_tables = getAllHallAndTables();
                     _token: '{{ csrf_token() }}'
                 },
                 success: function(response) {
-
                     $('#variant-list').html(response);
+                    $('#loader-overlay').fadeOut();
                 },
                 error: function(xhr, status, error) {
+                    $('#loader-overlay').fadeOut();
                     console.error(error);
                 }
             });
@@ -752,6 +844,7 @@ $hall_and_tables = getAllHallAndTables();
             let index = $(this).data('index');
             let id = ordered_items[index].id;
             let variant = ordered_items[index].variant;
+            $('#loader-overlay').fadeIn();
             $.ajax({
                 url: "{{ route('single.item.variants') }}",
                 method: 'POST',
@@ -762,11 +855,12 @@ $hall_and_tables = getAllHallAndTables();
                     _token: '{{ csrf_token() }}'
                 },
                 success: function(response) {
-
                     $('#variant-list').html(response);
+                    $('#loader-overlay').fadeOut();
                 },
                 error: function(xhr, status, error) {
                     console.error(error);
+                    $('#loader-overlay').fadeOut();
                 }
             });
         });
@@ -822,6 +916,7 @@ $hall_and_tables = getAllHallAndTables();
             let index = $(this).data('index');
             let id = ordered_items[index].id;
             let properties = ordered_items[index].properties;
+            $('#loader-overlay').fadeIn();
             $.ajax({
                 url: "{{ route('get.single.item.properties') }}",
                 method: 'POST',
@@ -833,9 +928,11 @@ $hall_and_tables = getAllHallAndTables();
                 },
                 success: function(response) {
                     $('#property-list').html(response);
+                    $('#loader-overlay').fadeOut();
                 },
                 error: function(xhr, status, error) {
                     console.error(error);
+                    $('#loader-overlay').fadeOut();
                 }
             });
         });
@@ -857,6 +954,10 @@ $hall_and_tables = getAllHallAndTables();
                 // Get the quantity input value
                 let quantity = parentRow.find(".food-property-quantity").val();
 
+                if (quantity == '' || quantity < 1) {
+                    quantity = 1;
+                }
+
                 // Add quantity directly to the item object
                 itemValue.quantity = parseInt(quantity); // Convert quantity to an integer
 
@@ -871,6 +972,9 @@ $hall_and_tables = getAllHallAndTables();
             addToCart();
         });
 
+        /**
+         * Select tables
+         */
         $('#select-table').click(function() {
             let html = '';
             checked_tables = [];
@@ -906,7 +1010,7 @@ $hall_and_tables = getAllHallAndTables();
         function addToCart() {
             let discount = $('#discount').val();
             let discount_type = $('#discount_type').val();
-
+            $('#loader-overlay').fadeIn();
             $.ajax({
                 url: "{{ route('pos.add.to.cart') }}",
                 method: 'POST',
@@ -920,9 +1024,11 @@ $hall_and_tables = getAllHallAndTables();
                 success: function(response) {
                     $('#order-summary').html(response);
                     makeCustomerSelected();
+                    $('#loader-overlay').fadeOut();
                 },
                 error: function(xhr, status, error) {
                     console.error(error);
+                    $('#loader-overlay').fadeOut();
                 }
             });
         }
@@ -1003,6 +1109,9 @@ $hall_and_tables = getAllHallAndTables();
             $('#selected-customer').text(customer_details.customer_name);
         }
 
+        /**
+         * Make tables selected
+         */
         function makeTablesSelected() {
             let tables = checked_tables;
             let html = '';
@@ -1024,7 +1133,36 @@ $hall_and_tables = getAllHallAndTables();
             }, 100);
         }
 
+        /**
+         * Fetch page
+         */
+        function fetchPage(url) {
+            $('#loader-overlay').fadeIn();
 
+            let search = $('#search').val();
+            let category = category_id_to_filter;
+            let branch = $('#branchSelect').val();
+
+            $.ajax({
+                url: url,
+                type: 'GET',
+                data: {
+                    search: search,
+                    category: category,
+                    branch: branch,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    $('#data-container').html(response.data);
+                    $('#pagination-links').html(response.pagination);
+
+                    $('#loader-overlay').fadeOut();
+                },
+                error: function(xhr) {
+                    console.error('An error occurred:', xhr);
+                }
+            });
+        }
     });
 </script>
 @endpush
