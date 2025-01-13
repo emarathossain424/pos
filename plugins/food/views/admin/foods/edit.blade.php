@@ -51,11 +51,11 @@ $all_branches = getBranches();
                         </div>
 
                         <div class="form-group">
-                            <label for="branch">{{translate('Select Branch')}}  ( <a href="{{route('manage.branch')}}">{{translate("Create branch if you haven't already")}}</a> )</label>
+                            <label for="branch">{{translate('Select Branch')}} ( <a href="{{route('manage.branch')}}">{{translate("Create branch if you haven't already")}}</a> )</label>
                             <select class="form-control select2 w-100" name="branch" id="branch" multiple>
                                 <option value="">{{translate('Select Branch')}}</option>
                                 @foreach($all_branches as $branch)
-                                    <option value="{{$branch->id}}" {{in_array($branch->id, $food_item_branches)? 'selected':'' }}>{{$branch->branch_name}}</option>
+                                <option value="{{$branch->id}}" {{in_array($branch->id, $food_item_branches)? 'selected':'' }}>{{$branch->branch_name}}</option>
                                 @endforeach
                             </select>
                             <div>
@@ -338,10 +338,11 @@ $all_branches = getBranches();
         $('#variant-id').change(() => {
             'use strict';
 
-            const variant_id = $('#variant-id').val()
+            let variant_id = $('#variant-id').val()
+            variant_id = variant_id.map(value => parseInt(value));
 
             //checking if structure is created for the first time while editing food item
-            if (is_structure_created || initial_food_type!='variant') {
+            if (is_structure_created || initial_food_type != 'variant') {
                 if (variant_id.length > 0) {
 
                     // Find  variant ids that do not exist in variant_id (selected variants) and then
@@ -408,7 +409,7 @@ $all_branches = getBranches();
             const properties = $('#properties').val()
             let data = {
                 'properties': properties,
-                'selected_property_items':<?php echo json_encode( $property_item_ids ); ?>,
+                'selected_property_items': <?php echo json_encode($property_item_ids); ?>,
                 '_token': '{{ csrf_token() }}'
             }
 
@@ -686,7 +687,7 @@ $all_branches = getBranches();
             let selectedValues = $(this).val();
             let propertyId = $(this).attr('name').match(/\d+/)[0]; // Extract property ID from the name attribute
 
-            selected_properties[ 'property_' + propertyId + '' ] = selectedValues;
+            selected_properties['property_' + propertyId + ''] = selectedValues;
         });
 
         let data = {
@@ -705,7 +706,9 @@ $all_branches = getBranches();
             'meta_description': meta_description_instance.getData(),
             'meta_image': $('#meta-image-input').val(),
             'variant_combo': variant_option_array,
-            'properties': {...selected_properties},
+            'properties': {
+                ...selected_properties
+            },
             '_token': '{{ csrf_token() }}'
         }
 
