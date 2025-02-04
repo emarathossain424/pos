@@ -22,6 +22,7 @@
                 $key = 0;
                 @endphp
                 @foreach($variants as $item)
+                @if(!empty($item['availability']))
                 @php
                 $current_variant = $item;
                 $checked = '';
@@ -36,13 +37,15 @@
                     <td>
                         <input type="radio" name="variant" value="{{ json_encode($item) }}" {{ $checked }} />
                     </td>
-                    <td>{{ $item['combo'][0]['options']['name'] }}</td> <!-- Size -->
-                    <td>{{ $item['combo'][1]['options']['name'] }}</td> <!-- Age Group -->
+                    @foreach($item['combo'] as $combo)
+                    <td>{{ $combo['options']['name'] }}</td>
+                    @endforeach
                     <td>{{setPriceFormat($item['special_price'])}}</td>
                 </tr>
                 @php
                 $key++;
                 @endphp
+                @endif
                 @endforeach
             </tbody>
         </table>

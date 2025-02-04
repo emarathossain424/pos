@@ -321,5 +321,11 @@
     "Cash": "Cash",
     "Card": "Card",
     "Mobile Banking": "Mobile Banking",
-    "Name and mobile are required for new customer": "Name and mobile are required for new customer"
+    "Name and mobile are required for new customer": "Name and mobile are required for new customer",
+    "Remove All": "Remove All",
+    "Clear Cart": "Clear Cart",
+    "Order placed successfully": "Order placed successfully",
+    "Print Receipt": "Print Receipt",
+    "Take New Order": "Take New Order",
+    "Process Transaction": "Process Transaction"
 }

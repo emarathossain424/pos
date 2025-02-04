@@ -598,7 +598,7 @@ $hall_and_tables = getAllHallAndTables();
                     $('#selected-customer').text(customer_name);
 
                     let customer_details = {
-                        customer_id: '-1',
+                        customer_id: null,
                         customer_name: customer_name,
                         customer_mobile: customer_mobile,
                         customer_email: customer_email,
@@ -732,7 +732,7 @@ $hall_and_tables = getAllHallAndTables();
         /**
          * Add to cart
          */
-        $(document).on('click', '.single-food-item .add-to-cart',function() {
+        $(document).on('click', '.single-food-item .add-to-cart', function() {
             const id = $(this).data('id');
             const name = $(this).data('name');
             const price = $(this).data('price');
@@ -1003,6 +1003,32 @@ $hall_and_tables = getAllHallAndTables();
         })
 
         /**
+         * Clear cart
+         */
+        $(document).on('click', '#clear-cart', function() {
+            localStorage.removeItem("ordered_items");
+            localStorage.removeItem("checked_tables");
+            localStorage.removeItem("tax_details");
+            localStorage.removeItem("order_discount");
+            localStorage.removeItem("customer_details");
+
+            ordered_items = [];
+            checked_tables = [];
+            tax_details = [];
+            order_discount = {};
+            customer_details = {};
+
+            addToCart();
+        })
+
+        /**
+         * Process transaction
+         */
+        $(document).on('click', '#process-transaction', function() {
+            processTransaction();
+        })
+
+        /**
          * Add ordered items to cart
          *
          * @return void
@@ -1162,6 +1188,73 @@ $hall_and_tables = getAllHallAndTables();
                     console.error('An error occurred:', xhr);
                 }
             });
+        }
+
+        function processTransaction() {
+            const customer_details = JSON.parse(localStorage.getItem('customer_details'));
+            const order_discount = JSON.parse(localStorage.getItem('order_discount'));
+            const ordered_items = JSON.parse(localStorage.getItem('ordered_items'));
+            const tax_details = JSON.parse(localStorage.getItem('tax_details'));
+            const checked_tables = JSON.parse(localStorage.getItem('checked_tables'));
+            console.log("customer_details");
+            console.log(customer_details);
+            console.log("order_discount");
+            console.log(order_discount);
+            console.log("ordered_items");
+            console.log(ordered_items);
+            console.log("tax_details");
+            console.log(tax_details);
+            console.log("checked_tables");
+            console.log(checked_tables);
+
+            const order_type = $('#order_type').val();
+            const payment_type = $('#payment_method').val();
+            const order_status = $('#order_status').val();
+            const total = $('#total').val();
+            const subtotal = $('#subtotal').val();
+
+            $.ajax({
+                url: "{{ route('pos.place.order') }}",
+                method: 'POST',
+                data: {
+                    customer_details: customer_details,
+                    ordered_items: ordered_items,
+                    order_discount: order_discount,
+                    tax_details: tax_details,
+                    checked_tables: checked_tables,
+                    order_type: order_type,
+                    payment_type: payment_type,
+                    order_status: order_status,
+                    total: total,
+                    subtotal: subtotal,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    console.log(response);
+                    $('#process-transaction').hide();
+                    $('#order-buttons').addClass('d-flex');
+                    $('#loader-overlay').fadeOut();
+
+                    if (response.success) {
+                        // Generate and Print Invoice
+                        printInvoice(response.order_id);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#loader-overlay').fadeOut();
+                    console.error(error);
+                }
+            });
+        }
+
+        // Function to Print Invoice
+        function printInvoice(orderId) {
+            console.log(orderId);
+            const invoiceUrl = "{{ route('pos.print.invoice', ':id') }}".replace(':id', orderId);
+            const printWindow = window.open(invoiceUrl, '_blank');
+            printWindow.onload = function() {
+                printWindow.print();
+            };
         }
     });
 </script>

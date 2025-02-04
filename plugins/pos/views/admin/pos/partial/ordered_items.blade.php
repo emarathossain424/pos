@@ -7,6 +7,7 @@ $order_status = getOrderStatus();
     <thead>
         <tr>
             <td><strong>{{translate('Order Details')}}<strong></td>
+            <td class="text-right"><button type="button" class="btn btn-sm btn-danger" id="clear-cart">{{translate('Clear Cart')}}</button></td>
         </tr>
     </thead>
     <tbody>
@@ -62,7 +63,10 @@ $order_status = getOrderStatus();
         @endforeach
         <tr>
             <td><strong>{{translate('Subtotal')}}</strong></td>
-            <td class="text-right">{{setPriceFormat($total)}}</td>
+            <td class="text-right">
+                <input type="hidden" id="subtotal" name="subtotal" value="{{$total}}">
+                {{setPriceFormat($total)}}
+            </td>
         </tr>
         <tr>
             @php
@@ -131,7 +135,10 @@ $order_status = getOrderStatus();
 
         <tr>
             <td><strong>{{translate('Grand Total')}}</strong></td>
-            <td class="text-right"><span class="fs-5"><strong>{{setPriceFormat($total)}}</strong></span></td>
+            <td class="text-right">
+                <input type="hidden" id="total" name="total" value="{{$total}}">
+                <span class="fs-5"><strong>{{setPriceFormat($total)}}</strong></span>
+            </td>
         </tr>
         <tr>
             <td>
@@ -189,7 +196,11 @@ $order_status = getOrderStatus();
         </tr>
         <tr>
             <td colspan="2" class="text-center">
-                <button type="button" class="btn btn-success btn-block mt-3 w-100">Process Transaction</button>
+                <button type="button" class="btn btn-success btn-block mt-3 ml-1 w-100" id="process-transaction">{{translate('Process Transaction')}}</button>
+                <div class="justify-content-between d-none" id="order-buttons">
+                    <button type="button" class="btn btn-success btn-block mt-3 ml-1 w-100">{{translate('Take New Order')}}</button>
+                    <button type="button" class="btn bg-pink btn-block mt-3 ml-1 w-100">{{translate('Print Receipt')}}</button>
+                </div>
             </td>
         </tr>
     </tbody>

@@ -544,7 +544,7 @@ class FoodItemController extends Controller
             $data['availability']  = $item->availability;
             $variants[]            = $data;
         }
-
+        
         return view('pos::admin.pos.partial.item_variants', compact('variants', 'food_item_id', 'food_item_name', 'food_item_quantity', 'order_index', 'food_item_variant'));
     }
 }
