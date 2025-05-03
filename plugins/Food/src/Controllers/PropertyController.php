@@ -1,5 +1,4 @@
 <?php
-
 namespace Plugin\Food\Controllers;
 
 use App\Http\Controllers\Controller;
@@ -11,16 +10,14 @@ use Plugin\Food\Models\FoodPropertyGroups;
 use Plugin\Food\Models\TranslateFoodPropertyGroupItems;
 use Plugin\Food\Models\TranslateFoodPropertyGroups;
 
-class PropertyController extends Controller
-{
+class PropertyController extends Controller {
 
     /**
      * Retrieves and displays a list of food property groups along with their associated items.
      *
      * @return \Illuminate\Http\Response The rendered view containing the list of food property groups.
      */
-    public function properties()
-    {
+    public function properties() {
         $properties = FoodPropertyGroups::with('items')->get();
         return view('Food::admin.property.index', compact('properties'));
     }
@@ -32,8 +29,7 @@ class PropertyController extends Controller
      * @throws \Exception If an error occurs while storing the property group.
      * @return \Illuminate\Http\RedirectResponse Redirects back to the previous page.
      */
-    public function createProperty(Request $request)
-    {
+    public function createProperty(Request $request) {
         $request->validate([
             'property_name' => 'required|unique:food_property_groups,name',
         ]);
@@ -58,8 +54,7 @@ class PropertyController extends Controller
      * @throws \Exception If an error occurs while updating the property group.
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function updateProperty(Request $request)
-    {
+    public function updateProperty(Request $request) {
         $request->validate([
             'property_name' => 'required|unique:food_property_groups,name,' . $request['id'],
         ]);
@@ -108,8 +103,7 @@ class PropertyController extends Controller
      * @throws \Exception If an error occurs during the deletion process.
      * @return \Illuminate\Http\RedirectResponse Redirects back to the previous page.
      */
-    public function deleteProperty(Request $request)
-    {
+    public function deleteProperty(Request $request) {
         try {
             $property = FoodPropertyGroups::find((int) $request['id']);
             $property->delete();
@@ -128,8 +122,7 @@ class PropertyController extends Controller
      * @throws \Exception If an error occurs while storing the food property item.
      * @return \Illuminate\Http\RedirectResponse Redirects back to the previous page.
      */
-    public function addItem(Request $request)
-    {
+    public function addItem(Request $request) {
         $request->validate([
             'property_id' => 'required|exists:food_property_groups,id',
             'item_name'   => 'required|unique:food_property_group_items,item_name',
@@ -156,8 +149,7 @@ class PropertyController extends Controller
      * @throws \Exception If an error occurs while updating the item.
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function updateItem(Request $request)
-    {
+    public function updateItem(Request $request) {
         $request->validate([
             'item_name' => 'required|unique:food_property_group_items,item_name,' . $request['id'],
         ]);
@@ -208,8 +200,7 @@ class PropertyController extends Controller
      * @throws \Exception If an error occurs during the deletion process.
      * @return \Illuminate\Http\RedirectResponse Redirects back to the previous page.
      */
-    public function deleteItem(Request $request)
-    {
+    public function deleteItem(Request $request) {
         try {
             $item = FoodPropertyGroupItems::find((int) $request['id']);
             $item->delete();
@@ -244,8 +235,7 @@ class PropertyController extends Controller
      *                                           "message": "No translation found"
      *                                       }
      */
-    public function getPropertyTranslation(Request $request)
-    {
+    public function getPropertyTranslation(Request $request) {
         $lang_id           = $request['lang_id'];
         $property_group_id = $request['id'];
 
@@ -292,8 +282,7 @@ class PropertyController extends Controller
      *                                           "message": "No translation found"
      *                                       }
      */
-    public function getItemTranslation(Request $request)
-    {
+    public function getItemTranslation(Request $request) {
         $lang_id = $request['lang_id'];
         $item_id = $request['id'];
 
@@ -326,8 +315,7 @@ class PropertyController extends Controller
      *                        - properties: An array of IDs of the food property groups associated with the selected property items.
      * @return \Illuminate\Http\Response The rendered view containing the list of food property items.
      */
-    public function getPropertyItems(Request $request)
-    {
+    public function getPropertyItems(Request $request) {
         $property_item_ids = $request['selected_property_items'] ?? [];
         $property_ids      = $request['properties'];
         $properties        = FoodPropertyGroups::whereIn('id', $property_ids)
@@ -345,16 +333,17 @@ class PropertyController extends Controller
      *                        - item_id: The ID of the food item to retrieve the associated property items for.
      * @return \Illuminate\Http\Response The rendered view containing the list of food property items associated with the food item.
      */
-    public function getSingleItemProperties(Request $request)
-    {
+    public function getSingleItemProperties(Request $request) {
         $order_index          = $request['index'];
         $id                   = $request['item_id'];
         $selected_properties  = $request['properties'] ?? [];
         $property_ids         = [];
+        $property_item_ids    = [];
         $food_item_properties = FoodItemProperty::where('food_item_id', $id)->get();
 
         foreach ($food_item_properties as $property) {
-            $property_ids[]      = $property->property_id;
+            $property_ids[] = $property->property_id;
+            $property_item_ids[] = $property->property_item_id;
         }
 
         $properties = FoodPropertyGroups::whereIn('id', $property_ids)
@@ -362,7 +351,6 @@ class PropertyController extends Controller
             ->with('items')
             ->get();
 
-
-        return view('Food::admin.foods.partial.property_items_for_orders', compact('properties', 'order_index', 'selected_properties'));
+        return view('Food::admin.foods.partial.property_items_for_orders', compact('properties', 'order_index', 'selected_properties','property_item_ids'));
     }
 }

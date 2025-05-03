@@ -99,7 +99,6 @@ class PosController extends Controller {
     }
 
     public function placeOrder( OrderValidationRequest $request ) {
-        // dd($request->all());
         try {
             DB::beginTransaction();
             $customer_details = $request['customer_details'];

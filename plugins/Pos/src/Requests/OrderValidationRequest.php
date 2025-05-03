@@ -37,15 +37,16 @@ class OrderValidationRequest extends FormRequest
 
             // Validate properties
             'ordered_items.*.properties' => 'nullable|array',
-            'ordered_items.*.properties.*.id' => 'exists:food_property_group_items,id',
+            'ordered_items.*.properties.*.id' => 'required_with:ordered_items.*.properties|exists:food_property_group_items,id',
 
             // Validate order discount
-            'order_discount.discount_type' => 'required|in:percent,fixed',
-            'order_discount.discount_amount' => 'required|numeric|min:0|max:100',
+            'order_discount.discount_type' => 'nullable|in:percent,fixed',
+            'order_discount.discount_amount' => 'required_with:order_discount.discount_type|numeric|min:0|max:100',
+
 
             // Validate tax details
-            'tax_details' => 'required|array|min:1',
-            'tax_details.*.tax_id' => 'required|exists:core_taxes,id',
+            'tax_details' => 'nullable|array|min:1',
+            'tax_details.*.tax_id' => 'required_with:tax_details|exists:core_taxes,id',
 
             // Validate tables
             'checked_tables' => 'nullable|array',

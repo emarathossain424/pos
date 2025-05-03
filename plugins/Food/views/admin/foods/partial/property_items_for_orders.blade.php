@@ -14,6 +14,7 @@
         </thead>
         <tbody>
             @foreach($property->items as $item)
+            <!-- @if(in_array($item->id, $property_item_ids)) -->
             @php
             $checked = '';
             $quantity = 1;
@@ -46,6 +47,7 @@
                     <strong>${{ number_format($item->price, 2) }}</strong>
                 </td>
             </tr>
+            <!-- @endif -->
             @endforeach
         </tbody>
     </table>

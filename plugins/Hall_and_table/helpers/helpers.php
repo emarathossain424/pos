@@ -48,8 +48,6 @@ if (!function_exists('getAllHallAndTables')) {
     {
         $hall_and_tables = Hall::with('tables')->get();
 
-        // dd($hall_and_tables);
-
         return $hall_and_tables;
     }
 }
