@@ -21,7 +21,7 @@ class VariationController extends Controller
     public function variations()
     {
         $variants = FoodVariant::with('options')->get();
-        return view('food::admin.variation.index', compact('variants'));
+        return view('Food::admin.variation.index', compact('variants'));
     }
 
     /**

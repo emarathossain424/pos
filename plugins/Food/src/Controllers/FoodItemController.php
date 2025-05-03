@@ -50,7 +50,7 @@ class FoodItemController extends Controller
 
         $food_items = $food_items->get();
 
-        return view('food::admin.foods.index', compact('food_items'));
+        return view('Food::admin.foods.index', compact('food_items'));
     }
 
     /**
@@ -59,7 +59,7 @@ class FoodItemController extends Controller
     public function addFoodItems()
     {
         $variants = FoodVariant::with('options')->get();
-        return view('food::admin.foods.create', compact('variants'));
+        return view('Food::admin.foods.create', compact('variants'));
     }
 
     /**
@@ -409,7 +409,7 @@ class FoodItemController extends Controller
             $variant_option_array[] = $data;
         }
 
-        return view('food::admin.foods.edit', compact('variants', 'food_item', 'variant_ids', 'variant_option_ids', 'variant_option_array', 'food_item_branches', 'property_ids', 'property_item_ids'));
+        return view('Food::admin.foods.edit', compact('variants', 'food_item', 'variant_ids', 'variant_option_ids', 'variant_option_array', 'food_item_branches', 'property_ids', 'property_item_ids'));
     }
 
     /**
@@ -544,7 +544,7 @@ class FoodItemController extends Controller
             $data['availability']  = $item->availability;
             $variants[]            = $data;
         }
-        
-        return view('pos::admin.pos.partial.item_variants', compact('variants', 'food_item_id', 'food_item_name', 'food_item_quantity', 'order_index', 'food_item_variant'));
+
+        return view('Pos::admin.pos.partial.item_variants', compact('variants', 'food_item_id', 'food_item_name', 'food_item_quantity', 'order_index', 'food_item_variant'));
     }
 }

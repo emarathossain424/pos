@@ -58,12 +58,12 @@ class PosController extends Controller {
 
         if ( $request->ajax() ) {
             return response()->json( [
-                'data'       => view( 'pos::admin.pos.partial.food_items', compact( 'food_items' ) )->render(),
+                'data'       => view( 'Pos::admin.pos.partial.food_items', compact( 'food_items' ) )->render(),
                 'pagination' => (string) $food_items->links( 'pagination::bootstrap-5' ),
             ] );
         }
 
-        return view( 'pos::admin.pos.index', compact( 'categories', 'food_items' ) );
+        return view( 'Pos::admin.pos.index', compact( 'categories', 'food_items' ) );
     }
 
     /**
@@ -79,7 +79,7 @@ class PosController extends Controller {
 
         $ordered_items = $request['ordered_items'] ?? [];
 
-        return view( 'pos::admin.pos.partial.ordered_items', compact( 'ordered_items', 'order_discount', 'taxes' ) );
+        return view( 'Pos::admin.pos.partial.ordered_items', compact( 'ordered_items', 'order_discount', 'taxes' ) );
     }
 
     /**
@@ -242,6 +242,6 @@ class PosController extends Controller {
             'cash_tendered' => $order->cash_tendered ?? $order->total,
         ];
 
-        return view( 'pos::admin.pos.invoice.invoice', $data );
+        return view( 'Pos::admin.pos.invoice.invoice', $data );
     }
 }

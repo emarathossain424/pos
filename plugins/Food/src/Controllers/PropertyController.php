@@ -22,7 +22,7 @@ class PropertyController extends Controller
     public function properties()
     {
         $properties = FoodPropertyGroups::with('items')->get();
-        return view('food::admin.property.index', compact('properties'));
+        return view('Food::admin.property.index', compact('properties'));
     }
 
     /**
@@ -334,7 +334,7 @@ class PropertyController extends Controller
             ->with('items')
             ->get();
 
-        return view('food::admin.foods.partial.property_items', compact('properties', 'property_item_ids'));
+        return view('Food::admin.foods.partial.property_items', compact('properties', 'property_item_ids'));
     }
 
     /**
@@ -363,6 +363,6 @@ class PropertyController extends Controller
             ->get();
 
 
-        return view('food::admin.foods.partial.property_items_for_orders', compact('properties', 'order_index', 'selected_properties'));
+        return view('Food::admin.foods.partial.property_items_for_orders', compact('properties', 'order_index', 'selected_properties'));
     }
 }

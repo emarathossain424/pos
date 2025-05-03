@@ -16,7 +16,7 @@ class CategoryController extends Controller {
      */
     public function categories() {
         $categories = FoodCategory::with( 'parentCategory' )->get();
-        return view( 'food::admin.category.index', compact( 'categories' ) );
+        return view( 'Food::admin.category.index', compact( 'categories' ) );
     }
 
     /**
@@ -25,7 +25,7 @@ class CategoryController extends Controller {
      * @return void
      */
     public function addCategory() {
-        return view( 'food::admin.category.create' );
+        return view( 'Food::admin.category.create' );
     }
 
     /**
@@ -69,7 +69,7 @@ class CategoryController extends Controller {
         if ( isset( request()->lang ) && ( request()->lang != $default_lang ) ) {
             $e_category = $e_category->translateInto( request()->lang )->first();
         }
-        return view( 'food::admin.category.edit', compact( 'e_category' ) );
+        return view( 'Food::admin.category.edit', compact( 'e_category' ) );
     }
 
     /**

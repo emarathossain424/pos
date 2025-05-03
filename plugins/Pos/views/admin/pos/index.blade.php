@@ -244,7 +244,7 @@ $hall_and_tables = getAllHallAndTables();
                         <!-- /Categories Section -->
 
                         <div id="data-container">
-                            @include('pos::admin.pos.partial.food_items', ['food_items' => $food_items])
+                            @include('Pos::admin.pos.partial.food_items', ['food_items' => $food_items])
                         </div>
 
                         <div id="pagination-links">

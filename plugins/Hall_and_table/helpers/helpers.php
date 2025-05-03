@@ -10,7 +10,7 @@ if (!function_exists('getAllTableShapes')) {
      */
     function getAllTableShapes()
     {
-        return config('hall_and_table.table_shapes');
+        return config('Hall_and_table.table_shapes');
     }
 }
 
@@ -22,7 +22,7 @@ if (!function_exists('getAllTableStatus')) {
      */
     function getAllTableStatus()
     {
-        return config('hall_and_table.table_status');
+        return config('Hall_and_table.table_status');
     }
 }
 
@@ -34,7 +34,7 @@ if (!function_exists('getAllTableTypes')) {
      */
     function getAllTableTypes()
     {
-        return config('hall_and_table.table_types');
+        return config('Hall_and_table.table_types');
     }
 }
 

@@ -18,7 +18,7 @@ class HallAndTableController extends Controller {
      */
     public function allHalls() {
         $halls = Hall::all();
-        return view( 'hall_and_table::admin.hall.index', compact( 'halls' ) );
+        return view( 'Hall_and_table::admin.hall.index', compact( 'halls' ) );
     }
 
     /**
@@ -190,7 +190,7 @@ class HallAndTableController extends Controller {
      */
     public function allTables( $hall_id ) {
         $tables = Table::where( 'hall_id', $hall_id )->get();
-        return view( 'hall_and_table::admin.table.index', compact( 'hall_id', 'tables' ) );
+        return view( 'Hall_and_table::admin.table.index', compact( 'hall_id', 'tables' ) );
     }
 
     /**
