@@ -32,12 +32,14 @@ class OrderValidationRequest extends FormRequest
 
             // Validate variants if exists
             'ordered_items.*.variant.combo' => 'nullable|array',
-            'ordered_items.*.variant.combo.*.variant.id' => 'required_with:ordered_items.*.variant.combo|exists:food_variants,id',
-            'ordered_items.*.variant.combo.*.options.id' => 'required_with:ordered_items.*.variant.combo|exists:food_variant_options,id',
+            'ordered_items.*.variant.combo.*.variant.id' => 'required_with:ordered_items.*.variant.combo|exists:food_item_variant_options,variant_id',
+            'ordered_items.*.variant.combo.*.options.id' => 'required_with:ordered_items.*.variant.combo|exists:food_item_variant_options,option_id',
 
             // Validate properties
             'ordered_items.*.properties' => 'nullable|array',
-            'ordered_items.*.properties.*.id' => 'required_with:ordered_items.*.properties|exists:food_property_group_items,id',
+            'ordered_items.*.properties.*.id' => 'required_with:ordered_items.*.properties|exists:food_item_properties,property_item_id',
+            'ordered_items.*.properties.*.property_group_id' => 'required_with:ordered_items.*.properties|exists:food_item_properties,property_id',
+
 
             // Validate order discount
             'order_discount.discount_type' => 'nullable|in:percent,fixed',

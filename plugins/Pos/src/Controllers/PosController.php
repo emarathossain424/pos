@@ -99,15 +99,22 @@ class PosController extends Controller {
     }
 
     public function placeOrder( OrderValidationRequest $request ) {
+        // dd($request->all());
         try {
             DB::beginTransaction();
-            $customer_details = $request['customer_details'];
+            $customer_details = !empty($request['customer_details']) ? $request['customer_details'] : [];
             $ordered_items    = $request['ordered_items'];
 
-            $customer_id = $customer_details['customer_id'];
-            if ( empty( $customer_id ) ) {
-                $customer_id = $this->register_customers( $customer_details );
+            if(!empty($customer_details)){
+                $customer_id = $customer_details['customer_id'];
+                if ( empty( $customer_id ) ) {
+                    $customer_id = $this->register_customers( $customer_details );
+                }
             }
+            else{
+                $customer_id = null;
+            }
+
 
             $order_id = $this->createOrder( $request, $customer_id );
             $this->storeOrderedItems( $ordered_items, $order_id );
@@ -120,6 +127,8 @@ class PosController extends Controller {
             ] );
         } catch ( \Exception $ex ) {
             DB::rollback();
+            dd($ex);
+
             return response()->json( [
                 'success' => 0,
                 'message' => 'Unable to place order',
@@ -159,8 +168,12 @@ class PosController extends Controller {
         $order                        = new Order();
         $order->token                 = $token;
         $order->customer_id           = $customer_id;
-        $order->order_discount_type   = $order_discount['discount_type'];
-        $order->order_discount_amount = $order_discount['discount_amount'];
+
+        if(isset($order_discount['discount_type']) && isset($order_discount['discount_amount'])){
+            $order->order_discount_type   = $order_discount['discount_type'];
+            $order->order_discount_amount = $order_discount['discount_amount'];
+        }
+
         $order->order_type            = $order_type;
         $order->payment_type          = $payment_type;
         $order->order_status          = $order_status;
