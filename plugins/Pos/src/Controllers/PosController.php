@@ -98,6 +98,12 @@ class PosController extends Controller {
         return response()->json( $food_items );
     }
 
+    /**
+     * Will place an order with the provided details and return the order ID.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\Response
+     */
     public function placeOrder( OrderValidationRequest $request ) {
         // dd($request->all());
         try {
@@ -136,6 +142,11 @@ class PosController extends Controller {
         }
     }
 
+    /**
+     * Registers a new customer if the customer details are provided.
+     * @param  array  $customer_details
+     * @return int
+     */
     public function register_customers( $customer_details ) {
         $name    = !empty( $customer_details['customer_name'] ) ? $customer_details['customer_name'] : '';
         $mobile  = !empty( $customer_details['customer_mobile'] ) ? $customer_details['customer_mobile'] : '';
@@ -152,6 +163,11 @@ class PosController extends Controller {
         return $customer->id;
     }
 
+    /**
+     * Creates a new order with the provided details and returns the order ID.
+     * @param  int  $customer_id
+     * @return int
+     */
     public function createOrder( $request, $customer_id ) {
         $checked_tables = $request['checked_tables'];
         $order_discount = $request['order_discount'];
@@ -186,6 +202,12 @@ class PosController extends Controller {
         return $order->id;
     }
 
+    /**
+     * Stores the ordered items in the database.
+     * @param  array  $ordered_items
+     * @param  int  $order_id
+     * @return void
+     **/
     public function storeOrderedItems( $ordered_items, $order_id ) {
         foreach ( $ordered_items as $value ) {
             $variant = !empty( $value['variant'] ) && is_array( $value['variant'] ) ? $value['variant'] : [];
@@ -206,6 +228,11 @@ class PosController extends Controller {
         }
     }
 
+    /**
+     * Prints an invoice for the given order ID.
+     * @param  int  $order_id
+     * @return \Illuminate\Http\Response
+     */
     public function printInvoice( $order_id ) {
         $order = Order::where( 'id', $order_id )->with( ['customer', 'orderedItems'] )->firstOrFail();
 
@@ -255,5 +282,49 @@ class PosController extends Controller {
         ];
 
         return view( 'Pos::admin.pos.invoice.invoice', $data );
+    }
+
+    public function orderList(){
+        return view('Pos::admin.pos.order_list');
+    }
+
+    public function getOrders(Request $request){
+        $search = $request->input('search.value');
+        $start = $request->input('start', 0);
+        $length = $request->input('length', 10);
+        $draw = intval($request->input('draw'));
+
+        $query = Order::query();
+
+        if ($search) {
+            $query->where('customer_name', 'like', "%$search%")
+                ->orWhere('status', 'like', "%$search%");
+        }
+
+        $total = $query->count();
+        $orders = $query->offset($start)->limit($length)->orderBy('id', 'desc')->get();
+
+        return response()->json([
+            'draw' => $draw,
+            'recordsTotal' => $total,
+            'recordsFiltered' => $total,
+            'data' => $orders,
+        ]);
+
+        // {
+        // "draw": 1,
+        // "recordsTotal": 25,
+        // "recordsFiltered": 25,
+        // "data": [
+        //         {
+        //         "id": 1,
+        //         "customer_name": "John Doe",
+        //         "total_amount": 120.00,
+        //         "status": "pending",
+        //         "created_at": "2025-05-15T08:00:00.000000Z"
+        //         }
+        //     ]
+        // }
+
     }
 }

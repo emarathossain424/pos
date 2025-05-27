@@ -20,4 +20,10 @@ Route::prefix('/pos')->middleware('auth')->group(function () {
     Route::post('/add-to-cart', [PosController::class, 'posAddToCart'])->name('pos.add.to.cart');
     Route::post('/place-order', [PosController::class, 'placeOrder'])->name('pos.place.order');
     Route::get('/print-invoice/{order_id}', [PosController::class, 'printInvoice'])->name('pos.print.invoice');
+
+    Route::get('/orders', [PosController::class, 'orderList'])->name('order.list');
+
+
+    Route::get('/get-orders', [PosController::class, 'getOrders'])->name('get.orders');
+
 });

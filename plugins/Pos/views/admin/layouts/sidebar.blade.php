@@ -1,5 +1,5 @@
 @php
-$active_menu_list = ['pos'];
+$active_menu_list = ['pos','order.list'];
 $is_active = in_array(Route::currentRouteName(), $active_menu_list);
 @endphp
 <li class="nav-item {{$is_active? 'menu-open':'' }}">
@@ -18,6 +18,14 @@ $is_active = in_array(Route::currentRouteName(), $active_menu_list);
                 <i class="far fa-circle nav-icon"></i>
                 <p>
                     {{translate('POS')}}
+                </p>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="{{route('order.list')}}" class="nav-link {{$is_active? 'active':'' }}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>
+                    {{translate('All Orders')}}
                 </p>
             </a>
         </li>
